@@ -1,18 +1,24 @@
 import os
+import numpy as np
 from tqdm import tqdm
 
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
+import sekitoba_data_create as dc
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 
+name = "time_index"
+
 def main():
     result = {}
+    data_storage = []
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
+    time_index = dc.TimeIndexGet()
     key_dict = {}
     
     for k in tqdm( race_data.keys() ):
@@ -44,22 +50,54 @@ def main():
             if not cd.race_check():
                 continue
 
-            key = str( int( cd.popular() ) )
-            lib.dic_append( result, year, {} )
-            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
-
-            result[year][key]["count"] += 1
+            current_time_index = time_index.main( kk, pd.past_day_list() )
+            instance = {}
+            instance["key"] = current_time_index["max"]
+            instance["odds"] = 0
+            instance["year"] = year
+            #lib.dic_append( result, year, {} )
+            #lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
 
             if cd.rank() == 1:
-                result[year][key]["recovery"] += cd.odds()
+                instance["odds"] = cd.odds()
 
+            data_storage.append( instance )
+
+
+    data_storage = sorted( data_storage, key = lambda x:x["key"] )
+    base = int( len( data_storage ) / 10 )    
+    count = 1
+    b = int( base * count )
+    split_key = data_storage[b]["key"]
+    split_list = [ split_key ]
+    
+    for i in range( 0, len( data_storage ) ):
+        current_key = data_storage[i]["key"]
+
+        if split_key < current_key:
+            count += 1
+            b = min( int( base * count ), len( data_storage ) - 1 )
+            split_key = data_storage[b]["key"]
+            split_list.append( split_key )
+
+        key = str( count )
+        year = data_storage[i]["year"]
+        lib.dic_append( result, year, {} )
+        lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+
+        result[year][key]["recovery"] += data_storage[i]["odds"]
+        result[year][key]["count"] += 1
 
     for year in result.keys():
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    lib.write_recovery_csv( result, "popular.csv" )
+    score = lib.recovery_score_check( result )
+    lib.write_recovery_csv( result,  name + ".csv" )
+    lib.recovery_data_upload( name, score, split_list )
+
+    print( split_list )
 
 if __name__ == "__main__":
     main()

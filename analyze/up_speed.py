@@ -1,19 +1,25 @@
+import os
+import numpy as np
+from tqdm import tqdm
+
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
 import sekitoba_data_create as dc
 
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
+dm.dl.file_set( "baba_index_data.pickle" )
+
+name = "up_speed"
 
 def main():
     result = {}
+    data_storage = []
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
+    baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
@@ -24,7 +30,7 @@ def main():
 
         key_place = str( race_info[race_id]["place"] )
         key_dist = str( race_info[race_id]["dist"] )
-        key_kind = str( race_info[race_id]["kind"] )        
+        key_kind = str( race_info[race_id]["kind"] )      
         key_baba = str( race_info[race_id]["baba"] )
 
         if year in lib.test_years:
@@ -33,8 +39,6 @@ def main():
         #芝かダートのみ
         if key_kind == "0" or key_kind == "3":
             continue
-
-        us_list = []
 
         for kk in race_data[k].keys():
             horce_id = kk
@@ -46,24 +50,31 @@ def main():
             if not cd.race_check():
                 continue
 
-            limb_math = lib.limb_search( pd )
-            key = str( int( limb_math ) )
-            
-            lib.dic_append( result, year, {} )
-            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
-            
-            result[year][key]["count"] += 1
+            speed, up_speed, pace_speed = pd.speed_index( baba_index_data[horce_id] )
+            score = lib.max_check( up_speed )
+            instance = {}
+            instance["key"] = score
+            instance["odds"] = 0
+            instance["year"] = year
 
             if cd.rank() == 1:
-                result[year][key]["recovery"] += cd.odds()
+                instance["odds"] = cd.odds()
 
+            data_storage.append( instance )
+
+    result, split_list = lib.recovery_data_split( data_storage )
+    
     for year in result.keys():
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    lib.write_recovery_csv( result, "limb.csv" )
-    
+    lib.write_recovery_csv( result,  name + ".csv" )
+    score = lib.recovery_score_check( result )
+    lib.recovery_data_upload( name, score, split_list )
+    print( split_list )
+    print( score )
+
 if __name__ == "__main__":
     main()
         
