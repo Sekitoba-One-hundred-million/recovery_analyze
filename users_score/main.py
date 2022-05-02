@@ -14,6 +14,7 @@ dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 dm.dl.file_set( "baba_index_data.pickle" )
+dm.dl.file_set( "parent_id_data.pickle" )
 
 def main( test_check = False ):
     result = {}
@@ -21,7 +22,9 @@ def main( test_check = False ):
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )    
+    baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
+    parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
+    
     us = UsersScore()
     time_index = dc.TimeIndexGet()
     up_score_get = dc.UpScore()
@@ -67,6 +70,10 @@ def main( test_check = False ):
                 continue
 
             key_horce_num = str( int( cd.horce_number() ) )
+            father_id = parent_id_data[horce_id]["father"]
+            mother_id = parent_id_data[horce_id]["mother"]
+            father_data = dc.parent_data_get.main( horce_data, father_id, baba_index_data )
+            mother_data = dc.parent_data_get.main( horce_data, mother_id, baba_index_data )            
             current_jockey = jockey_data.data_get( horce_id, cd.birthday(), cd.race_num() )
             
             us.set_data( data_name.before_rank, past_rank_list[0] )
@@ -95,6 +102,8 @@ def main( test_check = False ):
             us.set_data( data_name.baba, cd.baba_status() )
             us.set_data( data_name.horce_number, cd.horce_number() )
             us.set_data( data_name.age, cd.year() - int( horce_id[0:4] ) )
+            us.set_data( data_name.father_rank, father_data["rank"] )
+            us.set_data( data_name.mother_rank, mother_data["rank"] )
             
             score = us.get_score()
             key_score = str( int( score ) )

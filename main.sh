@@ -23,5 +23,12 @@ us_dir="users_score"
 cp -r $dir $re_dir/
 cp -r $dir $us_dir/
 
+if [ $# -gt 0 ]; then
+    echo $1
+    if [ $1 = "-n" ]; then
+       exit 1
+    fi
+fi
+
 python $re_dir/main.py
 python $us_dir/main.py

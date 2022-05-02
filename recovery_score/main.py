@@ -16,6 +16,7 @@ dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 dm.dl.file_set( "baba_index_data.pickle" )
+dm.dl.file_set( "parent_id_data.pickle" )
 
 def main():
     result = {}
@@ -24,6 +25,8 @@ def main():
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
     baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
+    parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
+    
     ds = DataSet()
     time_index = dc.TimeIndexGet()
     up_score_get = dc.UpScore()
@@ -68,6 +71,11 @@ def main():
 
             key_horce_num = str( int( cd.horce_number() ) )
             current_jockey = jockey_data.data_get( horce_id, cd.birthday(), cd.race_num() )
+            father_id = parent_id_data[horce_id]["father"]
+            mother_id = parent_id_data[horce_id]["mother"]
+            father_data = dc.parent_data_get.main( horce_data, father_id, baba_index_data )
+            mother_data = dc.parent_data_get.main( horce_data, mother_id, baba_index_data )
+            
             odds = cd.odds() if cd.rank() == 1 else 0
             ds.set_yo( year, odds )
             
@@ -98,6 +106,8 @@ def main():
             ds.set_split_data( data_name.jockey_one_rate, current_jockey["all"]["one"] )
             ds.set_split_data( data_name.jockey_two_rate, current_jockey["all"]["two"] )
             ds.set_split_data( data_name.jockey_three_rate, current_jockey["all"]["three"] )
+            ds.set_split_data( data_name.father_rank, father_data["rank"] )
+            ds.set_split_data( data_name.mother_rank, mother_data["rank"] )
             
             
     ds.data_analyze()
