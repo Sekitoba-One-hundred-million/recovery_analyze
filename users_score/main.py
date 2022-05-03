@@ -3,7 +3,12 @@ import numpy as np
 
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-import sekitoba_data_create as dc
+from sekitoba_data_create.time_index_get import TimeIndexGet
+from sekitoba_data_create.up_score import UpScore
+from sekitoba_data_create.train_index_get import TrainIndexGet
+from sekitoba_data_create.pace_time_score import PaceTimeScore
+from sekitoba_data_create.jockey_data_get import JockeyData
+from sekitoba_data_create import parent_data_get
 
 from common.name import Name
 from users_score import UsersScore
@@ -26,11 +31,11 @@ def main( test_check = False ):
     parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
     
     us = UsersScore()
-    time_index = dc.TimeIndexGet()
-    up_score_get = dc.UpScore()
-    train_index = dc.TrainIndexGet()
-    pace_time_score = dc.PaceTimeScore()
-    jockey_data = dc.JockeyData()
+    time_index = TimeIndexGet()
+    up_score_get = UpScore()
+    train_index = TrainIndexGet()
+    pace_time_score = PaceTimeScore()
+    jockey_data = JockeyData()
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
@@ -72,8 +77,8 @@ def main( test_check = False ):
             key_horce_num = str( int( cd.horce_number() ) )
             father_id = parent_id_data[horce_id]["father"]
             mother_id = parent_id_data[horce_id]["mother"]
-            father_data = dc.parent_data_get.main( horce_data, father_id, baba_index_data )
-            mother_data = dc.parent_data_get.main( horce_data, mother_id, baba_index_data )            
+            father_data = parent_data_get.main( horce_data, father_id, baba_index_data )
+            mother_data = parent_data_get.main( horce_data, mother_id, baba_index_data )            
             current_jockey = jockey_data.data_get( horce_id, cd.birthday(), cd.race_num() )
             
             us.set_data( data_name.before_rank, past_rank_list[0] )

@@ -9,6 +9,7 @@ from sekitoba_data_create.up_score import UpScore
 from sekitoba_data_create.train_index_get import TrainIndexGet
 from sekitoba_data_create.pace_time_score import PaceTimeScore
 from sekitoba_data_create.jockey_data_get import JockeyData
+from sekitoba_data_create import parent_data_get
 
 from data_set import DataSet
 from common.name import Name
@@ -76,8 +77,8 @@ def main():
             current_jockey = jockey_data.data_get( horce_id, cd.birthday(), cd.race_num() )
             father_id = parent_id_data[horce_id]["father"]
             mother_id = parent_id_data[horce_id]["mother"]
-            father_data = dc.parent_data_get.main( horce_data, father_id, baba_index_data )
-            mother_data = dc.parent_data_get.main( horce_data, mother_id, baba_index_data )
+            father_data = parent_data_get.main( horce_data, father_id, baba_index_data )
+            mother_data = parent_data_get.main( horce_data, mother_id, baba_index_data )
             
             odds = cd.odds() if cd.rank() == 1 else 0
             ds.set_yo( year, odds )
