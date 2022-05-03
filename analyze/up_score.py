@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-import sekitoba_data_create as dc
+from sekitoba_data_create.up_score import UpScore
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
@@ -20,7 +20,7 @@ def main():
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
     baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
-    up_score_get = dc.UpScore()
+    up_score_get = UpScore()
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )

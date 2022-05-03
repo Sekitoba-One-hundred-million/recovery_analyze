@@ -3,9 +3,12 @@ import numpy as np
 
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-import sekitoba_data_create as dc
 
-import sys
+from sekitoba_data_create.time_index_get import TimeIndexGet
+from sekitoba_data_create.up_score import UpScore
+from sekitoba_data_create.train_index_get import TrainIndexGet
+from sekitoba_data_create.pace_time_score import PaceTimeScore
+from sekitoba_data_create.jockey_data_get import JockeyData
 
 from data_set import DataSet
 from common.name import Name
@@ -28,11 +31,11 @@ def main():
     parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
     
     ds = DataSet()
-    time_index = dc.TimeIndexGet()
-    up_score_get = dc.UpScore()
-    train_index = dc.TrainIndexGet()
-    pace_time_score = dc.PaceTimeScore()
-    jockey_data = dc.JockeyData()
+    time_index = TimeIndexGet()
+    up_score_get = UpScore()
+    train_index = TrainIndexGet()
+    pace_time_score = PaceTimeScore()
+    jockey_data = JockeyData()
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )

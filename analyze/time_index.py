@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-import sekitoba_data_create as dc
+from sekitoba_data_create.time_index_get import TimeIndexGet
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
@@ -18,7 +18,7 @@ def main():
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    time_index = dc.TimeIndexGet()
+    time_index = TimeIndexGet()
     key_dict = {}
     
     for k in tqdm( race_data.keys() ):

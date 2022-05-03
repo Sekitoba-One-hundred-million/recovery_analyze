@@ -1,11 +1,10 @@
-
 import os
 import numpy as np
 from tqdm import tqdm
 
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-import sekitoba_data_create as dc
+from sekitoba_data_create import parent_data_get
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
@@ -55,7 +54,7 @@ def main():
 
             father_id = parent_id_data[horce_id]["father"]
             # mother_id = parent_id_data[horce_id]["mother"]
-            father_data = dc.parent_data_get.main( horce_data, father_id, baba_index_data )
+            father_data = parent_data_get.main( horce_data, father_id, baba_index_data )
             score = father_data["rank"]
             instance = {}
             instance["key"] = score

@@ -1,6 +1,5 @@
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-import sekitoba_data_create as dc
 
 from tqdm import tqdm
 import matplotlib.pyplot as plt
