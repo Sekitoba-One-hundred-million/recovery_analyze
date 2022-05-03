@@ -68,10 +68,11 @@ def main( test_check = False ):
             if not cd.race_check():
                 continue
 
-            past_rank_list = pd.rank_list()
             speed, up_speed, pace_speed = pd.speed_index( baba_index_data[horce_id] )
 
-            if len( past_rank_list ) == 0:
+            before_cd = pd.before_cd()
+
+            if before_cd == None:
                 continue
 
             key_horce_num = str( int( cd.horce_number() ) )
@@ -81,7 +82,7 @@ def main( test_check = False ):
             mother_data = parent_data_get.main( horce_data, mother_id, baba_index_data )            
             current_jockey = jockey_data.data_get( horce_id, cd.birthday(), cd.race_num() )
             
-            us.set_data( data_name.before_rank, past_rank_list[0] )
+            us.set_data( data_name.before_rank, before_cd.rank() )
             us.set_data( data_name.popular, cd.popular() )
             us.set_data( data_name.limb, lib.limb_search( pd ) )
             us.set_data( data_name.time_index, max( time_index.main( horce_id, pd.past_day_list() )["max"], 0 ) )
@@ -109,6 +110,7 @@ def main( test_check = False ):
             us.set_data( data_name.age, cd.year() - int( horce_id[0:4] ) )
             us.set_data( data_name.father_rank, father_data["rank"] )
             us.set_data( data_name.mother_rank, mother_data["rank"] )
+            us.set_data( data_name.before_up3, before_cd.up_time() )
             
             score = us.get_score()
             key_score = str( int( score ) )

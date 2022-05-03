@@ -67,11 +67,12 @@ def main():
             if not cd.race_check():
                 continue
 
-            past_rank_list = pd.rank_list()
-            speed, up_speed, pace_speed = pd.speed_index( baba_index_data[horce_id] )
+            before_cd = pd.before_cd()
 
-            if len( past_rank_list ) == 0:
+            if before_cd == None:
                 continue
+
+            speed, up_speed, pace_speed = pd.speed_index( baba_index_data[horce_id] )
 
             key_horce_num = str( int( cd.horce_number() ) )
             current_jockey = jockey_data.data_get( horce_id, cd.birthday(), cd.race_num() )
@@ -81,9 +82,10 @@ def main():
             mother_data = parent_data_get.main( horce_data, mother_id, baba_index_data )
             
             odds = cd.odds() if cd.rank() == 1 else 0
+            
             ds.set_yo( year, odds )
             
-            ds.set_not_split_data( data_name.before_rank, past_rank_list[0] )            
+            ds.set_not_split_data( data_name.before_rank, before_cd.rank() )
             ds.set_not_split_data( data_name.popular, cd.popular() )            
             ds.set_not_split_data( data_name.limb, lib.limb_search( pd ) )
             ds.set_not_split_data( data_name.baba, cd.baba_status() )
@@ -112,7 +114,7 @@ def main():
             ds.set_split_data( data_name.jockey_three_rate, current_jockey["all"]["three"] )
             ds.set_split_data( data_name.father_rank, father_data["rank"] )
             ds.set_split_data( data_name.mother_rank, mother_data["rank"] )
-            
+            ds.set_split_data( data_name.before_up3, before_cd.up_time() )
             
     ds.data_analyze()
     ds.data_upload()
