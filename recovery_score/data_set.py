@@ -20,6 +20,10 @@ class DataSet:
             self.split_data[name] = []
             self.not_split_data[name] = {}
 
+    def set_all_data( self, split_data, not_split_data ):
+        self.split_data = split_data
+        self.not_split_data = not_split_data
+
     def set_yo( self, year, odds ):
         self.year = year
         self.odds = odds
@@ -59,6 +63,7 @@ class DataSet:
             print( name, analyze_score )
             self.analyze_score_data[name] = analyze_score
             self.split_list_data[name] = split_list
+            lib.write_recovery_csv( recovery_data, name + ".csv" )
 
         for name in self.not_split_data.keys():
             if len( self.not_split_data[name] ) == 0:
@@ -68,6 +73,7 @@ class DataSet:
             analyze_score = lib.recovery_score_check( recovery_data )
             print( name, analyze_score )
             self.analyze_score_data[name] = analyze_score
+            lib.write_recovery_csv( recovery_data, name + ".csv" )
 
     def data_upload( self ):
         dm.pickle_upload( "split_data.pickle", self.split_list_data )

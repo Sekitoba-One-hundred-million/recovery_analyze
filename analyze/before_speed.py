@@ -12,7 +12,7 @@ dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 dm.dl.file_set( "baba_index_data.pickle" )
 
-name = "analyze"
+name = "before_speed"
 
 def main():
     result = {}
@@ -51,7 +51,12 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = pd.three_rate()
+            before_cd = pd.before_cd()
+
+            if before_cd == None:
+                continue
+
+            score = before_cd.speed()
             instance = {}
             instance["key"] = score
             instance["odds"] = 0

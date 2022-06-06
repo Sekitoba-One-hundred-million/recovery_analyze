@@ -32,11 +32,11 @@ class UsersScore:
     def data_clear( self ):
         self.data.clear()
 
-    def get_score( self ):
-        score = 0
+    def get_score_dict( self ):
+        score = {}
 
         for k in self.data.keys():      
-            score += self.function[k]( k )
+            score[k] = self.function[k]( k )
 
         return score
 
