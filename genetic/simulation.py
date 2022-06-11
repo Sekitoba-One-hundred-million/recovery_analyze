@@ -34,8 +34,8 @@ class Simulation():
                         instance["score"] += rate_data[k] * learn_data[race_id][i]["score"][k]
                         
                     instance["rank"] = learn_data[race_id][i]["rank"]
-                    instance["score"] = int( instance["score"] )
-                
+                    
+                instance["score"] = int( instance["score"] )
                 instance_list.append( instance )
 
             if not len( instance_list ) == 0:

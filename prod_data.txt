@@ -1,0 +1,1 @@
+users_score_rate.pickle v1

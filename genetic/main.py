@@ -62,7 +62,7 @@ def main():
         od = OnceData()
         test_simu_data = {}
         key_list, test_key_list = key_list_get()
-
+        print( test_key_list[0], key_list[-1] )
         for k in tqdm( key_list ):
             data, _, race_id = od.create( k )
 
