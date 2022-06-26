@@ -11,7 +11,7 @@ class Simulation():
         self.rank_win_rate_data = dm.dl.data_get( "rank_win_rate_data.pickle" )
         self.rank_score = dm.dl.data_get( "rank_score.pickle" )
         self.odds_key = { "one": "単勝", "quinella": "馬連" }
-        self.buy_score = { "one": 1455, "quinella": 2331 }
+        self.buy_score = { "one": 1407, "quinella": 2610 }
         self.function = {}
         self.function["one"] = self.one
         self.function["quinella"] = self.quinella

@@ -39,6 +39,9 @@ def main():
         if key_kind == "0" or key_kind == "3":
             continue
 
+        count = 0
+        pace_spee_index_list = []
+
         for kk in race_data[k].keys():
             horce_id = kk
             current_data, past_data = lib.race_check( horce_data[horce_id],
@@ -50,29 +53,37 @@ def main():
                 continue
 
             speed, up_speed, pace_speed = pd.speed_index( baba_index_data[horce_id] )
-            score = lib.max_check( pace_speed )
-            instance = {}
-            instance["key"] = score
-            instance["odds"] = 0
-            instance["year"] = year
+            pace_spee_index_list.append( lib.max_check( pace_speed ) )
+
+        for kk in race_data[k].keys():
+            horce_id = kk
+            current_data, past_data = lib.race_check( horce_data[horce_id],
+                                                     year, day, num, race_place_num )#今回と過去のデータに分ける
+            cd = lib.current_data( current_data )
+            pd = lib.past_data( past_data, current_data )
+
+            if not cd.race_check():
+                continue
+
+            current_speed_index = pace_spee_index_list[count]
+            score = pace_spee_index_list.index( current_speed_index )
+            key = str( int( score ) )
+            lib.dic_append( result, year, {} )
+            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+
+            count += 1
+            result[year][key]["count"] += 1
 
             if cd.rank() == 1:
-                instance["odds"] = cd.odds()
+                result[year][key]["recovery"] += cd.odds()
 
-            data_storage.append( instance )
-
-    result, split_list = lib.recovery_data_split( data_storage )
-    
     for year in result.keys():
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    lib.write_recovery_csv( result,  name + ".csv" )
     score = lib.recovery_score_check( result )
-    lib.recovery_data_upload( name, score, split_list )    
-    print( split_list )
-    print( score )
+    lib.write_recovery_csv( result, name + ".csv" )
 
 if __name__ == "__main__":
     main()

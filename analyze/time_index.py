@@ -14,12 +14,10 @@ name = "time_index"
 
 def main():
     result = {}
-    data_storage = []
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
     time_index = TimeIndexGet()
-    key_dict = {}
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
@@ -40,6 +38,9 @@ def main():
         if key_kind == "0" or key_kind == "3":
             continue
 
+        time_index_list = []
+        count = 0
+        
         for kk in race_data[k].keys():
             horce_id = kk
             current_data, past_data = lib.race_check( horce_data[horce_id],
@@ -51,42 +52,28 @@ def main():
                 continue
 
             current_time_index = time_index.main( kk, pd.past_day_list() )
-            instance = {}
-            instance["key"] = current_time_index["max"]
-            instance["odds"] = 0
-            instance["year"] = year
-            #lib.dic_append( result, year, {} )
-            #lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+            time_index_list.append( current_time_index["max"] )
+
+        for kk in race_data[k].keys():
+            horce_id = kk
+            current_data, past_data = lib.race_check( horce_data[horce_id],
+                                                     year, day, num, race_place_num )#今回と過去のデータに分ける
+            cd = lib.current_data( current_data )
+            pd = lib.past_data( past_data, current_data )
+
+            if not cd.race_check():
+                continue
+
+            score = time_index_list.index( time_index_list[count] )
+            key = str( int( score ) )
+            lib.dic_append( result, year, {} )
+            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+
+            count += 1
+            result[year][key]["count"] += 1
 
             if cd.rank() == 1:
-                instance["odds"] = cd.odds()
-
-            data_storage.append( instance )
-
-
-    data_storage = sorted( data_storage, key = lambda x:x["key"] )
-    base = int( len( data_storage ) / 10 )    
-    count = 1
-    b = int( base * count )
-    split_key = data_storage[b]["key"]
-    split_list = [ split_key ]
-    
-    for i in range( 0, len( data_storage ) ):
-        current_key = data_storage[i]["key"]
-
-        if split_key < current_key:
-            count += 1
-            b = min( int( base * count ), len( data_storage ) - 1 )
-            split_key = data_storage[b]["key"]
-            split_list.append( split_key )
-
-        key = str( count )
-        year = data_storage[i]["year"]
-        lib.dic_append( result, year, {} )
-        lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
-
-        result[year][key]["recovery"] += data_storage[i]["odds"]
-        result[year][key]["count"] += 1
+                result[year][key]["recovery"] += cd.odds()
 
     for year in result.keys():
         for k in result[year].keys():
@@ -95,9 +82,6 @@ def main():
 
     score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result,  name + ".csv" )
-    lib.recovery_data_upload( name, score, split_list )
-
-    print( split_list )
 
 if __name__ == "__main__":
     main()

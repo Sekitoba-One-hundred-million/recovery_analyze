@@ -2,12 +2,14 @@ age
 all_horce_num
 baba
 before_diff
+before_id_weight
 before_pace
 before_rank
 before_speed
 before_up3
 best_weight
 father_rank
+foot_used
 horce_age
 horce_number
 id_weight
@@ -16,6 +18,7 @@ jockey_rank
 jockey_three_rate
 jockey_two_rate
 limb
+limb1_count
 money
 mother_rank
 omega
@@ -25,8 +28,10 @@ pace_time_score
 popular
 popular_rank
 race_interval
+race_level_check
 rank_score_odds
 speed_index
+straight_slope
 three_average
 three_rate
 time_index

@@ -49,56 +49,33 @@ def main():
             if not cd.race_check():
                 continue
 
-            instance = {}
-            instance["key"] = cd.id_weight()
-            instance["odds"] = 0
-            instance["year"] = year
-            #lib.dic_append( result, year, {} )
-            #lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+            #score = min( max( cd.id_weight(), -10 ), 10 )
+            
+            #if score < 0:
+            #    score *= -1
+            #    score /= 2
+            #    score *= -1
+            #else:
+            #    score /= 2
+            
+            score = cd.weight() / 10
+            key = str( int( score ) )
+            
+            lib.dic_append( result, year, {} )
+            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+            
+            result[year][key]["count"] += 1
 
             if cd.rank() == 1:
-                instance["odds"] = cd.odds()
-
-            data_storage.append( instance )
-
-
-    data_storage = sorted( data_storage, key = lambda x:x["key"] )
-    base = int( len( data_storage ) / 10 )    
-    count = 1
-    b = int( base * count )
-    split_key = data_storage[b]["key"]
-    split_list = [ split_key ]
-    key = str( int( len( split_list ) ) )
-    
-    for i in range( 0, len( data_storage ) ):
-        current_key = data_storage[i]["key"]
-
-        if split_key < current_key:
-            count += 1
-            b = min( int( base * count ), len( data_storage ) - 1 )
-            split_key = data_storage[b]["key"]
-            key = str( int( len( split_list ) + 1 ) )
-            
-            if not split_key == split_list[-1]:
-                split_list.append( split_key )
-            
-        year = data_storage[i]["year"]
-        lib.dic_append( result, year, {} )
-        lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
-
-        result[year][key]["recovery"] += data_storage[i]["odds"]
-        result[year][key]["count"] += 1        
+                result[year][key]["recovery"] += cd.odds()
 
     for year in result.keys():
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    lib.write_recovery_csv( result, name + ".csv" )
     score = lib.recovery_score_check( result )
-    lib.recovery_data_upload( name, score, split_list )
-    print( split_list )
-    print( score )
+    lib.write_recovery_csv( result, name + ".csv" )
 
 if __name__ == "__main__":
     main()

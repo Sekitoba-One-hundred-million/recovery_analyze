@@ -35,8 +35,6 @@ def main():
         if key_kind == "0" or key_kind == "3":
             continue
 
-        us_list = []
-
         for kk in race_data[k].keys():
             horce_id = kk
             current_data, past_data = lib.race_check( horce_data[horce_id],
@@ -65,7 +63,7 @@ def main():
 
     score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result, name + ".csv" )
-    lib.recovery_data_upload( name, score, [] )
+    #lib.recovery_data_upload( name, score, [] )
     
 if __name__ == "__main__":
     main()

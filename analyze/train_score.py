@@ -15,7 +15,6 @@ name = "train_score"
 
 def main():
     result = {}
-    data_storage = []
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
@@ -53,40 +52,16 @@ def main():
 
             key_horce_num = str( int( cd.horce_number() ) )
             current_train = train_index.main( race_id, key_horce_num )
-            instance = {}
-            instance["key"] = current_train["score"]
-            instance["odds"] = 0
-            instance["year"] = year
+            score = max( current_train["score"], -2 )
+            key = str( int( score ) )
+            
+            lib.dic_append( result, year, {} )
+            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+            
+            result[year][key]["count"] += 1
 
             if cd.rank() == 1:
-                instance["odds"] = cd.odds()
-
-            data_storage.append( instance )
-
-
-    data_storage = sorted( data_storage, key = lambda x:x["key"] )
-    base = int( len( data_storage ) / 10 )    
-    count = 1
-    b = int( base * count )
-    split_key = data_storage[b]["key"]
-    split_list = [ split_key ]
-    
-    for i in range( 0, len( data_storage ) ):
-        current_key = data_storage[i]["key"]
-
-        if split_key < current_key:
-            count += 1
-            b = min( int( base * count ), len( data_storage ) - 1 )
-            split_key = data_storage[b]["key"]
-            split_list.append( split_key )
-
-        key = str( count )
-        year = data_storage[i]["year"]
-        lib.dic_append( result, year, {} )
-        lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
-
-        result[year][key]["recovery"] += data_storage[i]["odds"]
-        result[year][key]["count"] += 1        
+                result[year][key]["recovery"] += cd.odds()
 
     for year in result.keys():
         for k in result[year].keys():
@@ -94,10 +69,7 @@ def main():
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
     score = lib.recovery_score_check( result )
-    lib.write_recovery_csv( result,  name + ".csv" )
-    lib.recovery_data_upload( name, score, split_list )
-
-    print( split_list )
+    lib.write_recovery_csv( result, name + ".csv" )
 
 if __name__ == "__main__":
     main()

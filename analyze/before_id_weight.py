@@ -4,14 +4,13 @@ from tqdm import tqdm
 
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-from sekitoba_data_create.up_score import UpScore
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 dm.dl.file_set( "baba_index_data.pickle" )
 
-name = "up_score"
+name = "before_id_weight"
 
 def main():
     result = {}
@@ -20,7 +19,6 @@ def main():
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
     baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
-    up_score_get = UpScore()
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
@@ -51,7 +49,20 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = up_score_get.score_get( pd )
+            before_cd = pd.before_cd()
+
+            if before_cd == None:
+                continue
+            
+            score = min( max( before_cd.id_weight(), -10 ), 10 )
+            
+            if score < 0:
+                score *= -1
+                score /= 2
+                score *= -1
+            else:
+                score /= 2
+                        
             key = str( int( score ) )
             
             lib.dic_append( result, year, {} )
@@ -69,7 +80,6 @@ def main():
 
     score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result, name + ".csv" )
-
 
 if __name__ == "__main__":
     main()

@@ -49,29 +49,24 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = pd.race_interval()
-            instance = {}
-            instance["key"] = score
-            instance["odds"] = 0
-            instance["year"] = year
+            score = min( max( pd.race_interval(), 0 ), 20 )
+            key = str( int( score ) )
+            
+            lib.dic_append( result, year, {} )
+            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+            
+            result[year][key]["count"] += 1
 
             if cd.rank() == 1:
-                instance["odds"] = cd.odds()
+                result[year][key]["recovery"] += cd.odds()
 
-            data_storage.append( instance )
-
-    result, split_list = lib.recovery_data_split( data_storage )
-    
     for year in result.keys():
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    lib.write_recovery_csv( result,  name + ".csv" )
     score = lib.recovery_score_check( result )
-    lib.recovery_data_upload( name, score, split_list )
-    print( split_list )
-    print( score )
+    lib.write_recovery_csv( result, name + ".csv" )
 
 if __name__ == "__main__":
     main()

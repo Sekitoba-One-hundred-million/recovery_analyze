@@ -35,7 +35,7 @@ class UsersScore:
     def get_score_dict( self ):
         score = {}
 
-        for k in self.data.keys():      
+        for k in self.data.keys():
             score[k] = self.function[k]( k )
 
         return score

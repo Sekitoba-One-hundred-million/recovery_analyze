@@ -38,6 +38,9 @@ def main():
         if key_kind == "0" or key_kind == "3":
             continue
 
+        count = 0
+        ome_index_list = []
+
         for kk in race_data[k].keys():
             horce_id = kk
             current_data, past_data = lib.race_check( horce_data[horce_id],
@@ -55,30 +58,43 @@ def main():
             except:
                 continue
 
-            score = omega_index
-            instance = {}
-            instance["key"] = score
-            instance["odds"] = 0
-            instance["year"] = year
+            ome_index_list.append( omega_index ) 
+
+        for kk in race_data[k].keys():
+            horce_id = kk
+            current_data, past_data = lib.race_check( horce_data[horce_id],
+                                                     year, day, num, race_place_num )#今回と過去のデータに分ける
+            cd = lib.current_data( current_data )
+            pd = lib.past_data( past_data, current_data )
+
+            if not cd.race_check():
+                continue
+
+            horce_num = int( cd.horce_number() )
+                
+            try:
+                omega_index = omega_index_data[race_id][horce_num-1]
+            except:
+                continue
+
+            score = ome_index_list[count] / 5
+            key = str( int( score ) )
+            lib.dic_append( result, year, {} )
+            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+
+            count += 1
+            result[year][key]["count"] += 1
 
             if cd.rank() == 1:
-                instance["odds"] = cd.odds()
-
-            data_storage.append( instance )
-            
-    result, split_list = lib.recovery_data_split( data_storage )
+                result[year][key]["recovery"] += cd.odds()
 
     for year in result.keys():
-        #print( year )
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    lib.write_recovery_csv( result,  name + ".csv" )
     score = lib.recovery_score_check( result )
-    #lib.recovery_data_upload( name, score, split_list )
-    print( split_list )
-    print( score )
+    lib.write_recovery_csv( result, name + ".csv" )
 
 if __name__ == "__main__":
     main()

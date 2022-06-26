@@ -1,27 +1,23 @@
-import os
-import numpy as np
-from tqdm import tqdm
-
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-from sekitoba_data_create.up_score import UpScore
+from sekitoba_data_create.stright_slope_score import StrightSlope
+
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
-dm.dl.file_set( "baba_index_data.pickle" )
 
-name = "up_score"
+name = "straight_slope"
 
 def main():
     result = {}
-    data_storage = []
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
-    up_score_get = UpScore()
-    
+    straight_slope = StrightSlope()
+
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
         year = race_id[0:4]
@@ -51,8 +47,8 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = up_score_get.score_get( pd )
-            key = str( int( score ) )
+            score = straight_slope.data_get( cd, pd )
+            key = str( score )
             
             lib.dic_append( result, year, {} )
             lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
@@ -69,8 +65,8 @@ def main():
 
     score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result, name + ".csv" )
-
-
+    #lib.recovery_data_upload( name, score, [] )
+    
 if __name__ == "__main__":
     main()
         

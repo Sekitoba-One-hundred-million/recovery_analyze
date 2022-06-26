@@ -2,10 +2,12 @@ import sekitoba_library as lib
 import sekitoba_data_manage as dm
 
 dm.dl.file_set( "odds_data.pickle" )
+dm.dl.file_set( "users_rank_data.pickle" )
 
 class Simulation():
     def __init__( self ):
         self.odds_data = dm.dl.data_get( "odds_data.pickle" )
+        self.users_rank_data = dm.dl.data_get( "users_rank_data.pickle" )        
         self.function = {}
         self.function["one"] = self.one
         self.function["quinella"] = self.quinella
@@ -14,8 +16,8 @@ class Simulation():
 
         self.odds_key = { "one": "単勝", "quinella": "馬連", "trio": "三連複", "wide": "ワイド" }
 
-    def simulation( self, learn_data, rate_data, kind, test = False ):
-        result = []
+    def simulation( self, learn_data, rate_data, buy_kind, test = False ):
+        result = {}
         
         for race_id in learn_data.keys():
             instance_list = []
@@ -23,25 +25,28 @@ class Simulation():
                 current_odds = self.odds_data[race_id]
             except:
                 continue
-            
-            for i in range( 0, len( learn_data[race_id] ) ):
-                instance = { "odds": 0, "score": 0 }
 
-                for k in learn_data[race_id][i]["score"].keys():
+            for horce_id in learn_data[race_id].keys():
+                instance = { "odds": 0, "score": 0 }
+                
+                for kind in learn_data[race_id][horce_id].keys():
                     if test:
-                        instance["score"] += learn_data[race_id][i]["score"][k]
+                        instance["score"] += learn_data[race_id][horce_id][kind]
                     else:
-                        instance["score"] += rate_data[k] * learn_data[race_id][i]["score"][k]
+                        instance["score"] += rate_data[kind] * learn_data[race_id][horce_id][kind]
                         
-                    instance["rank"] = learn_data[race_id][i]["rank"]
-                    
+                instance["rank"] = self.users_rank_data[race_id][horce_id]
                 instance["score"] = int( instance["score"] )
                 instance_list.append( instance )
 
             if not len( instance_list ) == 0:
-                result.extend( self.function[kind]( instance_list, current_odds[self.odds_key[kind]] ) )
+                year = race_id[0:4]
+                lib.dic_append( result, year, [] )
+                result[year].extend( self.function[buy_kind]( instance_list, current_odds[self.odds_key[buy_kind]] ) )
+
+        for year in result.keys():
+            result[year] = sorted( result[year], key=lambda x:x["score"], reverse = True )
             
-        result = sorted( result, key=lambda x:x["score"], reverse = True )
         return result
 
     def one( self, data, odds ):

@@ -3,29 +3,12 @@ from mpi4py import MPI
 
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-
+from analyze import UsersAnalyze
 from common.name import Name
-from once_data import OnceData
 
 data_name = Name()
 
-dm.dl.file_set( "race_data.pickle" )
-dm.dl.file_set( "race_info_data.pickle" )
-dm.dl.file_set( "horce_data_storage.pickle" )
-dm.dl.file_set( "baba_index_data.pickle" )
-dm.dl.file_set( "parent_id_data.pickle" )
-
-def use_key_list( key_list ):
-    result = []
-    
-    for k in key_list:
-        race_id = lib.id_get( k )
-        year = race_id[0:4]
-
-        if year in lib.test_years:
-            result.append( k )
-
-    return result
+dm.dl.file_set( "users_data.pickle" )
 
 def key_list_search( rank, size, key_list ):
     n = int( len( key_list ) / ( size - 1 ) )
@@ -47,71 +30,105 @@ def data_connect( base, add_data ):
             base[year][score]["recovery"] += add_data[year][score]["recovery"]
 
 def recovery_check( data ):
-    check = {}
-    key_list = []
-
-    for year in data.keys():
-        for score in data[year].keys():
-            if not score in check.keys():
-                check[score] = True
-                key_list.append( int( score ) )
-        
-    key_list = sorted( key_list, reverse = True )
+    result = {}
+    result["all"] = {}
+    score_key = {}
     
     for year in data.keys():
+        result[year] = {}
         
-        for k in key_list:
-            k = str( k )
-            try:
-                data[year][k]["recovery"] = data[year][k]["recovery"] / data[year][k]["count"]
-                data[year][k]["recovery"] = round( data[year][k]["recovery"], 2 )
-            except:
-                data[year][k] = {}
-                data[year][k]["recovery"] = 0
-                data[year][k]["count"] = 0
+        for kind in data[year].keys():
+            lib.dic_append( score_key, kind, {} )
+            result[year][kind] = {}
+            lib.dic_append( result["all"], kind, {} )
+            current_data = sorted( data[year][kind], key = lambda x:x["score"], reverse = True )
+
+            if len( current_data ) == 0:
+                continue
+
+            count = 0
+            recovery = 0
+            current_score = current_data[0]["score"]            
+            
+            for i in range( 0, len( current_data ) ):
+                score = current_data[i]["score"]
+                
+                if not score == current_score or i == len( current_data ) - 1:
+                    key_score = str( int( current_score ) )
+                    lib.dic_append( result["all"][kind], key_score, { "recovery": 0, "count": 0 } )
+                    score_key[kind][key_score] = current_score
+                    result[year][kind][key_score] = {}
+                    result[year][kind][key_score]["count"] = count
+                    result[year][kind][key_score]["recovery"] = round( recovery / count, 2 )
+                    result["all"][kind][key_score]["recovery"] += recovery
+                    result["all"][kind][key_score]["count"] += count
+                    
+                    count = 0
+                    recovery = 0
+                    current_score = score
+
+                count += 1
+                recovery += current_data[i]["odds"]
+
+    for kind in result["all"].keys():
+        for key_score in result["all"][kind].keys():
+            result["all"][kind][key_score]["recovery"] /= result["all"][kind][key_score]["count"]
+            result["all"][kind][key_score]["recovery"] = round( result["all"][kind][key_score]["recovery"], 2 )
+
+    return result, score_key
+
+def write( recovery_data, score_key ):
+    for kind in score_key.keys():
+        first = True
+        write_score = "year/score\t"
+        key_list = []
+        
+        for sk in score_key[kind].keys():
+            key_list.append( int( sk ) )
+
+        key_list = sorted( key_list )
+        f = open( "/Users/kansei/Desktop/recovery_data/users_score_" + kind + ".csv", "w" )
+        
+        for year in recovery_data.keys():
+            write_recovery = year + "\t"
+            write_count = year + "\t"
+
+            for key in key_list:
+                score = str( key )
+                
+                if first:
+                    write_score += score + "\t"
+
+                try:
+                    write_recovery += str( recovery_data[year][kind][score]["recovery"] ) + "\t"
+                    write_count += str( recovery_data[year][kind][score]["count"] ) + "\t"
+                except:
+                    write_recovery += "0\t"
+                    write_count += "0\t"
+
+            if first:
+                #print( write_score )
+                write_score += "\n"
+                f.write( write_score )
+
+            #print( write_recovery )
+            #print( write_count + "\n" )
+            write_recovery += "\n"
+            write_count += "\n\n"
+            f.write( write_recovery )
+            f.write( write_count )            
+            first = False
+            
+        f.close()
+            
 
 def main():
-    comm = MPI.COMM_WORLD   #COMM_WORLDは全体
-    size = comm.Get_size()  #サイズ（指定されたプロセス（全体）数）
-    rank = comm.Get_rank()  #ランク（何番目のプロセスか。プロセスID）
-    name = MPI.Get_processor_name() #プロセスが動いているノードのホスト名
-
-    if rank == 0:
-        dm.dl.local_keep()
-        
-        for i in range( 1, size ):
-            comm.send( True, dest = i, tag = 1 )
-
-        score_data = {}
-
-        for i in range( 1, size ):
-            file_name = comm.recv( source = i, tag = 2 )
-            instance = dm.local_pickle_load( file_name )
-            data_connect( score_data, instance )
-
-        recovery_check( score_data )
-        file_name = "users_score.csv"
-        lib.write_recovery_csv( score_data, file_name )
-    else:
-        ok = comm.recv( source = 0, tag = 1 )
-        od = OnceData()
-        print( "start rank:{}".format( rank ) )
-        key_list = use_key_list( list( od.race_data.keys() ) )
-        key_list = key_list_search( rank, size, key_list )
-
-        if rank == 1:
-            for k in tqdm( key_list ):
-                od.create( k )
-        else:
-            for k in key_list:
-                od.create( k )
-
-        file_name = str( rank ) + "-instance.pickle"
-        dir_name = "./storage/"
-        dm.local_pickle_save( dir_name + file_name, od.data )
-        comm.send( dir_name + file_name, dest = 0, tag = 2 )
-
-    MPI.Finalize()
+    ua = UsersAnalyze()
+    buy_result = ua.users_analyze()
+    recovery_data, score_key = recovery_check( buy_result )
+    write( recovery_data, score_key )
+    dm.pickle_upload( "users_score_data.pickle", ua.users_score_data )
+    
     
 if __name__ == "__main__":
     main()

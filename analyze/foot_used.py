@@ -1,26 +1,26 @@
-import os
-import numpy as np
-from tqdm import tqdm
-
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-from sekitoba_data_create.up_score import UpScore
+import sekitoba_data_create as dc
+
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
+dm.dl.file_set( "race_rank_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
-dm.dl.file_set( "baba_index_data.pickle" )
+dm.dl.file_set( "time_index_data.pickle" )
 
-name = "up_score"
+name = "foot_used"
 
 def main():
     result = {}
-    data_storage = []
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
+    race_rank_data = dm.dl.data_get( "race_rank_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
-    up_score_get = UpScore()
+    foot_used_data = dm.dl.data_get( "foot_used.pickle" )
+    time_index_data = dm.dl.data_get( "time_index_data.pickle" )
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
@@ -51,9 +51,56 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = up_score_get.score_get( pd )
-            key = str( int( score ) )
+            before_cd = pd.before_cd()
+
+            if before_cd == None:
+                continue
+
+            try:
+                horce_time_index = time_index_data[horce_id]
+            except:
+                continue
+
+            current_race_rank = race_rank_data[race_id]
+            past_cd_list = pd.past_cd_list()
+            foot_score = { "1": -100, "2": -100 }
             
+            for past_cd in past_cd_list:
+                past_race_id = past_cd.race_id()
+                
+                try:
+                    past_race_rank = race_rank_data[past_race_id]
+                    foot_used = foot_used_data[past_race_id]
+                    time_index = horce_time_index[past_cd.birthday()]
+                except:
+                    continue
+
+                if past_race_rank < current_race_rank:
+                    continue
+
+                key_foot_used = str( foot_used )
+                foot_score[key_foot_used] = max( foot_score[key_foot_used], time_index )
+
+            score = -1
+
+            try:
+                before_foot_used = foot_used_data[before_cd.race_id()]
+            except:
+                continue
+            
+            if not foot_score["1"] == -100 and \
+              not foot_score["2"] == -100:
+                good_foot_used = 0
+
+                if foot_score["1"] > foot_score["2"]:
+                    good_foot_used = 1
+                else:
+                    good_foot_used = 2
+
+                #slope = lib.stright_slope( cd.place() )
+                score = cd.baba_status() * 10 + good_foot_used
+                
+            key = str( int( score ) )  
             lib.dic_append( result, year, {} )
             lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
             
@@ -69,8 +116,7 @@ def main():
 
     score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result, name + ".csv" )
-
-
+    
 if __name__ == "__main__":
     main()
         

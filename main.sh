@@ -40,15 +40,16 @@ cp -r $dir $learn_dir/
 cp -r $dir $genetic_dir
 
 if [ $tag = "2" ]; then
+    cd /Users/kansei/ghq/github.com/Sekitoba-One-hundred-million/sekitoba_library; pip install .; cd /Users/kansei/ghq/github.com/Sekitoba-One-hundred-million/recovery_analyze
     mpiexec -n 6 python $re_dir/main.py
 fi
 
 if [ $tag = "3" ]; then
-    mpiexec -n 6 python $us_dir/main.py
+    python $us_dir/main.py
 fi
 
 if [ $tag = "4" ]; then
-    python $genetic_dir/main.py
+    mpiexec -n 6 python $genetic_dir/main.py
 fi
 
 rm -rf storage

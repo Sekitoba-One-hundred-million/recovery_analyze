@@ -18,21 +18,6 @@ def key_list_search( rank, size, key_list ):
 
     return key_list[s1:s2]
 
-def split_data_connect( base, add_data ):
-    for k in add_data.keys():
-        lib.dic_append( base, k, [] )
-        base[k].extend( add_data[k] )
-
-def not_split_data_connect( base, add_data ):
-    for name in add_data.keys():
-        lib.dic_append( base, name, {} )
-        for year in add_data[name].keys():
-            lib.dic_append( base[name], year, {} )
-            for score in add_data[name][year].keys():
-                lib.dic_append( base[name][year], score, { "recovery": 0, "count": 0 } )
-                base[name][year][score]["count"] += add_data[name][year][score]["count"]
-                base[name][year][score]["recovery"] += add_data[name][year][score]["recovery"]
-
 def main():
     comm = MPI.COMM_WORLD   #COMM_WORLDは全体
     size = comm.Get_size()  #サイズ（指定されたプロセス（全体）数）
@@ -46,17 +31,16 @@ def main():
             comm.send( True, dest = i, tag = 1 )
 
         ds = DataSet()
-        split_data = {}
-        not_split_data = {}
+        rank_data = {}
+        users_data = {}
 
         for i in range( 1, size ):
             file_name = comm.recv( source = i, tag = 2 )
             instance = dm.local_pickle_load( file_name )
-            split_data_connect( split_data, instance["split"] )
-            not_split_data_connect( not_split_data, instance["not_split"] )
+            users_data.update( instance["users"] )
+            rank_data.update( instance["rank"] )
 
-        ds.set_all_data( split_data, not_split_data )
-        ds.data_analyze()
+        ds.set_all_data( users_data, rank_data )
         ds.data_upload()
     else:
         ok = comm.recv( source = 0, tag = 1 )        
@@ -71,7 +55,7 @@ def main():
             for k in key_list:
                 od.create( k )
 
-        instance = { "split": od.ds.split_data, "not_split": od.ds.not_split_data }
+        instance = { "rank": od.rank_data, "users": od.ds.users_data }
         file_name = str( rank ) + "-instance.pickle"
         dir_name = "./storage/"
         dm.local_pickle_save( dir_name + file_name, instance )

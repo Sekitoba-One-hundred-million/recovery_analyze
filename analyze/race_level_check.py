@@ -1,34 +1,34 @@
-import os
-import numpy as np
-from tqdm import tqdm
-
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-from sekitoba_data_create.up_score import UpScore
+from sekitoba_data_create.high_level_data_get import RaceHighLevel
+
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
+dm.dl.file_set( "race_level_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
-dm.dl.file_set( "baba_index_data.pickle" )
+dm.dl.file_set( "race_level_split_data.pickle" )
 
-name = "up_score"
+name = "race_level_check"
 
 def main():
     result = {}
-    data_storage = []
+    race_high_level = RaceHighLevel()
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
+    race_day = dm.dl.data_get( "race_day.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
-    up_score_get = UpScore()
-    
+
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
         year = race_id[0:4]
         race_place_num = race_id[4:6]
         day = race_id[9]
         num = race_id[7]
-
+        ymd = { "y": int( year ), "m": race_day[race_id]["month"], "d": race_day[race_id]["day"] }
+        
         key_place = str( race_info[race_id]["place"] )
         key_dist = str( race_info[race_id]["dist"] )
         key_kind = str( race_info[race_id]["kind"] )        
@@ -51,7 +51,12 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = up_score_get.score_get( pd )
+            score = race_high_level.data_get( cd, pd, ymd )
+
+            if score == 1000:
+                continue
+            
+            score = int( score )
             key = str( int( score ) )
             
             lib.dic_append( result, year, {} )
@@ -69,8 +74,8 @@ def main():
 
     score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result, name + ".csv" )
-
-
+    #lib.recovery_data_upload( name, score, [] )
+    
 if __name__ == "__main__":
     main()
         
