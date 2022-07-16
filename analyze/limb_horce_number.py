@@ -1,24 +1,20 @@
-import os
-import numpy as np
-from tqdm import tqdm
-
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
+
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
-dm.dl.file_set( "baba_index_data.pickle" )
 
-name = "id_weight"
+name = "limb_horce_number"
 
 def main():
     result = {}
-    data_storage = []
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
@@ -39,6 +35,8 @@ def main():
         if key_kind == "0" or key_kind == "3":
             continue
 
+        us_list = []
+
         for kk in race_data[k].keys():
             horce_id = kk
             current_data, past_data = lib.race_check( horce_data[horce_id],
@@ -49,16 +47,8 @@ def main():
             if not cd.race_check():
                 continue
 
-            #score = min( max( cd.id_weight(), -10 ), 10 )
-            
-            #if score < 0:
-            #    score *= -1
-            #    score /= 2
-            #    score *= -1
-            #else:
-            #    score /= 2
-            
-            score = cd.weight() / 10
+            limb_math = lib.limb_search( pd )
+            score = limb_math * 100 + int( cd.horce_number() / 2 )
             key = str( int( score ) )
             
             lib.dic_append( result, year, {} )
@@ -74,9 +64,8 @@ def main():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result, name + ".csv" )
-
+    
 if __name__ == "__main__":
     main()
         

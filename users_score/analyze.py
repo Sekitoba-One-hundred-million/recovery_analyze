@@ -1,6 +1,6 @@
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-from score import UsersScore
+from score import UsersScoreFunction
 from common.name import Name
 
 data_name = Name()
@@ -22,7 +22,7 @@ class UsersAnalyze:
         self.odds_data = dm.dl.data_get( "odds_data.pickle" )
         self.users_data = dm.dl.data_get( "users_data.pickle" )
         self.user_rank_data = dm.dl.data_get( "users_rank_data.pickle" )
-        self.users_score = UsersScore()
+        self.users_score_function = UsersScoreFunction()
         self.set_function()
 
     def set_function( self ):
@@ -31,7 +31,7 @@ class UsersAnalyze:
         self.buy_function["wide"] = self.wide
         self.buy_function["triple"] = self.triple
 
-        self.users_score.set_function()
+        self.users_score_function.set_function()
 
     def get_score( self, race_id, horce_id ):
         score = 0
@@ -40,7 +40,7 @@ class UsersAnalyze:
         self.data = self.users_data[race_id][horce_id]
         
         for k in self.data.keys():
-            s = self.users_score.function[k]( self.data[k] )
+            s = self.users_score_function.function[k]( self.data[k] )
             self.users_score_data[race_id][horce_id][k] = s
             score += s
 
@@ -148,6 +148,7 @@ class UsersAnalyze:
 
     def users_analyze( self ):
         result = {}
+        test_result = {}
         score_data = {}
         
         for race_id in self.users_data.keys():

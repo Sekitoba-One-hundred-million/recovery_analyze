@@ -1,4 +1,3 @@
-
 import os
 import numpy as np
 from tqdm import tqdm
@@ -33,7 +32,7 @@ def main():
 
         key_place = str( race_info[race_id]["place"] )
         key_dist = str( race_info[race_id]["dist"] )
-        key_kind = str( race_info[race_id]["kind"] )      
+        key_kind = str( race_info[race_id]["kind"] )
         key_baba = str( race_info[race_id]["baba"] )
 
         if year in lib.test_years:
@@ -53,31 +52,54 @@ def main():
             if not cd.race_check():
                 continue
 
-            #father_id = parent_id_data[horce_id]["father"]
             mother_id = parent_id_data[horce_id]["mother"]
-            mother_data = parent_data_get.main( horce_data, mother_id, baba_index_data )
-            score = mother_data["rank"]
-            instance = {}
-            instance["key"] = score
-            instance["odds"] = 0
-            instance["year"] = year
+            
+            try:
+                mother_data = horce_data[mother_id]
+            except:
+                continue
+            
+            mother_pd = lib.past_data( mother_data, [] )
+            count = 0
+            score = 0
+            
+            for mother_cd in mother_pd.past_cd_list():
+                c = 0
+                
+                if mother_cd.place() == cd.place():
+                    c += 1
+
+                if mother_cd.baba_status() == cd.baba_status():
+                    c += 1
+
+                if lib.dist_check( mother_cd.dist() * 1000 ) == lib.dist_check( cd.dist() * 1000 ):
+                    c += 1
+
+                count += c
+                score += mother_cd.rank() * c
+
+            if not count == 0:
+                score /= count
+                
+            score = int( score )
+            key = str( int( score ) )
+            lib.dic_append( result, year, {} )
+            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+
+            count += 1
+            result[year][key]["count"] += 1
 
             if cd.rank() == 1:
-                instance["odds"] = cd.odds()
+                result[year][key]["recovery"] += cd.odds()
 
-            data_storage.append( instance )
-
-    result, split_list = lib.recovery_data_split( data_storage )
-    
     for year in result.keys():
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    lib.write_recovery_csv( result,  name + ".csv" )
     score = lib.recovery_score_check( result )
-    lib.recovery_data_upload( name, score, split_list )
-
+    lib.write_recovery_csv( result, name + ".csv" )
+            
 if __name__ == "__main__":
     main()
         

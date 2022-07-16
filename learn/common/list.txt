@@ -11,14 +11,14 @@ best_weight
 father_rank
 foot_used
 horce_age
-horce_number
-id_weight
 jockey_one_rate
 jockey_rank
 jockey_three_rate
 jockey_two_rate
 limb
 limb1_count
+limb_horce_number
+match_rank
 money
 mother_rank
 omega
@@ -36,7 +36,9 @@ three_average
 three_rate
 time_index
 train_score
+trainer_rank
 two_rate
 up_score
 up_speed
 weather
+weight

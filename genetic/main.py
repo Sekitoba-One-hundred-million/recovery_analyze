@@ -58,24 +58,31 @@ def score_create( learn_data, rate_data, kind, test = False ):
         for key_score in recovery_data[year].keys():
             lib.dic_append( score_data, key_score, { "recovery": 0, "count": 0, "one": 0 } )
             score_data[key_score]["count"] += 1
+            money = recovery_data[year][key_score]["recovery"] * recovery_data[year][key_score]["count"]
+            score_data[key_score]["recovery"] += ( money - recovery_data[year][key_score]["count"] )
             
             if check_recovery < recovery_data[year][key_score]["recovery"]:
-                money = recovery_data[year][key_score]["recovery"] * recovery_data[year][key_score]["count"]
-                score_data[key_score]["recovery"] += money - recovery_data[year][key_score]["count"]
                 score_data[key_score]["one"] += 1
 
+    best_one = 0
     best_score = 0
     best_key_score = "0"
     
     for key_score in score_data.keys():
+        one = score_data[key_score]["one"]
         rate = score_data[key_score]["one"] / score_data[key_score]["count"]
+        #rate = pow( rate, 2 ) 
         score = score_data[key_score]["recovery"] * rate
 
-        if best_score < score:
+        if best_one < one:
             best_key_score = key_score
             best_score = score
+            best_one = one
+        elif best_one == one and best_score < score:
+            best_key_score = key_score
+            best_score = score            
 
-    return best_score, best_key_score
+    return best_score, best_key_score, best_one
     
 def main():
     comm = MPI.COMM_WORLD   #COMM_WORLDは全体
@@ -86,6 +93,8 @@ def main():
     use_buy_key = []
     use_buy_key.append( "one" )
     use_buy_key.append( "quinella" )
+    #use_buy_key.append( "wide" )
+    use_buy_key.append( "triple" )
 
     users_score_data = dm.pickle_load( "users_score_data.pickle" )
     best_key_data = {}
@@ -124,6 +133,7 @@ def main():
     
             for i in range( 0, N ):
                 score_list = []
+                one_list = []
 
                 if rank == 0:
                     print( "kind:{} num:{}".format( k, i ) )
@@ -135,27 +145,31 @@ def main():
 
                     for r in range( 1, size ):
                         instance_score = comm.recv( source = r, tag = 1 )
+                        instance_one = comm.recv( source = r, tag = 2 )
                         score_list.extend( instance_score )
-                        
+                        one_list.extend( instance_one )                    
                 else:
                     parents = comm.recv( source = 0, tag = 0 )
                     instance_score_list = []
+                    instance_one_list = []
                     
                     for parent in parents:
-                        score, best_key = score_create( learn_data, parent, k )
+                        score, best_key, one = score_create( learn_data, parent, k )
                         instance_score_list.append( score )
-                        print( "score:{} best_key_score:{}".format( score, best_key ) )
+                        instance_one_list.append( one )
+                        print( "score:{} best_key_score:{}, one:{}".format( score, best_key, one ) )
 
                     comm.send( instance_score_list, dest = 0, tag = 1 )
+                    comm.send( instance_one_list, dest = 0, tag = 2 )
 
                 if rank == 0:
-                    ga.scores_set( score_list )
+                    ga.scores_set( score_list, one_list )
                     ga.next_genetic()
-                    print( "best_score:{}\n".format( ga.best_score ) )
+                    print( "best_score:{} best_one:{}\n".format( ga.best_score, ga.best_one ) )
 
             if rank == 0:
-                final_test_score, _ = score_create( test_data, ga.best_population, k )
-                _ , best_key = score_create( learn_data, ga.best_population, k )
+                final_test_score, _, _ = score_create( test_data, ga.best_population, k )
+                _ , best_key, _ = score_create( learn_data, ga.best_population, k )
                 print( "best_score:{} best_data{}".format( ga.best_score, ga.best_population ) )
                 print( "final_test_score:{}".format( final_test_score ) )
                 print( "check_key: {}".format( best_key ) )

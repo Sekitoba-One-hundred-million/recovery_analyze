@@ -1,8 +1,15 @@
+from mpi4py import MPI
+
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
 
 dm.dl.file_set( "odds_data.pickle" )
 dm.dl.file_set( "users_rank_data.pickle" )
+
+comm = MPI.COMM_WORLD   #COMM_WORLDは全体
+size = comm.Get_size()  #サイズ（指定されたプロセス（全体）数）
+rank = comm.Get_rank()  #ランク（何番目のプロセスか。プロセスID）
+name = MPI.Get_processor_name() #プロセスが動いているノードのホスト名
 
 class Simulation():
     def __init__( self ):
@@ -11,10 +18,10 @@ class Simulation():
         self.function = {}
         self.function["one"] = self.one
         self.function["quinella"] = self.quinella
-        self.function["trio"] = self.trio
+        self.function["triple"] = self.triple
         self.function["wide"] = self.wide
 
-        self.odds_key = { "one": "単勝", "quinella": "馬連", "trio": "三連複", "wide": "ワイド" }
+        self.odds_key = { "one": "単勝", "quinella": "馬連", "triple": "三連複", "wide": "ワイド" }
 
     def simulation( self, learn_data, rate_data, buy_kind, test = False ):
         result = {}
@@ -36,7 +43,7 @@ class Simulation():
                         instance["score"] += rate_data[kind] * learn_data[race_id][horce_id][kind]
                         
                 instance["rank"] = self.users_rank_data[race_id][horce_id]
-                instance["score"] = int( instance["score"] )
+                instance["score"] = int( int( instance["score"] / 5 ) * 5 )
                 instance_list.append( instance )
 
             if not len( instance_list ) == 0:
@@ -70,6 +77,18 @@ class Simulation():
 
         return result
 
+    def triple( self, data, odds ):
+        result = []
+        
+        for i in range( 0, len( data ) ):
+            for r in range( i + 1, len( data ) ):
+                for t in range( r + 1, len( data ) ):
+                    score = int( data[i]["score"] + data[r]["score"] + data[t]["score"] )
+                    od = odds if data[i]["rank"] < 4 and data[r]["rank"] < 4 and data[t]["rank"] < 4 else 0
+                    result.append( { "score": score, "odds": od / 100 } )
+
+        return result
+
     def wide( self, data, odds ):
         result = []
         for i in range( 0, len( data ) ):
@@ -86,18 +105,5 @@ class Simulation():
                         od = 0
 
                 result.append( { "score": score, "odds": od / 100 } )
-
-        return result
-
-    def trio( self, data, odds ):
-        result = []
-
-        for i in range( 0, len( data ) ):
-            for r in range( i + 1, len( data ) ):
-                for t in range( r + 1, len( data ) ):
-                    score = int( data[i]["score"] + data[r]["score"] + data[t]["score"] )
-                    od = odds if data[i]["score"] < 4 and data[r]["score"] < 4 and data[t]["score"] < 4 else 0
-
-                    result.append( { "score": score, "odds": od / 100 } )
 
         return result

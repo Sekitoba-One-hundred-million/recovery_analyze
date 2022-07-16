@@ -46,7 +46,7 @@ def main():
             if not cd.race_check():
                 continue
 
-            key = str( int( ( cd.popular() - 1 ) / 3 ) )
+            key = str( int( cd.popular() ) )
             lib.dic_append( result, year, {} )
             lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
 

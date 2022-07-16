@@ -66,7 +66,7 @@ def recovery_check( data ):
                     count = 0
                     recovery = 0
                     current_score = score
-
+                
                 count += 1
                 recovery += current_data[i]["odds"]
 

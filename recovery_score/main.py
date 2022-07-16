@@ -36,6 +36,7 @@ def main():
 
         for i in range( 1, size ):
             file_name = comm.recv( source = i, tag = 2 )
+            print( "finish rank {}".format( i ) )
             instance = dm.local_pickle_load( file_name )
             users_data.update( instance["users"] )
             rank_data.update( instance["rank"] )

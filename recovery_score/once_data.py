@@ -8,7 +8,8 @@ from sekitoba_data_create.time_index_get import TimeIndexGet
 #from sekitoba_data_create.up_score import UpScore
 #from sekitoba_data_create.train_index_get import TrainIndexGet
 #from sekitoba_data_create.pace_time_score import PaceTimeScore
-#from sekitoba_data_create.jockey_data_get import JockeyData
+from sekitoba_data_create.jockey_data_get import JockeyData
+from sekitoba_data_create.trainer_data_get import TrainerData
 from sekitoba_data_create.high_level_data_get import RaceHighLevel
 from sekitoba_data_create.race_type import RaceType
 #from sekitoba_data_create import parent_data_get
@@ -26,6 +27,7 @@ dm.dl.file_set( "baba_index_data.pickle" )
 dm.dl.file_set( "parent_id_data.pickle" )
 dm.dl.file_set( "omega_index_data.pickle" )
 dm.dl.file_set( "race_day.pickle" )
+dm.dl.file_set( "parent_id_data.pickle" )
 
 class OnceData:
     def __init__( self ):
@@ -36,16 +38,18 @@ class OnceData:
         self.parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
         self.omega_index_data = dm.dl.data_get( "omega_index_data.pickle" )
         self.race_day = dm.dl.data_get( "race_day.pickle" )
+        self.parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
         self.rank_data = {}
         
         self.ds = DataSet()
         self.race_high_level = RaceHighLevel()
         self.race_type = RaceType()
         self.time_index = TimeIndexGet()
+        self.trainer_data = TrainerData()
+        self.jockey_data = JockeyData()
         #self.up_score_get = UpScore()
         #self.train_index = TrainIndexGet()
         #self.pace_time_score = PaceTimeScore()
-        #self.jockey_data = JockeyData()
 
     def clear( self ):
         dm.dl.data_clear()
@@ -58,6 +62,36 @@ class OnceData:
         else:
             score /= d
 
+        return int( score )
+
+    def match_rank_score( self, cd: lib.current_data, target_id ):
+        try:
+            target_data = self.horce_data[target_id]
+        except:
+            target_data = []
+                
+        target_pd = lib.past_data( target_data, [] )
+        count = 0
+        score = 0
+            
+        for target_cd in target_pd.past_cd_list():
+            c = 0
+                
+            if target_cd.place() == cd.place():
+                c += 1
+                
+            if target_cd.baba_status() == cd.baba_status():
+                c += 1
+
+            if lib.dist_check( target_cd.dist() * 1000 ) == lib.dist_check( cd.dist() * 1000 ):
+                c += 1
+
+            count += c
+            score += target_cd.rank() * c
+
+        if not count == 0:
+            score /= count
+                
         return int( score )
 
     def create( self, k ):
@@ -126,6 +160,11 @@ class OnceData:
             except:
                 continue
 
+            father_id = self.parent_id_data[horce_id]["father"]
+            mother_id = self.parent_id_data[horce_id]["mother"]
+            
+            father_score = self.match_rank_score( cd, father_id )
+            mother_score = self.match_rank_score( cd, mother_id )
             stright_slope_score = self.race_type.stright_slope( cd, pd )
             foot_used_score = self.race_type.foot_used( cd, pd )
             high_level_score = self.race_high_level.data_get( cd, pd, ymd )
@@ -133,10 +172,16 @@ class OnceData:
             age = current_year - horce_birth_day
             speed_index_score = race_data[data_name.speed_index].index( race_data[data_name.speed_index][count] )
             race_interval_score = min( max( pd.race_interval(), 0 ), 20 )
-            id_weight_score = int( cd.weight() / 10 )
+            weight_score = int( cd.weight() / 10 )
             before_id_weight_score = self.division( min( max( before_cd.id_weight(), -10 ), 10 ), 2 )
             omega_index_score = int( omega_index_score / 5 )
             before_speed_score = int( before_cd.speed() )
+            trainer_rank_score = self.trainer_data.rank( race_id, horce_id )
+            jockey_rank_score = self.jockey_data.rank( race_id, horce_id )
+            popular_rank = abs( before_cd.rank() - before_cd.popular() )
+            before_diff_score = int( max( before_cd.diff(), 0 ) * 10 )
+            limb_horce_number = int( limb_math * 100 + int( cd.horce_number() / 2 ) )
+            macth_rank_score = pd.match_rank()
             
             count += 1
             odds = cd.odds() if cd.rank() == 1 else 0
@@ -154,7 +199,16 @@ class OnceData:
             self.ds.set_users_data( data_name.age, age )
             self.ds.set_users_data( data_name.speed_index, speed_index_score )
             self.ds.set_users_data( data_name.race_interval, race_interval_score )
-            self.ds.set_users_data( data_name.id_weight, id_weight_score )
+            self.ds.set_users_data( data_name.weight, weight_score )
             self.ds.set_users_data( data_name.before_id_weight, before_id_weight_score )
             self.ds.set_users_data( data_name.omega, omega_index_score )
             self.ds.set_users_data( data_name.before_speed, before_speed_score )
+            self.ds.set_users_data( data_name.popular, cd.popular() )
+            self.ds.set_users_data( data_name.trainer_rank, trainer_rank_score )
+            self.ds.set_users_data( data_name.jockey_rank, jockey_rank_score )
+            self.ds.set_users_data( data_name.popular_rank, popular_rank )
+            self.ds.set_users_data( data_name.before_diff, before_diff_score )
+            self.ds.set_users_data( data_name.limb_horce_number, limb_horce_number )
+            self.ds.set_users_data( data_name.father_rank, father_score )
+            self.ds.set_users_data( data_name.mother_rank, mother_score )
+            self.ds.set_users_data( data_name.match_rank, macth_rank_score )

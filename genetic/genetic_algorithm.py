@@ -1,4 +1,5 @@
 import math
+import copy
 import random
 
 class GA:
@@ -8,8 +9,11 @@ class GA:
         self.key_list = key_list
         self.parent = []
         self.scores = []
+        self.ones = []
+        self.roulette_scores = []
         self.best_population = None
         self.best_score = -1
+        self.best_one = 0
         self.mutation_rate = 0.05
 
         for i in range( 0, self.population ):
@@ -26,10 +30,24 @@ class GA:
     def get_parent( self ):
         return self.parent
 
-    def scores_set( self, scores ):
+    def scores_set( self, scores, ones ):
         self.scores = scores
+        self.ones = ones
+        self.roulette_scores = copy.deepcopy( scores )
+
+        max_score = max( self.scores )
+        max_one = max( self.ones )
+
+        for i in range( 0, len( self.roulette_scores ) ):
+            if max_one == self.ones[i]:
+                self.roulette_scores[i] += max_score
 
     def score_create( self ):
+        score = 0
+        
+        #if random.random() < 0.5:
+        #    score = 1
+        
         score = random.random()
         score += 0.05
         score *= 10
@@ -40,10 +58,15 @@ class GA:
     def softmax( self, score_list ):
         result = []
         sum_value = 0
-        max_value = max( score_list )
+        min_value = min( score_list )
+
+        if min_value < 0:
+            min_value *= -1
+        else:
+            min_value = 0
 
         for i in range( 0, len( score_list ) ):
-            sum_value += score_list[i]
+            sum_value += ( score_list[i] + min_value )
 
         for i in range( 0, len( score_list ) ):
             result.append( score_list[i] / sum_value )
@@ -51,7 +74,7 @@ class GA:
         return result
 
     def roulette( self ):
-        softmax_scores = self.softmax( self.scores )
+        softmax_scores = self.softmax( self.roulette_scores )
         result = []
         before = -1
         
@@ -119,7 +142,11 @@ class GA:
         result = []
 
         for i in range( 0, self.population ):
-            if self.best_score < self.scores[i]:
+            if self.best_one < self.ones[i]:
+                self.best_one = self.ones[i]
+                self.best_score = self.scores[i]
+                self.best_population = self.parent[i]
+            elif self.best_one == self.ones[i] and self.best_score < self.scores[i]:
                 self.best_score = self.scores[i]
                 self.best_population = self.parent[i]
 

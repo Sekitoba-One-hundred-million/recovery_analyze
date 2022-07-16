@@ -14,7 +14,6 @@ name = "before_diff"
 
 def main():
     result = {}
-    data_storage = []
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
@@ -49,29 +48,29 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = pd.diff_get()
-            instance = {}
-            instance["key"] = score
-            instance["odds"] = 0
-            instance["year"] = year
+            before_cd = pd.before_cd()
+
+            if before_cd == None:
+                continue
+            
+            score = max( before_cd.diff() * 10, 0 )
+            key_score = str( int( score ) )
+            lib.dic_append( result, year, {} )
+            lib.dic_append( result[year], key_score, { "recovery": 0, "count": 0 } )
+
+            result[year][key_score]["count"] += 1
 
             if cd.rank() == 1:
-                instance["odds"] = cd.odds()
+                result[year][key_score]["recovery"] += cd.odds()
 
-            data_storage.append( instance )
 
-    result, split_list = lib.recovery_data_split( data_storage )
-    
     for year in result.keys():
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    lib.write_recovery_csv( result,  name + ".csv" )
+    lib.write_recovery_csv( result, name + ".csv" )
     score = lib.recovery_score_check( result )
-    lib.recovery_data_upload( name, score, split_list )
-    print( split_list )
-    print( score )
 
 if __name__ == "__main__":
     main()

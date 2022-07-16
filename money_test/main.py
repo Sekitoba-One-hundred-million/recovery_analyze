@@ -1,3 +1,4 @@
+import copy
 import random
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -16,10 +17,19 @@ def main():
     recovery = 0
     win = 0
     odds_data = dm.dl.data_get( "odds_data.pickle" )
-    test_data = dm.dl.data_get( "users_score_simu_data.pickle" )
+    users_score_data = dm.dl.data_get( "users_score_data.pickle" )
     users_score_rate = dm.dl.data_get( "users_score_rate.pickle" )
+    users_score_test_data = {}
+
+    for race_id in users_score_data.keys():
+        year = race_id[0:4]
+
+        if year in lib.test_years:
+            users_score_test_data[race_id] = copy.deepcopy( users_score_data[race_id] )
+
+    users_score_data.clear()
     si = Simulation()
-    analyze_data = si.score_create( test_data, users_score_rate )
+    analyze_data = si.score_create( users_score_test_data, users_score_rate )
     key_list = list( analyze_data.keys() )
     random.shuffle( key_list )
     

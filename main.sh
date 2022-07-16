@@ -6,16 +6,18 @@ re_dir="recovery_score"
 us_dir="users_score"
 learn_dir="learn"
 genetic_dir="genetic"
+money_test_dir="money_test"
 
 echo "1: name update"
 echo "2: recovery_score update"
 echo "3: users_score update"
 echo "4: GA start"
+echo "5: money test start"
 
 tag=""
-read -p "Enter 1,2,3,4 > " tag
+read -p "Enter 1,2,3,4,5 > " tag
 
-if [ !$tag = "1" ] && [ !$tag = "2" ] && [ !$tag = "3" ] && [ !$tag = "4" ]; then
+if [ !$tag = "1" ] && [ !$tag = "2" ] && [ !$tag = "3" ] && [ !$tag = "4" ] && [ !$tag = "5" ]; then
     echo "Wrong number"
     exit 1
 fi
@@ -50,6 +52,10 @@ fi
 
 if [ $tag = "4" ]; then
     mpiexec -n 6 python $genetic_dir/main.py
+fi
+
+if [ $tag = "5" ]; then
+    python $money_test_dir/main.py
 fi
 
 rm -rf storage
