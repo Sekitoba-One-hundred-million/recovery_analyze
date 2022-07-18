@@ -1,5 +1,6 @@
 import sys
 import copy
+import random
 from mpi4py import MPI
 from tqdm import tqdm
 
@@ -29,60 +30,93 @@ def key_list_get():
 def score_create( learn_data, rate_data, kind, test = False ):
     si = Simulation()
     analyze_data = si.simulation( learn_data, rate_data, kind, test = test )
-    recovery_data = {}
-
-    for year in analyze_data.keys():
-        recovery_data[year] = {}
-        current_score = analyze_data[year][0]["score"]
-        score = 0
-        count = 0
-        recovery = 0
-        max_count = 0 
-        
-        for data in analyze_data[year]:
-            count += 1
-        
-            if data["score"] == current_score:
-                recovery += data["odds"]
-            else:
-                key_score = current_score
-                r = recovery / count
-                recovery_data[year][key_score] = { "recovery": r, "count": count }
-                recovery += data["odds"]
-                current_score = data["score"]
-
     check_recovery = 1.05
-    score_data = {}
-
-    for year in recovery_data.keys():
-        for key_score in recovery_data[year].keys():
-            lib.dic_append( score_data, key_score, { "recovery": 0, "count": 0, "one": 0 } )
-            score_data[key_score]["count"] += 1
-            money = recovery_data[year][key_score]["recovery"] * recovery_data[year][key_score]["count"]
-            score_data[key_score]["recovery"] += ( money - recovery_data[year][key_score]["count"] )
-            
-            if check_recovery < recovery_data[year][key_score]["recovery"]:
-                score_data[key_score]["one"] += 1
-
-    best_one = 0
-    best_score = 0
-    best_key_score = "0"
+    genetic_score_ensemble_count = 20
+    genetic_score_ensemble_rate = 0.2
+    best_data = []
+    users_score_data_list = []
+    users_score_key = {}
     
-    for key_score in score_data.keys():
-        one = score_data[key_score]["one"]
-        rate = score_data[key_score]["one"] / score_data[key_score]["count"]
-        #rate = pow( rate, 2 ) 
-        score = score_data[key_score]["recovery"] * rate
+    for sec in range( genetic_score_ensemble_count ):
+        recovery_data = {}
+        
+        for year in analyze_data.keys():
+            for data in analyze_data[year]:
+                if random.random() < genetic_score_ensemble_rate:
+                    key_score = str( int( data["score"] ) )
+                    lib.dic_append( recovery_data, key_score, { "money": 0, "count": 0 } )
+                    recovery_data[key_score]["money"] += data["odds"]
+                    recovery_data[key_score]["count"] += 1
 
-        if best_one < one:
-            best_key_score = key_score
-            best_score = score
-            best_one = one
-        elif best_one == one and best_score < score:
-            best_key_score = key_score
-            best_score = score            
+        recovery_key_list = list( recovery_data.keys() )
+        
+        for i in range( 0, len( recovery_key_list ) ):
+            recovery_key_list[i] = int( recovery_key_list[i] )
+        
+        get_money = 0
+        count = 0
+        users_score_data = {}
+        recovery_key_list.sort( reverse = True )
 
-    return best_score, best_key_score, best_one
+        for users_score in recovery_key_list:
+            key_score = str( users_score )
+            get_money += recovery_data[key_score]["money"]
+            count += recovery_data[key_score]["count"]
+            score_recovery = get_money / count
+            users_score_data[key_score] = { "recovery": score_recovery, "score": count }
+            users_score_key[key_score] = True
+
+        users_score_data_list.append( users_score_data )
+
+    best_score = 0
+    best_key = ""
+    best_one = 0
+
+    for score_key in users_score_key.keys():
+        check_data = []
+        current_best_score = 0
+        current_best_key = ""
+        minus_score = 0
+        minus_count = 0
+        
+        for users_score_data in users_score_data_list:
+            if score_key in users_score_data.keys():
+                if check_recovery < users_score_data[score_key]["recovery"]:
+                    check_data.append( users_score_data[score_key] )
+                else:
+                    minus_score += users_score_data[score_key]["score"]
+
+        check_clear_count = len( check_data )
+
+        if check_clear_count == 0:
+            continue
+
+        minus_score /= check_clear_count
+        current_best_key = score_key
+            
+        if check_clear_count == 1:
+            current_best_score = check_data[0]["score"]
+        else:
+            check_data = sorted( check_data, key=lambda x:x["score"] )
+
+            if check_clear_count % 2 == 1:
+                median_index = int( check_clear_count / 2 )
+                current_best_score = check_data[median_index]["score"]
+            else:
+                median_index_1 = int( check_clear_count / 2 )
+                median_index_2 = int( check_clear_count / 2 - 1 )
+                current_best_score = int( ( check_data[median_index_1]["score"] + check_data[median_index_2]["score"] ) / 2 )
+
+        #current_best_score = current_best_score * ( check_clear_count / genetic_score_ensemble_count )
+        current_best_score -= minus_score
+        
+        if best_score < current_best_score:
+            best_score = current_best_score
+            best_key = current_best_key
+            best_one = check_clear_count
+        
+    #print( best_data )
+    return best_score, best_key, best_one
     
 def main():
     comm = MPI.COMM_WORLD   #COMM_WORLDは全体
@@ -92,9 +126,9 @@ def main():
 
     use_buy_key = []
     use_buy_key.append( "one" )
-    use_buy_key.append( "quinella" )
+    #use_buy_key.append( "quinella" )
     #use_buy_key.append( "wide" )
-    use_buy_key.append( "triple" )
+    #use_buy_key.append( "triple" )
 
     users_score_data = dm.pickle_load( "users_score_data.pickle" )
     best_key_data = {}
@@ -112,7 +146,7 @@ def main():
     ga_update = ""
 
     if rank == 0:
-        ga_update = input( "ga update(y/n): " )
+        ga_update = "y"#input( "ga update(y/n): " )
         
         for r in range( 1, size ):
             comm.send( ga_update, dest = r, tag = 0 )
@@ -188,7 +222,8 @@ def main():
         sys.exit()
     
     print( "test start" )
-    test.main( test_data, use_buy_key )
+    test.main( test_data, use_buy_key, "test" )
+    test.main( learn_data, use_buy_key, "learn" )
 
 if __name__ == "__main__":
     main()

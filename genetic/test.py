@@ -103,12 +103,12 @@ def key_check( test_data, users_score_rate, kind_key_list ):
         print( "{} check_score: {}".format( ticket_kind, check_score ) )
         print( "recovery: {} count: {}\n".format( recovery, count ) )
 
-def main( test_data, kind_key_list ):
+def main( test_data, kind_key_list, name ):
     users_score_rate = dm.pickle_load( "users_score_rate.pickle" )
     test_result, score_key = data_create( test_data, users_score_rate, kind_key_list )
     dir_name = "/Users/kansei/Desktop/recovery_data/"
 
     for k in kind_key_list:
-        csv_write( dir_name + "genetic_test_" + k + "_users_score.csv", test_result[k], score_key[k] )
+        csv_write( dir_name + "genetic_" + name + "_" + k + "_users_score.csv", test_result[k], score_key[k] )
 
     key_check( test_data, users_score_rate, kind_key_list )
