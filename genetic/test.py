@@ -83,8 +83,7 @@ def csv_write( file_name, data, score_key_dict ):
             
     f.close()
 
-def key_check( test_data, users_score_rate, kind_key_list ):
-    users_best_key = dm.pickle_load( "users_best_key.pickle" )
+def key_check( test_data, users_score_rate, kind_key_list, users_best_key ):
     si = Simulation()
     
     for ticket_kind in users_best_key.keys():
@@ -103,12 +102,20 @@ def key_check( test_data, users_score_rate, kind_key_list ):
         print( "{} check_score: {}".format( ticket_kind, check_score ) )
         print( "recovery: {} count: {}\n".format( recovery, count ) )
 
-def main( test_data, kind_key_list, name ):
-    users_score_rate = dm.pickle_load( "users_score_rate.pickle" )
+def pram_write( users_rate_data, ticket_kind ):
+    f = open( ticket_kind + "_score_rate.txt", "w" )
+    
+    for k in users_rate_data[ticket_kind].keys():
+        f.write( k + ": " + str( users_rate_data[ticket_kind][k] ) + "\n" )
+
+    f.close()
+
+def main( test_data, users_score_rate, users_best_key, kind_key_list, name ):
     test_result, score_key = data_create( test_data, users_score_rate, kind_key_list )
     dir_name = "/Users/kansei/Desktop/recovery_data/"
 
     for k in kind_key_list:
+        pram_write( users_score_rate, k )
         csv_write( dir_name + "genetic_" + name + "_" + k + "_users_score.csv", test_result[k], score_key[k] )
 
-    key_check( test_data, users_score_rate, kind_key_list )
+    key_check( test_data, users_score_rate, kind_key_list, users_best_key )

@@ -1,6 +1,6 @@
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-from sekitoba_data_create.race_type import RaceType
+from sekitoba_data_create.jockey_data_get import JockeyData
 
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -9,15 +9,15 @@ dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 
-name = "straight_slope"
+name = "jockey_year_rank"
 
 def main():
     result = {}
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    race_type = RaceType()
-
+    jockey_data = JockeyData()
+    
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
         year = race_id[0:4]
@@ -37,6 +37,8 @@ def main():
         if key_kind == "0" or key_kind == "3":
             continue
 
+        us_list = []
+
         for kk in race_data[k].keys():
             horce_id = kk
             current_data, past_data = lib.race_check( horce_data[horce_id],
@@ -47,8 +49,12 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = race_type.stright_slope( cd, pd )
-            key = str( score )
+            before_year = int( year ) - 1
+            key_before_year = str( int( before_year ) )
+            score = jockey_data.year_rank( race_id, horce_id, key_before_year )
+            score = int( score / 10 )
+                
+            key = str( int( score ) )
             
             lib.dic_append( result, year, {} )
             lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )

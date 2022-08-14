@@ -32,8 +32,8 @@ def main():
         key_kind = str( race_info[race_id]["kind"] )      
         key_baba = str( race_info[race_id]["baba"] )
 
-        if year in lib.test_years:
-            continue
+        #if year in lib.test_years:
+        #    continue
 
         #芝かダートのみ
         if key_kind == "0" or key_kind == "3":
@@ -50,28 +50,29 @@ def main():
                 continue
 
             score = pd.get_money()
-            instance = {}
-            instance["key"] = score
-            instance["odds"] = 0
-            instance["year"] = year
+
+            if not score == 0:
+                score += 100
+
+            score /= 200
+            score = min( score, 30 )
+            key = str( int( score ) )
+            
+            lib.dic_append( result, year, {} )
+            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+            
+            result[year][key]["count"] += 1
 
             if cd.rank() == 1:
-                instance["odds"] = cd.odds()
+                result[year][key]["recovery"] += cd.odds()
 
-            data_storage.append( instance )
-
-    result, split_list = lib.recovery_data_split( data_storage )
-    
     for year in result.keys():
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    lib.write_recovery_csv( result,  name + ".csv" )
     score = lib.recovery_score_check( result )
-    lib.recovery_data_upload( name, score, split_list )
-    print( split_list )
-    print( score )
+    lib.write_recovery_csv( result, name + ".csv" )
 
 if __name__ == "__main__":
     main()

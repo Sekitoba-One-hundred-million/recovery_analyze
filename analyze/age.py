@@ -28,8 +28,8 @@ def main():
         key_kind = str( race_info[race_id]["kind"] )        
         key_baba = str( race_info[race_id]["baba"] )
 
-        if year in lib.test_years:
-            continue
+        #if year in lib.test_years:
+        #    continue
 
         #芝かダートのみ
         if key_kind == "0" or key_kind == "3":
@@ -65,10 +65,7 @@ def main():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result, name + ".csv" )
-    lib.recovery_data_upload( name, score, [] )
-    print( score )
     
 if __name__ == "__main__":
     main()

@@ -12,8 +12,9 @@ class Simulation():
         self.odds_data = dm.dl.data_get( "odds_data.pickle" )
         self.rank_win_rate_data = dm.dl.data_get( "rank_win_rate_data.pickle" )
         self.rank_score = dm.dl.data_get( "rank_score.pickle" )
-        self.buy_score = { "one": { "min": 35, "max": 100 }, "quinella": { "min": 50, "max": 65 } }#dm.dl.data_get( "users_best_key.pickle" )
-        #self.buy_score = { "one": { "min": 35, "max": 100 } }
+        #self.buy_score = { "one": { "min": 35, "max": 100 }, "quinella": { "min": 50, "max": 65 } }#dm.dl.data_get( "users_best_key.pickle" )
+        self.buy_score = { "one": { "min": 45, "max": 55 } }
+        #self.buy_score = { "one": { "min": 15, "max": 20 }, "quinella": { "min": 35, "max": 50 } }
         self.users_rank_data = dm.dl.data_get( "users_rank_data.pickle" )
         #self.odds_key = { "one": "単勝", "quinella": "馬連", "wide": "ワイド", "triple": "三連複" }
         self.odds_key = { "one": "単勝", "quinella": "馬連", "wide": "ワイド", "triple": "三連複" }
@@ -23,16 +24,16 @@ class Simulation():
         self.function["triple"] = self.triple
         self.function["wide"] = self.wide
 
-        self.money = 5000
-        self.first_money = 5000
+        self.money = 1000
+        self.first_money = 1000
         self.money_list = []
 
     def bet_money( self, rate ):
-        rate = 0.001#min( 0.01, rate )
-        bet_money = min( self.money / 2, self.first_money )
+        rate = 0.01#min( 0.01, rate )
+        #bet_money = min( self.money / 2, self.first_money )
         bet_money = self.money / 2
-        #return max( int( bet_money * rate ), 1 )
-        return 1
+        return max( int( bet_money * rate ), 1 )
+        #return 1
 
     def users_score_check( self, users_score, kind ):        
         if self.buy_score[kind]["min"] <= users_score and users_score <= self.buy_score[kind]["max"]:
@@ -64,7 +65,7 @@ class Simulation():
                 instance["rank"] = self.users_rank_data[race_id][horce_id]
                 instance["score"] = {}
                 
-                for kind in self.odds_key.keys():
+                for kind in self.buy_score.keys():
                     instance["score"][kind] = 0
                     
                     for k in users_score_data[race_id][horce_id].keys():

@@ -1,23 +1,24 @@
+import os
+import numpy as np
+from tqdm import tqdm
+
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-from sekitoba_data_create.race_type import RaceType
-
-from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
+dm.dl.file_set( "baba_index_data.pickle" )
 
-name = "straight_slope"
+name = "before_popular"
 
 def main():
     result = {}
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    race_type = RaceType()
-
+    baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
+    
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
         year = race_id[0:4]
@@ -27,7 +28,7 @@ def main():
 
         key_place = str( race_info[race_id]["place"] )
         key_dist = str( race_info[race_id]["dist"] )
-        key_kind = str( race_info[race_id]["kind"] )        
+        key_kind = str( race_info[race_id]["kind"] )      
         key_baba = str( race_info[race_id]["baba"] )
 
         #if year in lib.test_years:
@@ -47,26 +48,30 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = race_type.stright_slope( cd, pd )
-            key = str( score )
+            before_cd = pd.before_cd()
+
+            if before_cd == None:
+                continue
             
+            score = before_cd.popular()
+            key_score = str( int( score ) )
             lib.dic_append( result, year, {} )
-            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
-            
-            result[year][key]["count"] += 1
+            lib.dic_append( result[year], key_score, { "recovery": 0, "count": 0 } )
+
+            result[year][key_score]["count"] += 1
 
             if cd.rank() == 1:
-                result[year][key]["recovery"] += cd.odds()
+                result[year][key_score]["recovery"] += cd.odds()
+
 
     for year in result.keys():
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result, name + ".csv" )
-    #lib.recovery_data_upload( name, score, [] )
-    
+    score = lib.recovery_score_check( result )
+
 if __name__ == "__main__":
     main()
         

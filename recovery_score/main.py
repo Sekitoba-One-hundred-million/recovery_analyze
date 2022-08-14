@@ -6,6 +6,7 @@ import sekitoba_data_manage as dm
 
 from once_data import OnceData
 from data_set import DataSet
+import recovery_check
 
 def key_list_search( rank, size, key_list ):
     n = int( len( key_list ) / ( size - 1 ) )
@@ -33,6 +34,7 @@ def main():
         ds = DataSet()
         rank_data = {}
         users_data = {}
+        odds_data = {}
 
         for i in range( 1, size ):
             file_name = comm.recv( source = i, tag = 2 )
@@ -40,8 +42,10 @@ def main():
             instance = dm.local_pickle_load( file_name )
             users_data.update( instance["users"] )
             rank_data.update( instance["rank"] )
+            odds_data.update( instance["odds"] )
 
-        ds.set_all_data( users_data, rank_data )
+        ds.set_all_data( users_data, rank_data, odds_data )
+        recovery_check.main( ds )
         ds.data_upload()
     else:
         ok = comm.recv( source = 0, tag = 1 )        
@@ -56,7 +60,7 @@ def main():
             for k in key_list:
                 od.create( k )
 
-        instance = { "rank": od.rank_data, "users": od.ds.users_data }
+        instance = { "rank": od.ds.rank_data, "odds": od.ds.odds_data, "users": od.ds.users_data }
         file_name = str( rank ) + "-instance.pickle"
         dir_name = "./storage/"
         dm.local_pickle_save( dir_name + file_name, instance )

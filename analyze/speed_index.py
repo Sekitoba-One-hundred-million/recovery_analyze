@@ -34,8 +34,8 @@ def main():
         key_kind = str( race_info[race_id]["kind"] )        
         key_baba = str( race_info[race_id]["baba"] )
 
-        if year in lib.test_years:
-            continue
+        #if year in lib.test_years:
+        #    continue
 
         #芝かダートのみ
         if key_kind == "0" or key_kind == "3":
@@ -58,10 +58,13 @@ def main():
 
             current_time_index = time_index.main( horce_id, pd.past_day_list() )
             speed, up_speed, pace_speed = pd.speed_index( baba_index_data[horce_id] )
-            speed_index_list.append( lib.max_check( speed ) + lib.max_check( up_speed ) + lib.max_check( pace_speed ) + current_time_index["max"] )
+            #speed_index_list.append( lib.max_check( speed ) + lib.max_check( up_speed ) + lib.max_check( pace_speed ) + current_time_index["max"] )
+            speed_index_list.append( lib.max_check( speed ) + current_time_index["max"] )
             #up_speed_index_list.append( lib.max_check( up_speed ) )
             #pace_speed_index_list.append( lib.max_check( pace_speed ) )
 
+        sort_speed_index = sorted( speed_index_list, reverse = True )
+        
         for kk in race_data[k].keys():
             horce_id = kk
             current_data, past_data = lib.race_check( horce_data[horce_id],
@@ -72,7 +75,7 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = speed_index_list.index( speed_index_list[count] )
+            score = sort_speed_index.index( speed_index_list[count] )
             key = str( int( score ) )
             lib.dic_append( result, year, {} )
             lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )

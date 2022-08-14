@@ -10,6 +10,7 @@ dm.dl.file_set( "split_data.pickle" )
 dm.dl.file_set( "users_data.pickle" )
 dm.dl.file_set( "users_rank_data.pickle" )
 dm.dl.file_set( "recovery_score_data.pickle" )
+#dm.dl.file_set( "users_score_rate.pickle" )
 
 class UsersAnalyze:
     def __init__( self ):
@@ -22,6 +23,7 @@ class UsersAnalyze:
         self.odds_data = dm.dl.data_get( "odds_data.pickle" )
         self.users_data = dm.dl.data_get( "users_data.pickle" )
         self.user_rank_data = dm.dl.data_get( "users_rank_data.pickle" )
+        #self.users_score_rate = dm.dl.data_get( "users_score_rate.pickle" )
         self.users_score_function = UsersScoreFunction()
         self.set_function()
 

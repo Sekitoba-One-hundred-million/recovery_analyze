@@ -58,12 +58,12 @@ def main():
             
             p1, p2 = before_cd.pace()
             pace = ( p1 - p2 )
-            score = 0
+            score = pace * 10
 
-            if pace < -1:
-                score = 1
-            elif 0.5 < pace:
-                score = 2
+            #if pace < -1:
+            #    score = 1
+            #elif 0.5 < pace:
+            #    score = 2
 
             key = str( int( score ) )
             lib.dic_append( result, year, {} )

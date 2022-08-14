@@ -10,11 +10,12 @@ class GA:
         self.parent = []
         self.scores = []
         self.ones = []
-        self.roulette_scores = []
         self.best_population = None
         self.best_score = -1
         self.best_one = 0
         self.mutation_rate = 0.05
+        self.next_individual_rate = 0.5
+        self.ticket_kind = ""
 
         for i in range( 0, self.population ):
             t = {}
@@ -30,24 +31,14 @@ class GA:
     def get_parent( self ):
         return self.parent
 
-    def scores_set( self, scores, ones ):
-        self.scores = scores
-        self.ones = ones
-        self.roulette_scores = copy.deepcopy( scores )
+    def set_ticket_kind( self, kind ):
+        self.ticket_kind = kind
 
-        max_score = max( self.scores )
-        max_one = max( self.ones )
-
-        for i in range( 0, len( self.roulette_scores ) ):
-            if max_one == self.ones[i]:
-                self.roulette_scores[i] += max_score
+    def scores_set( self, score_list, one_list ):
+        self.scores = copy.deepcopy( score_list )
+        self.ones = copy.deepcopy( one_list )
 
     def score_create( self ):
-        score = 0
-        
-        #if random.random() < 0.5:
-        #    score = 1
-        
         score = random.random()
         score += 0.05
         score *= 10
@@ -58,23 +49,29 @@ class GA:
     def softmax( self, score_list ):
         result = []
         sum_value = 0
-        min_value = min( score_list )
 
-        if min_value < 0:
-            min_value *= -1
-        else:
-            min_value = 0
+        # 一回正規化する max rangeにひっかかかる
+        # scoreは絶対0以上
+        sum_value = sum( score_list )
 
         for i in range( 0, len( score_list ) ):
-            sum_value += ( score_list[i] + min_value )
+            if not sum_value == 0:
+                result.append( score_list[i] / sum_value )
+            else:
+                result.append( score_list[i] )
 
-        for i in range( 0, len( score_list ) ):
-            result.append( score_list[i] / sum_value )
+        for i in range( 0, len( result ) ):
+            result[i] = math.exp( result[i] )
+
+        sum_value = sum( result )
+
+        for i in range( 0, len( result ) ):
+            result[i] /= sum_value
 
         return result
 
-    def roulette( self ):
-        softmax_scores = self.softmax( self.roulette_scores )
+    def roulette( self, roulette_scores ):
+        softmax_scores = self.softmax( roulette_scores )
         result = []
         before = -1
         
@@ -98,36 +95,20 @@ class GA:
 
             if not before == get_num:
                 result.append( get_num )
-                before = get_num                
+                before = get_num   
 
         return result[0], result[1]
 
-    def two_crossing( self, parent1, parent2 ):
+    def random_crossing( self, parent1, parent2 ):
         result = {}
         two_point = []
         before = -1
 
-        while 1:
-            if len( two_point ) == 2:
-                break
-            
-            p = random.randint( 1, self.element - 2 )
-
-            if not before == p:
-                before = p
-                two_point.append( p )
-
-        min_point = min( two_point )
-        max_point = max( two_point )
-
-        for k in self.key_list[0:min_point]:
-            result[k] = parent1[k]
-
-        for k in self.key_list[min_point:max_point]:
-            result[k] = parent2[k]
-
-        for k in self.key_list[max_point:self.element]:
-            result[k] = parent1[k]
+        for k in self.key_list:
+            if random.random() < 0.5:
+                result[k] = parent1[k]
+            else:
+                result[k] = parent2[k]
             
         return result
 
@@ -137,23 +118,40 @@ class GA:
                 data[k] = self.score_create()
 
         return data        
+
+    def ranking( self, N ):
+        rank_list = list( range( 1, N + 1 ) )
+        p1, p2 = self.roulette( rank_list )
+        p1 = N - p1 - 1
+        p2 = N - p2 - 1
+        return p1, p2
         
     def next_genetic( self ):
-        result = []
+        next_individual = []
+        next_check = []
 
         for i in range( 0, self.population ):
-            if self.best_one < self.ones[i]:
+            next_check.append( { "score": self.scores[i], "parent": self.parent[i] } )
+            
+            if self.best_score < self.scores[i]:
                 self.best_one = self.ones[i]
                 self.best_score = self.scores[i]
                 self.best_population = self.parent[i]
-            elif self.best_one == self.ones[i] and self.best_score < self.scores[i]:
-                self.best_score = self.scores[i]
-                self.best_population = self.parent[i]
 
-        for i in range( 0, self.population ):
-            point1, point2 = self.roulette()
-            child = self.two_crossing( self.parent[point1], self.parent[point2] )
+        next_check = sorted( next_check, key=lambda x:x["score"], reverse = True )
+        next_elite_count = int( self.population * self.next_individual_rate )
+        
+        for i in range( 0, next_elite_count ):
+            next_individual.append( copy.deepcopy( next_check[i]["parent"] ) )
+
+        while 1:
+            if len( next_individual ) == self.population:
+                break
+            
+            point1, point2 = self.ranking( next_elite_count )
+            #child = self.two_crossing( self.parent[point1], self.parent[point2] )
+            child = self.random_crossing( next_individual[point1], next_individual[point2] )
             child = self.mutation( child )
-            result.append( child )
+            next_individual.append( child )
 
-        self.parent = result
+        self.parent = copy.deepcopy( next_individual )

@@ -1,23 +1,27 @@
+import os
+import numpy as np
+from tqdm import tqdm
+
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-from sekitoba_data_create.race_type import RaceType
-
-from tqdm import tqdm
-import matplotlib.pyplot as plt
+from sekitoba_data_create.before_data import BeforeData
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
+dm.dl.file_set( "baba_index_data.pickle" )
 
-name = "straight_slope"
+name = "beofre_up3_rank"
 
 def main():
     result = {}
+    data_storage = []
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    race_type = RaceType()
-
+    baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
+    before_data = BeforeData()
+    
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
         year = race_id[0:4]
@@ -47,9 +51,13 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = race_type.stright_slope( cd, pd )
-            key = str( score )
-            
+            before_cd = pd.before_cd()
+
+            if before_cd == None:
+                continue
+
+            score = before_data.up3_rank( before_cd )
+            key = str( int( score ) )
             lib.dic_append( result, year, {} )
             lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
             
@@ -57,7 +65,7 @@ def main():
 
             if cd.rank() == 1:
                 result[year][key]["recovery"] += cd.odds()
-
+                
     for year in result.keys():
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
@@ -65,8 +73,7 @@ def main():
 
     score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result, name + ".csv" )
-    #lib.recovery_data_upload( name, score, [] )
-    
+
 if __name__ == "__main__":
     main()
         

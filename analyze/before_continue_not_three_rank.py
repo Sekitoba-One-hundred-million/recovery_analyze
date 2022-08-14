@@ -1,6 +1,5 @@
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-from sekitoba_data_create.race_type import RaceType
 
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -9,15 +8,14 @@ dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 
-name = "straight_slope"
+name = "before_continue_not_three_rank"
 
 def main():
     result = {}
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    race_type = RaceType()
-
+    
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
         year = race_id[0:4]
@@ -47,8 +45,18 @@ def main():
             if not cd.race_check():
                 continue
 
-            score = race_type.stright_slope( cd, pd )
-            key = str( score )
+            score = 0
+            past_cd_list = pd.past_cd_list()
+
+            for past_cd in past_cd_list:
+                if not past_cd == None and past_cd.race_check():
+                    if 3 < past_cd.rank():
+                        score += 1
+                    else:
+                        break
+
+            score = min( score, 10 )
+            key = str( int( score ) )
             
             lib.dic_append( result, year, {} )
             lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )

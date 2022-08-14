@@ -4,15 +4,17 @@ import sekitoba_data_manage as dm
 class DataSet:
     def __init__( self ):
         self.rank_data = {}
+        self.odds_data = {}
         self.users_data = {}
         self.year = ""
         self.odds = 0
         self.race_id = ""
         self.horce_id = ""
 
-    def set_all_data( self, users_data, rank_data ):
+    def set_all_data( self, users_data, rank_data, odds_data ):
         self.rank_data = rank_data
         self.users_data = users_data
+        self.odds_data = odds_data
 
     def set_yo( self, year, odds ):
         self.year = year
@@ -30,6 +32,10 @@ class DataSet:
     def set_rank_data( self, rank ):
         lib.dic_append( self.rank_data, self.race_id, {} )
         self.rank_data[self.race_id][self.horce_id] = rank
+
+    def set_odds_data( self, odds ):
+        lib.dic_append( self.odds_data, self.race_id, {} )
+        self.odds_data[self.race_id][self.horce_id] = odds
 
     def data_upload( self ):
         dm.pickle_upload( "users_rank_data.pickle", self.rank_data )

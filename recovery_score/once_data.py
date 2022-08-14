@@ -12,6 +12,7 @@ from sekitoba_data_create.jockey_data_get import JockeyData
 from sekitoba_data_create.trainer_data_get import TrainerData
 from sekitoba_data_create.high_level_data_get import RaceHighLevel
 from sekitoba_data_create.race_type import RaceType
+from sekitoba_data_create.before_data import BeforeData
 #from sekitoba_data_create import parent_data_get
 
 
@@ -28,6 +29,7 @@ dm.dl.file_set( "parent_id_data.pickle" )
 dm.dl.file_set( "omega_index_data.pickle" )
 dm.dl.file_set( "race_day.pickle" )
 dm.dl.file_set( "parent_id_data.pickle" )
+dm.dl.file_set( "horce_sex_data.pickle" )
 
 class OnceData:
     def __init__( self ):
@@ -39,7 +41,7 @@ class OnceData:
         self.omega_index_data = dm.dl.data_get( "omega_index_data.pickle" )
         self.race_day = dm.dl.data_get( "race_day.pickle" )
         self.parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
-        self.rank_data = {}
+        self.horce_sex_data = dm.dl.data_get( "horce_sex_data.pickle" )
         
         self.ds = DataSet()
         self.race_high_level = RaceHighLevel()
@@ -47,6 +49,7 @@ class OnceData:
         self.time_index = TimeIndexGet()
         self.trainer_data = TrainerData()
         self.jockey_data = JockeyData()
+        self.before_data = BeforeData()
         #self.up_score_get = UpScore()
         #self.train_index = TrainIndexGet()
         #self.pace_time_score = PaceTimeScore()
@@ -111,10 +114,9 @@ class OnceData:
         if key_kind == "0" or key_kind == "3":
             return
 
-        self.rank_data[race_id] = {}
         count = 0
-        race_data = {}
-        race_data[data_name.speed_index] = []
+        current_race_data = {}
+        current_race_data[data_name.speed_index] = []
         
         for kk in self.race_data[k].keys():
             horce_id = kk
@@ -133,7 +135,9 @@ class OnceData:
 
             current_time_index = self.time_index.main( kk, pd.past_day_list() )
             speed, up_speed, pace_speed = pd.speed_index( self.baba_index_data[horce_id] )
-            race_data[data_name.speed_index].append( lib.max_check( speed ) + lib.max_check( up_speed ) + lib.max_check( pace_speed ) + current_time_index["max"] )
+            current_race_data[data_name.speed_index].append( lib.max_check( speed ) + current_time_index["max"] )
+
+        sort_speed_index = sorted( current_race_data[data_name.speed_index], reverse = True )
 
         for kk in self.race_data[k].keys():
             horce_id = kk
@@ -160,17 +164,19 @@ class OnceData:
             except:
                 continue
 
+            before_year = int( year ) - 1
+            key_before_year = str( int( before_year ) )
             father_id = self.parent_id_data[horce_id]["father"]
             mother_id = self.parent_id_data[horce_id]["mother"]
             
-            father_score = self.match_rank_score( cd, father_id )
+            #father_score = self.match_rank_score( cd, father_id )
             mother_score = self.match_rank_score( cd, mother_id )
             stright_slope_score = self.race_type.stright_slope( cd, pd )
-            foot_used_score = self.race_type.foot_used( cd, pd )
+            #foot_used_score = self.race_type.foot_used( cd, pd )
             high_level_score = self.race_high_level.data_get( cd, pd, ymd )
             limb_math = lib.limb_search( pd )
             age = current_year - horce_birth_day
-            speed_index_score = race_data[data_name.speed_index].index( race_data[data_name.speed_index][count] )
+            speed_index_score = sort_speed_index.index( current_race_data[data_name.speed_index][count] )
             race_interval_score = min( max( pd.race_interval(), 0 ), 20 )
             weight_score = int( cd.weight() / 10 )
             before_id_weight_score = self.division( min( max( before_cd.id_weight(), -10 ), 10 ), 2 )
@@ -178,23 +184,52 @@ class OnceData:
             before_speed_score = int( before_cd.speed() )
             trainer_rank_score = self.trainer_data.rank( race_id, horce_id )
             jockey_rank_score = self.jockey_data.rank( race_id, horce_id )
-            popular_rank = abs( before_cd.rank() - before_cd.popular() )
+            #popular_rank = abs( before_cd.rank() - before_cd.popular() )
             before_diff_score = int( max( before_cd.diff(), 0 ) * 10 )
             limb_horce_number = int( limb_math * 100 + int( cd.horce_number() / 2 ) )
             macth_rank_score = pd.match_rank()
+            money_score = pd.get_money()
             
+            if not money_score == 0:
+                money_score += 100
+                
+            money_score = min( int( money_score / 200 ), 30 )
+            burden_weight_score = int( max( cd.burden_weight() - 50, 0 ) )
+            #before_up3_rank = self.before_data.up3_rank( before_cd )
+            before_continue_not_three_rank = pd.before_continue_not_three_rank()
+            #limb_place_score = int( cd.place() * 10 + limb_math )
+            horce_sex = self.horce_sex_data[horce_id]
+            horce_sex_month = int( self.race_day[race_id]["month"] * 10 + horce_sex )
+            dist_kind_count = min( pd.dist_kind_count(), 20 )
+            before_popular = before_cd.popular()
+            before_passing_list = before_cd.passing_rank().split( "-" )
+            
+            try:
+                before_last_passing_rank = int( before_passing_list[-1] )
+            except:
+                before_last_passing_rank = 0
+
+            try:
+                before_first_passing_rank = int( before_passing_list[0] )
+            except:
+                before_first_passing_rank = 0
+
+            #p1, p2 = before_cd.pace()
+            #before_pace = int( ( p1 - p2 ) * 10 )
+            jockey_year_rank_score = int( self.jockey_data.year_rank( race_id, horce_id, key_before_year ) / 10 )
+            age_dist = age * 10 + cd.dist_kind()
             count += 1
             odds = cd.odds() if cd.rank() == 1 else 0
             
-            self.rank_data[race_id][horce_id] = cd.rank()
             self.ds.set_yo( year, odds )
             self.ds.set_id( race_id, horce_id )
             self.ds.set_rank_data( cd.rank() )
+            self.ds.set_odds_data( cd.odds() )
             
             self.ds.set_users_data( data_name.before_rank, before_cd.rank() )
             self.ds.set_users_data( data_name.race_level_check, high_level_score )
             self.ds.set_users_data( data_name.straight_slope, stright_slope_score )
-            self.ds.set_users_data( data_name.foot_used, foot_used_score )
+            #self.ds.set_users_data( data_name.foot_used, foot_used_score )
             self.ds.set_users_data( data_name.limb, limb_math )
             self.ds.set_users_data( data_name.age, age )
             self.ds.set_users_data( data_name.speed_index, speed_index_score )
@@ -206,9 +241,25 @@ class OnceData:
             self.ds.set_users_data( data_name.popular, cd.popular() )
             self.ds.set_users_data( data_name.trainer_rank, trainer_rank_score )
             self.ds.set_users_data( data_name.jockey_rank, jockey_rank_score )
-            self.ds.set_users_data( data_name.popular_rank, popular_rank )
+            #self.ds.set_users_data( data_name.popular_rank, popular_rank )
             self.ds.set_users_data( data_name.before_diff, before_diff_score )
             self.ds.set_users_data( data_name.limb_horce_number, limb_horce_number )
-            self.ds.set_users_data( data_name.father_rank, father_score )
+            #self.ds.set_users_data( data_name.father_rank, father_score )
             self.ds.set_users_data( data_name.mother_rank, mother_score )
             self.ds.set_users_data( data_name.match_rank, macth_rank_score )
+            self.ds.set_users_data( data_name.weather, cd.weather() )
+            self.ds.set_users_data( data_name.burden_weight, burden_weight_score )
+            #self.ds.set_users_data( data_name.before_up3_rank, before_up3_rank )
+            self.ds.set_users_data( data_name.before_continue_not_three_rank, before_continue_not_three_rank )
+            #self.ds.set_users_data( data_name.limb_place, limb_place_score )
+            self.ds.set_users_data( data_name.horce_sex, horce_sex )
+            self.ds.set_users_data( data_name.horce_sex_month, horce_sex_month )
+            self.ds.set_users_data( data_name.dist_kind_count, dist_kind_count )
+            self.ds.set_users_data( data_name.before_popular, before_popular )
+            self.ds.set_users_data( data_name.before_last_passing_rank, before_last_passing_rank )
+            self.ds.set_users_data( data_name.before_first_passing_rank, before_first_passing_rank )
+            #self.ds.set_users_data( data_name.before_pace, before_pace )
+            self.ds.set_users_data( data_name.jockey_year_rank, jockey_year_rank_score )
+            #self.ds.set_users_data( data_name.age_dist, age_dist )
+            self.ds.set_users_data( data_name.horce_num, horce_num )
+            self.ds.set_users_data( data_name.money, money_score )
