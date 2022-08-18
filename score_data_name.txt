@@ -1,6 +1,7 @@
 before_rank
 race_level_check
 straight_slope
+foot_used
 limb
 age
 speed_index
@@ -8,7 +9,6 @@ race_interval
 weight
 before_id_weight
 omega
-before_speed
 popular
 trainer_rank
 jockey_rank
@@ -21,10 +21,14 @@ burden_weight
 before_continue_not_three_rank
 horce_sex
 horce_sex_month
-dist_kind_count
 before_popular
 before_last_passing_rank
 before_first_passing_rank
 jockey_year_rank
 money
 horce_num
+baba
+before_pace
+place
+popular_rank
+train_score

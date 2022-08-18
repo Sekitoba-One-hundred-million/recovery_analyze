@@ -8,7 +8,7 @@ dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 
-name = "limb_place"
+name = "place"
 
 def main():
     result = {}
@@ -45,8 +45,7 @@ def main():
             if not cd.race_check():
                 continue
 
-            limb_math = lib.limb_search( pd )
-            score = cd.place() * 10 + limb_math
+            score = cd.place()
             key = str( int( score ) )
             
             lib.dic_append( result, year, {} )

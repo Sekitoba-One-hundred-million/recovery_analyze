@@ -31,9 +31,12 @@ for file_name in $file_list; do
     base='        self.'
     ARR=(${file_name//./ })
     name=${ARR[0]}
+    minus_name=${name}_minus
     # echo $file_name
     echo "$base$name = \"$name\"" >> $write_file_name
+    echo "$base$minus_name = \"$minus_name\"" >> $write_file_name
     echo $name >> $list_file
+    echo $minus_name >> $list_file
     done
 
 cp -r $dir $re_dir/

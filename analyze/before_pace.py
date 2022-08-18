@@ -6,11 +6,13 @@ from tqdm import tqdm
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
 import sekitoba_data_create as dc
+from sekitoba_data_create.before_data import BeforeData
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 dm.dl.file_set( "baba_index_data.pickle" )
+dm.dl.file_set( "wrap_data.pickle" )
 
 name = "before_pace"
 
@@ -20,7 +22,7 @@ def main():
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
+    before_data = BeforeData()
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
@@ -33,9 +35,6 @@ def main():
         key_dist = str( race_info[race_id]["dist"] )
         key_kind = str( race_info[race_id]["kind"] )      
         key_baba = str( race_info[race_id]["baba"] )
-
-        if year in lib.test_years:
-            continue
 
         #芝かダートのみ
         if key_kind == "0" or key_kind == "3":
@@ -55,16 +54,8 @@ def main():
 
             if before_cd == None:
                 continue
-            
-            p1, p2 = before_cd.pace()
-            pace = ( p1 - p2 )
-            score = pace * 10
 
-            #if pace < -1:
-            #    score = 1
-            #elif 0.5 < pace:
-            #    score = 2
-
+            score = before_data.pace( before_cd.race_id() )
             key = str( int( score ) )
             lib.dic_append( result, year, {} )
             lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )

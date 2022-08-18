@@ -34,8 +34,8 @@ def main():
         key_kind = str( race_info[race_id]["kind"] )        
         key_baba = str( race_info[race_id]["baba"] )
 
-        if year in lib.test_years:
-            continue
+        #if year in lib.test_years:
+        #    continue
 
         #芝かダートのみ
         if key_kind == "0" or key_kind == "3":

@@ -27,7 +27,8 @@ class DataSet:
     def set_users_data( self, name, data ):
         lib.dic_append( self.users_data, self.race_id, {} )
         lib.dic_append( self.users_data[self.race_id], self.horce_id, {} )
-        self.users_data[self.race_id][self.horce_id][name] = data 
+        self.users_data[self.race_id][self.horce_id][name] = data
+        self.users_data[self.race_id][self.horce_id][name+"_minus"] = data 
 
     def set_rank_data( self, rank ):
         lib.dic_append( self.rank_data, self.race_id, {} )

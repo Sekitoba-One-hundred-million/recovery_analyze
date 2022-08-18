@@ -41,7 +41,7 @@ class UsersAnalyze:
         lib.dic_append( self.users_score_data[race_id], horce_id, {} )
         self.data = self.users_data[race_id][horce_id]
         
-        for k in self.data.keys():
+        for k in self.users_score_function.function.keys():
             s = self.users_score_function.function[k]( self.data[k] )
             self.users_score_data[race_id][horce_id][k] = s
             score += s

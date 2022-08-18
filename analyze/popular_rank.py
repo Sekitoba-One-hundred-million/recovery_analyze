@@ -29,8 +29,8 @@ def main():
         key_kind = str( race_info[race_id]["kind"] )        
         key_baba = str( race_info[race_id]["baba"] )
 
-        if year in lib.test_years:
-            continue
+        #if year in lib.test_years:
+        #    continue
 
         #芝かダートのみ
         if key_kind == "0" or key_kind == "3":
@@ -55,7 +55,7 @@ def main():
             
             before_popular = before_cd.popular()
             before_rank = before_cd.rank()
-            score = abs( before_rank - before_popular )
+            score = before_rank - before_popular
             key = str( int( score ) )
             
             lib.dic_append( result, year, {} )
@@ -71,10 +71,7 @@ def main():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result, name + ".csv" )
-    print( score )
-    #lib.recovery_data_upload( name, score, [] )
     
 if __name__ == "__main__":
     main()
