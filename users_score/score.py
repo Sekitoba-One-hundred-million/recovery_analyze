@@ -2,6 +2,14 @@ from common.name import Name
 
 data_name = Name()
 
+def use_data_write( key_list ):
+    f = open( "score_data_name.txt", "w" )
+    for name in key_list:
+        if not "minus" in name:
+            f.write( name + "\n" )
+
+    f.close()
+
 class UsersScoreFunction:
     def __init__( self ):
         self.function = {}
@@ -54,16 +62,8 @@ class UsersScoreFunction:
         self.function[data_name.popular_rank] = self.popular_rank
         self.function[data_name.train_score] = self.train_score
         
-        self.use_data_write()
+        use_data_write( list( self.function.keys() ) )
         print( "data count: {}".format( len( self.function ) ) )
-
-    def use_data_write( self ):
-        f = open( "score_data_name.txt", "w" )
-        for name in self.function.keys():
-            if not "minus" in name:
-                f.write( name + "\n" )
-
-        f.close()
 
     def before_rank( self, score ):
         score = int( score )
