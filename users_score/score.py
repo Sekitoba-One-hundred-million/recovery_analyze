@@ -3,10 +3,15 @@ from common.name import Name
 data_name = Name()
 
 def use_data_write( key_list ):
+    name_dict = {}
     f = open( "score_data_name.txt", "w" )
+    
     for name in key_list:
-        if not "minus" in name:
-            f.write( name + "\n" )
+        name = name.replace( "_minus", "" )
+        name_dict[name] = True
+
+    for name in name_dict.keys():
+        f.write( name + "\n" )
 
     f.close()
 
