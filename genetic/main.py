@@ -226,8 +226,8 @@ def main():
     ensemble_count = 1
 
     use_buy_key = []
-    use_buy_key.append( "one" )
-    #use_buy_key.append( "quinella" )
+    #use_buy_key.append( "one" )
+    use_buy_key.append( "quinella" )
     #use_buy_key.append( "wide" )
     #use_buy_key.append( "triple" )
 
