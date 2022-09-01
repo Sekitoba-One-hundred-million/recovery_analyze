@@ -60,14 +60,19 @@ def recovery_check( data ):
                     result[year][kind][key_score] = {}
                     result[year][kind][key_score]["count"] = count
                     result[year][kind][key_score]["recovery"] = round( recovery / count, 2 )
+                        
                     result["all"][kind][key_score]["recovery"] += recovery
                     result["all"][kind][key_score]["count"] += count
                     
                     count = 0
                     recovery = 0
                     current_score = score
-                
-                count += 1
+
+                if kind == "wide":
+                    count += 3
+                else:
+                    count += 1
+                    
                 recovery += current_data[i]["odds"]
 
     for kind in result["all"].keys():
@@ -77,7 +82,7 @@ def recovery_check( data ):
 
     return result, score_key
 
-def write( recovery_data, score_key ):
+def write( recovery_data, score_key, test = False ):
     for kind in score_key.keys():
         first = True
         write_score = "year/score\t"
@@ -87,7 +92,13 @@ def write( recovery_data, score_key ):
             key_list.append( int( sk ) )
 
         key_list = sorted( key_list )
-        f = open( "/Users/kansei/Desktop/recovery_data/users_score_" + kind + ".csv", "w" )
+
+        if test:
+            file_name = "/Users/kansei/Desktop/recovery_data/test_users_score_" + kind + ".csv"
+        else:
+            file_name = "/Users/kansei/Desktop/recovery_data/users_score_" + kind + ".csv"
+            
+        f = open( file_name, "w" )
         
         for year in recovery_data.keys():
             write_recovery = year + "\t"
@@ -119,14 +130,18 @@ def write( recovery_data, score_key ):
             f.write( write_count )            
             first = False
             
-        f.close()
-            
+        f.close()            
 
 def main():
     ua = UsersAnalyze()
     buy_result = ua.users_analyze()
     recovery_data, score_key = recovery_check( buy_result )
     write( recovery_data, score_key )
+
+    buy_result = ua.users_analyze( test = True )
+    recovery_data, score_key = recovery_check( buy_result )
+    write( recovery_data, score_key, test = True )
+
     dm.pickle_upload( "users_score_data.pickle", ua.users_score_data )
     
     

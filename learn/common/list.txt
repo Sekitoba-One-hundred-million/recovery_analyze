@@ -68,6 +68,8 @@ money
 money_minus
 mother_rank
 mother_rank_minus
+my_limb_count
+my_limb_count_minus
 omega
 omega_minus
 one_rate
@@ -82,6 +84,8 @@ popular
 popular_minus
 popular_rank
 popular_rank_minus
+race_deployment
+race_deployment_minus
 race_interval
 race_interval_minus
 race_level_check
@@ -104,6 +108,8 @@ trainer_rank
 trainer_rank_minus
 two_rate
 two_rate_minus
+up3_standard_value
+up3_standard_value_minus
 up_score
 up_score_minus
 up_speed

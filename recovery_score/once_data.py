@@ -114,8 +114,10 @@ class OnceData:
             return
 
         count = 0
+        race_limb = {}
         current_race_data = {}
         current_race_data[data_name.speed_index] = []
+        current_race_data[data_name.my_limb_count] = {}
         
         for kk in self.race_data[k].keys():
             horce_id = kk
@@ -132,6 +134,12 @@ class OnceData:
             if before_cd == None:
                 continue
 
+            limb_math = lib.limb_search( pd )
+            key_limb = str( int( limb_math ) )
+            lib.dic_append( current_race_data[data_name.my_limb_count], key_limb, 0 )
+            current_race_data[data_name.my_limb_count][key_limb] += 1
+            race_limb[kk] = limb_math
+            
             current_time_index = self.time_index.main( kk, pd.past_day_list() )
             speed, up_speed, pace_speed = pd.speed_index( self.baba_index_data[horce_id] )
             current_race_data[data_name.speed_index].append( lib.max_check( speed ) + current_time_index["max"] )
@@ -173,7 +181,9 @@ class OnceData:
             stright_slope_score = self.race_type.stright_slope( cd, pd )
             foot_used_score = self.race_type.foot_used_score_get( cd, pd )
             high_level_score = self.race_high_level.data_get( cd, pd, ymd )
-            limb_math = lib.limb_search( pd )
+            limb_math = race_limb[kk]#lib.limb_search( pd )
+            key_limb = str( int( limb_math ) )
+            my_limb_count_score = current_race_data[data_name.my_limb_count][key_limb]
             age = current_year - horce_birth_day
             speed_index_score = sort_speed_index.index( current_race_data[data_name.speed_index][count] )
             race_interval_score = min( max( pd.race_interval(), 0 ), 20 )
@@ -213,13 +223,15 @@ class OnceData:
             except:
                 before_first_passing_rank = 0
 
-            #p1, p2 = before_cd.pace()
-            #before_pace = int( ( p1 - p2 ) * 10 )
+            p1, p2 = before_cd.pace()
+            up3 = before_cd.up_time()
+            up3_standard_value = max( min( ( up3 - p2 ) * 5, 15 ), -10 )
             jockey_year_rank_score = int( self.jockey_data.year_rank( race_id, horce_id, key_before_year ) / 10 )
             baba = cd.baba_status()
             before_pace = self.before_data.pace( before_cd.race_id() )
             popular_rank_score = before_cd.rank() - before_cd.popular()
             train_score = self.train_index.score_get( race_id, horce_num )
+            deployment_score = self.race_type.deploypent( pd )
             count += 1
             odds = cd.odds() if cd.rank() == 1 else 0
             
@@ -243,17 +255,13 @@ class OnceData:
             self.ds.set_users_data( data_name.popular, cd.popular() )
             self.ds.set_users_data( data_name.trainer_rank, trainer_rank_score )
             self.ds.set_users_data( data_name.jockey_rank, jockey_rank_score )
-            #self.ds.set_users_data( data_name.popular_rank, popular_rank )
             self.ds.set_users_data( data_name.before_diff, before_diff_score )
             self.ds.set_users_data( data_name.limb_horce_number, limb_horce_number )
-            #self.ds.set_users_data( data_name.father_rank, father_score )
             self.ds.set_users_data( data_name.mother_rank, mother_score )
             self.ds.set_users_data( data_name.match_rank, macth_rank_score )
             self.ds.set_users_data( data_name.weather, cd.weather() )
             self.ds.set_users_data( data_name.burden_weight, burden_weight_score )
-            #self.ds.set_users_data( data_name.before_up3_rank, before_up3_rank )
             self.ds.set_users_data( data_name.before_continue_not_three_rank, before_continue_not_three_rank )
-            #self.ds.set_users_data( data_name.limb_place, limb_place_score )
             self.ds.set_users_data( data_name.horce_sex, horce_sex )
             self.ds.set_users_data( data_name.horce_sex_month, horce_sex_month )
             self.ds.set_users_data( data_name.dist_kind_count, dist_kind_count )
@@ -268,3 +276,6 @@ class OnceData:
             self.ds.set_users_data( data_name.place, cd.place() )
             self.ds.set_users_data( data_name.popular_rank, popular_rank_score )
             self.ds.set_users_data( data_name.train_score, train_score )
+            self.ds.set_users_data( data_name.race_deployment, deployment_score )
+            self.ds.set_users_data( data_name.up3_standard_value, up3_standard_value )
+            self.ds.set_users_data( data_name.my_limb_count, my_limb_count_score )

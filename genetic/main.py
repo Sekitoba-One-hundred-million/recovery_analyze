@@ -38,11 +38,7 @@ def score_create( learn_data, rate_data, kind, test = False ):
     check_recovery = 1.05
     genetic_score_ensemble_count = 200
     genetic_score_ensemble_rate = 0
-
-    if kind == "one":
-        genetic_score_ensemble_rate = 0.05
-    elif kind == "quinella":
-        genetic_score_ensemble_rate = 0.05
+    genetic_score_ensemble_rate = 0.05
         
     best_data = []
     users_score_data_list = []
@@ -221,13 +217,14 @@ def users_score_test( test_data, learn_data, best_users_score_rate, best_key_dat
         dm.pickle_upload( "users_best_key.pickle", users_best_key )
 
 def main():
-    N = 250
+    N = 200
     population = 20
     ensemble_count = 1
 
     use_buy_key = []
-    #use_buy_key.append( "one" )
-    use_buy_key.append( "quinella" )
+    use_buy_key.append( "one" )
+    #use_buy_key.append( "three" )
+    #use_buy_key.append( "quinella" )
     #use_buy_key.append( "wide" )
     #use_buy_key.append( "triple" )
 

@@ -66,6 +66,11 @@ class UsersScoreFunction:
         self.function[data_name.place] = self.place
         self.function[data_name.popular_rank] = self.popular_rank
         self.function[data_name.train_score] = self.train_score
+        self.function[data_name.race_deployment] = self.race_deployment
+        self.function[data_name.up3_standard_value] = self.up3_standard_value
+        self.function[data_name.up3_standard_value_minus] = self.up3_standard_value_minus
+        self.function[data_name.my_limb_count] = self.my_limb_count
+        self.function[data_name.my_limb_count_minus] = self.my_limb_count_minus
         
         use_data_write( list( self.function.keys() ) )
         print( "data count: {}".format( len( self.function ) ) )
@@ -83,7 +88,6 @@ class UsersScoreFunction:
         
         if 14 < score:
             return -5
-
         return 0
 
     def race_level_check( self, score ):
@@ -202,7 +206,7 @@ class UsersScoreFunction:
         score = int( score )
 
         if 12 < score:
-            return -5
+            return 5
         
         return 0
 
@@ -435,5 +439,45 @@ class UsersScoreFunction:
 
         if score == 1:
             return 5
+
+        return 0
+
+    def race_deployment( self, score ):
+        score = int( score )
+
+        if score == 7:
+            return 5
+
+        return 0
+
+    def up3_standard_value( self, score ):
+        score = int( score )
+
+        if score == 4 or score == 7:
+            return 5
+
+        return 0
+
+    def up3_standard_value_minus( self, score ):
+        score = int( score )
+
+        if 10 <= score:
+            return -5
+
+        return 0
+
+    def my_limb_count( self, score ):
+        score = int( score )
+
+        if score == 2 or score == 3 or score == 4:
+            return 5        
+
+        return 0
+
+    def my_limb_count_minus( self, score ):
+        score = int( score )
+
+        if score == 7 or score == 8:
+            return -5
 
         return 0

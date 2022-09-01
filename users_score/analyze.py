@@ -19,7 +19,7 @@ class UsersAnalyze:
         self.buy_function = {}
         self.users_score_data = {}
         self.key_list = []
-        self.odds_key = { "one": "単勝", "quinella": "馬連", "wide": "ワイド", "triple": "三連複" }
+        self.odds_key = { "one": "単勝", "three": "複勝", "quinella": "馬連", "wide": "ワイド", "triple": "三連複" }
         self.odds_data = dm.dl.data_get( "odds_data.pickle" )
         self.users_data = dm.dl.data_get( "users_data.pickle" )
         self.user_rank_data = dm.dl.data_get( "users_rank_data.pickle" )
@@ -29,6 +29,7 @@ class UsersAnalyze:
 
     def set_function( self ):
         self.buy_function["one"] = self.one
+        self.buy_function["three"] = self.three
         self.buy_function["quinella"] = self.quinella
         self.buy_function["wide"] = self.wide
         self.buy_function["triple"] = self.triple
@@ -57,6 +58,23 @@ class UsersAnalyze:
 
             if rank == 1:
                 instance["odds"] = odds / 100
+
+            result.append( instance )
+
+        return result
+
+    def three( self, race_score_data, rank_data, odds ):
+        result = []
+
+        for horce_id in race_score_data.keys():
+            instance = { "score": int( race_score_data[horce_id] ), "odds": 0 }
+            rank = rank_data[horce_id]
+
+            if rank <= 3:
+                try:
+                    instance["odds"] = odds[int(rank-1)] / 100
+                except:
+                    instance["odds"] = 0
 
             result.append( instance )
 
@@ -94,16 +112,29 @@ class UsersAnalyze:
             for r in range( i + 1, len( key_list ) ):
                 horce_id_2 = key_list[r]
                 rank_2 = rank_data[horce_id_2]
-                score = int( race_score_data[horce_id_1] + race_score_data[horce_id_2] )
-                instance = { "score": score, "odds": 0 }
 
-                if rank_1 <= 3 and rank_2 <= 3:
-                    index = int( rank_1 + rank_2 - 3 )
-                    #print( wide_odds, index )
-                    if index < len( wide_odds ):
-                        instance["odds"] = wide_odds[index] / 100
+                for t in range( r + 1, len( key_list ) ):
+                    horce_id_3 = key_list[t]
+                    rank_3 = rank_data[horce_id_3]
+                    
+                    score = int( race_score_data[horce_id_1] + race_score_data[horce_id_2] + race_score_data[horce_id_3] )
+                    instance = { "score": score, "odds": 0 }
+                    index_list = []
 
-                result.append( instance )
+                    if rank_1 <= 3 and rank_2 <= 3:
+                        index_list.append( int( rank_1 + rank_2 - 3 ) )
+
+                    if rank_1 <= 3 and rank_3 <= 3:
+                        index_list.append( int( rank_1 + rank_3 - 3 ) )
+
+                    if rank_2 <= 3 and rank_3 <= 3:
+                        index_list.append( int( rank_2 + rank_3 - 3 ) )
+
+                    for index in index_list:
+                        if index < len( wide_odds ):
+                            instance["odds"] += wide_odds[index] / 100
+
+                    result.append( instance )
 
         return result
 
@@ -148,7 +179,7 @@ class UsersAnalyze:
 
         return result
 
-    def users_analyze( self ):
+    def users_analyze( self, test = False ):
         result = {}
         test_result = {}
         score_data = {}
@@ -163,7 +194,7 @@ class UsersAnalyze:
         for race_id in score_data.keys():
             year = race_id[0:4]
             
-            if year in lib.test_years:
+            if ( year in lib.test_years and not test ) or ( not year in lib.test_years and test ):
                 continue
 
             lib.dic_append( result, year, {} )
