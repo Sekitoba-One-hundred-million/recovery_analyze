@@ -121,9 +121,9 @@ def score_create( learn_data, rate_data, kind, test = False ):
                 ave_score += check_data[i]["score"]
 
             ave_score /= check_clear_count
-            #current_best_score = ( ave_score + median_score ) / 2
-            current_best_score = median_score
-            current_best_score -= abs( median_score - ave_score )
+            current_best_score = ( ave_score + median_score ) / 2
+            #current_best_score = median_score
+            #current_best_score -= abs( median_score - ave_score )
 
         if not  check_clear_count == genetic_score_ensemble_count:
            minus_score /= ( genetic_score_ensemble_count - check_clear_count ) 
@@ -222,9 +222,9 @@ def main():
     ensemble_count = 1
 
     use_buy_key = []
-    use_buy_key.append( "one" )
+    #use_buy_key.append( "one" )
     #use_buy_key.append( "three" )
-    #use_buy_key.append( "quinella" )
+    use_buy_key.append( "quinella" )
     #use_buy_key.append( "wide" )
     #use_buy_key.append( "triple" )
 

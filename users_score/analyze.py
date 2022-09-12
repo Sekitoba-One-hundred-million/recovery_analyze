@@ -173,9 +173,10 @@ class UsersAnalyze:
             return None
 
         for kind in self.odds_key.keys():
-            result[kind] = self.buy_function[kind]( race_score_data, \
-                                                   self.user_rank_data[race_id], \
-                                                   current_odds[self.odds_key[kind]] )
+            if self.odds_key[kind] in current_odds.keys():
+                result[kind] = self.buy_function[kind]( race_score_data, \
+                                                    self.user_rank_data[race_id], \
+                                                    current_odds[self.odds_key[kind]] )
 
         return result
 
@@ -205,6 +206,8 @@ class UsersAnalyze:
 
             for kind in self.odds_key.keys():
                 lib.dic_append( result[year], kind, [] )
-                result[year][kind].extend( buy_result[kind] )
+
+                if kind in buy_result.keys():
+                    result[year][kind].extend( buy_result[kind] )
 
         return result

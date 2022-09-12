@@ -68,6 +68,8 @@ money
 money_minus
 mother_rank
 mother_rank_minus
+my_deployment_count
+my_deployment_count_minus
 my_limb_count
 my_limb_count_minus
 omega
@@ -106,6 +108,8 @@ train_score
 train_score_minus
 trainer_rank
 trainer_rank_minus
+true_skill
+true_skill_minus
 two_rate
 two_rate_minus
 up3_standard_value

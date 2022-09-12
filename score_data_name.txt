@@ -30,10 +30,10 @@ jockey_year_rank
 money
 horce_num
 baba
-before_pace
 place
 popular_rank
 train_score
 race_deployment
 up3_standard_value
 my_limb_count
+true_skill
