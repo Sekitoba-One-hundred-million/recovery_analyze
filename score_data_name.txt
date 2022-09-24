@@ -37,3 +37,5 @@ race_deployment
 up3_standard_value
 my_limb_count
 true_skill
+true_skill_index
+father_blood_type

@@ -30,6 +30,7 @@ dm.dl.file_set( "race_day.pickle" )
 dm.dl.file_set( "parent_id_data.pickle" )
 dm.dl.file_set( "horce_sex_data.pickle" )
 dm.dl.file_set( "true_skill_data.pickle" )
+dm.dl.file_set( "horce_blood_type_data.pickle" )
 
 class OnceData:
     def __init__( self ):
@@ -43,6 +44,7 @@ class OnceData:
         self.parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
         self.horce_sex_data = dm.dl.data_get( "horce_sex_data.pickle" )
         self.true_skill_data = dm.dl.data_get( "true_skill_data.pickle" )
+        self.horce_blood_type_data = dm.dl.data_get( "horce_blood_type_data.pickle" )
         
         self.ds = DataSet()
         self.race_high_level = RaceHighLevel()
@@ -119,6 +121,7 @@ class OnceData:
         race_limb = {}
         current_race_data = {}
         current_race_data[data_name.speed_index] = []
+        current_race_data[data_name.true_skill_index] = []
         current_race_data[data_name.my_limb_count] = {}
         
         for kk in self.race_data[k].keys():
@@ -140,6 +143,7 @@ class OnceData:
             current_time_index = self.time_index.main( kk, pd.past_day_list() )
             speed, up_speed, pace_speed = pd.speed_index( self.baba_index_data[horce_id] )
             current_race_data[data_name.speed_index].append( lib.max_check( speed ) + current_time_index["max"] )
+            current_race_data[data_name.true_skill_index].append( self.true_skill_data[race_id][horce_id] )
 
         sort_speed_index = sorted( current_race_data[data_name.speed_index], reverse = True )
 
@@ -157,6 +161,7 @@ class OnceData:
             current_year = cd.year()
             horce_birth_day = int( horce_id[0:4] )
             horce_num = int( cd.horce_number() )
+            key_horce_num = str( horce_num )
 
             before_cd = pd.before_cd()
 
@@ -198,10 +203,13 @@ class OnceData:
             except:
                 omega_index_score = -1
 
+            true_skill = int( self.true_skill_data[race_id][horce_id] )
+            true_skill_index = current_race_data[data_name.true_skill_index].index( self.true_skill_data[race_id][horce_id] )      
+
             try:
-                true_skill = int( self.true_skill_data[race_id][horce_id] )
+                father_blood_type = self.horce_blood_type_data[race_id][key_horce_num]["father"]
             except:
-                true_skill = -1
+                father_blood_type = 0
 
             before_year = int( year ) - 1
             key_before_year = str( int( before_year ) )
@@ -241,6 +249,8 @@ class OnceData:
             baba = cd.baba_status()
             train_score = self.train_index.score_get( race_id, horce_num )
             deployment_score = self.race_type.deploypent( pd )
+            father_blood_type_score = int( cd.dist_kind() * 10 + father_blood_type )
+
             count += 1
             odds = cd.odds() if cd.rank() == 1 else 0
             
@@ -288,3 +298,5 @@ class OnceData:
             self.ds.set_users_data( data_name.up3_standard_value, up3_standard_value )
             self.ds.set_users_data( data_name.my_limb_count, my_limb_count_score )
             self.ds.set_users_data( data_name.true_skill, true_skill )
+            self.ds.set_users_data( data_name.true_skill_index, true_skill_index )
+            self.ds.set_users_data( data_name.father_blood_type, father_blood_type_score )

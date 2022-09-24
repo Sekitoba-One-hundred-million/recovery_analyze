@@ -72,6 +72,9 @@ class UsersScoreFunction:
         self.function[data_name.my_limb_count_minus] = self.my_limb_count_minus
         self.function[data_name.true_skill] = self.true_skill
         self.function[data_name.true_skill_minus] = self.true_skill_minus
+        self.function[data_name.true_skill_index] = self.true_skill_index
+        self.function[data_name.father_blood_type] = self.father_blood_type
+        self.function[data_name.father_blood_type_minus] = self.father_blood_type_minus
         
         use_data_write( list( self.function.keys() ) )
         print( "data count: {}".format( len( self.function ) ) )
@@ -478,10 +481,7 @@ class UsersScoreFunction:
     def true_skill( self, score ):
         score = int( score )
 
-        if 36 <= score:
-            return 10
-
-        if 31 <= score:
+        if score <= 37 and 30 <= score:
             return 5
 
         return 0
@@ -489,7 +489,31 @@ class UsersScoreFunction:
     def true_skill_minus( self, score ):
         score = int( score )
 
-        if score <= 22:
+        if score <= 19:
             return -5
 
-        return 0    
+        return 0
+
+    def true_skill_index( self, score ):
+        score = int( score )
+
+        if 1 <= score and score <= 4:
+            return 5
+
+        return 0
+
+    def father_blood_type( self, score ):
+        score = int( score )
+
+        if score == 15 or score == 22:
+            return 5
+
+        return 0
+
+    def father_blood_type_minus( self, score ):
+        score = int( score )
+
+        if score == 12 or score == 23:
+            return -5
+
+        return 0

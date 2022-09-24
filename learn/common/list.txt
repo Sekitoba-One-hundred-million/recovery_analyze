@@ -34,6 +34,8 @@ burden_weight
 burden_weight_minus
 dist_kind_count
 dist_kind_count_minus
+father_blood_type
+father_blood_type_minus
 father_rank
 father_rank_minus
 foot_used
@@ -110,6 +112,8 @@ trainer_rank
 trainer_rank_minus
 true_skill
 true_skill_minus
+true_skill_index
+true_skill_index_minus
 two_rate
 two_rate_minus
 up3_standard_value
