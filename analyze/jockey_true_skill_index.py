@@ -10,7 +10,7 @@ dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 dm.dl.file_set( "true_skill_data.pickle" )
 
-name = "true_skill_index"
+name = "jockey_true_skill_index"
 DATA = "recovery"
 COUNT = "count"
     
@@ -20,7 +20,8 @@ def main():
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    true_skill_data = dm.dl.data_get( "true_skill_data.pickle" )
+    jockey_true_skill_data = dm.dl.data_get( "jockey_true_skill_data.pickle" )
+    race_jockey_id_data = dm.pickle_load( "race_jockey_id_data.pickle" )
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
@@ -34,34 +35,17 @@ def main():
         key_kind = str( race_info[race_id]["kind"] )        
         key_baba = str( race_info[race_id]["baba"] )
 
-        #if year in lib.test_years:
-        #    continue
-
         #芝かダートのみ
         if key_kind == "0" or key_kind == "3":
             continue
 
+        try:
+            jockey_id_list = race_jockey_id_data[race_id]
+        except:
+            continue
 
-        true_skill_list = []
-
-        for kk in race_data[k].keys():
-            horce_id = kk
-            current_data, past_data = lib.race_check( horce_data[horce_id],
-                                                     year, day, num, race_place_num )#今回と過去のデータに分ける
-            cd = lib.current_data( current_data )
-            pd = lib.past_data( past_data, current_data )
-
-            if not cd.race_check():
-                continue
-
-            before_cd = pd.before_cd()
-            
-            try:
-                true_skill_list.append( true_skill_data[before_cd.race_id()][horce_id] )
-            except:
-                true_skill_list.append( 25 )
-
-        true_skill_list = sorted( true_skill_list, reverse = True )
+        count = 0
+        jockey_true_skill_list = []
         
         for kk in race_data[k].keys():
             horce_id = kk
@@ -73,11 +57,27 @@ def main():
             if not cd.race_check():
                 continue
 
-            before_cd = pd.before_cd()
+            try:
+                jockey_id = jockey_id_list[horce_id]
+                jockey_true_skill_list.append( jockey_true_skill_data[race_id][jockey_id] )
+            except:
+                jockey_true_skill_list.append( 25 )
+
+        jockey_true_skill_list = sorted( jockey_true_skill_list, reverse = True )
+
+        for kk in race_data[k].keys():
+            horce_id = kk
+            current_data, past_data = lib.race_check( horce_data[horce_id],
+                                                     year, day, num, race_place_num )#今回と過去のデータに分ける
+            cd = lib.current_data( current_data )
+            pd = lib.past_data( past_data, current_data )
+
+            if not cd.race_check():
+                continue
 
             try:
-                true_skill_score = true_skill_data[before_cd.race_id()][horce_id]
-                score = true_skill_list.index( true_skill_score )
+                jockey_id = jockey_id_list[horce_id]
+                score = jockey_true_skill_list.index( jockey_true_skill_data[race_id][jockey_id] )
             except:
                 score = -1
 

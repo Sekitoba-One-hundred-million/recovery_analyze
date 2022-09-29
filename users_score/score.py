@@ -35,8 +35,6 @@ class UsersScoreFunction:
         self.function[data_name.before_id_weight] = self.before_id_weight
         self.function[data_name.omega] = self.omega
         self.function[data_name.before_speed_minus] = self.before_speed_minus
-        self.function[data_name.popular] = self.popular
-        self.function[data_name.popular_minus] = self.popular_minus
         self.function[data_name.trainer_rank] = self.trainer_rank
         self.function[data_name.trainer_rank_minus] = self.trainer_rank_minus
         self.function[data_name.jockey_rank] = self.jockey_rank
@@ -70,11 +68,13 @@ class UsersScoreFunction:
         self.function[data_name.up3_standard_value_minus] = self.up3_standard_value_minus
         self.function[data_name.my_limb_count] = self.my_limb_count
         self.function[data_name.my_limb_count_minus] = self.my_limb_count_minus
-        self.function[data_name.true_skill] = self.true_skill
-        self.function[data_name.true_skill_minus] = self.true_skill_minus
-        self.function[data_name.true_skill_index] = self.true_skill_index
+        self.function[data_name.horce_true_skill] = self.horce_true_skill
+        #self.function[data_name.horce_true_skill_minus] = self.horce_true_skill_minus
+        #self.function[data_name.true_skill_index] = self.true_skill_index
         self.function[data_name.father_blood_type] = self.father_blood_type
         self.function[data_name.father_blood_type_minus] = self.father_blood_type_minus
+        self.function[data_name.jockey_true_skill] = self.jockey_true_skill
+        self.function[data_name.jockey_true_skill_minus] = self.jockey_true_skill_minus
         
         use_data_write( list( self.function.keys() ) )
         print( "data count: {}".format( len( self.function ) ) )
@@ -196,22 +196,6 @@ class UsersScoreFunction:
         if 65 < score:
             return -5
 
-        return 0
-
-    def popular( self, score ):
-        score = int( score )
-
-        if 1 < score and score < 8:
-            return 5
-
-        return 0
-
-    def popular_minus( self, score ):
-        score = int( score )
-
-        if 12 < score:
-            return 5
-        
         return 0
 
     def trainer_rank( self, score ):
@@ -478,27 +462,27 @@ class UsersScoreFunction:
 
         return 0
 
-    def true_skill( self, score ):
+    def horce_true_skill( self, score ):
         score = int( score )
 
-        if score <= 37 and 30 <= score:
+        if score <= 41 and 36 <= score:
             return 5
 
         return 0
 
-    def true_skill_minus( self, score ):
+    def jockey_true_skill( self, score ):
         score = int( score )
 
-        if score <= 19:
+        if score <= 34 and 31 <= score:
+            return 5
+
+        return 0
+
+    def jockey_true_skill_minus( self, score ):
+        score = int( score )
+
+        if score < 20:
             return -5
-
-        return 0
-
-    def true_skill_index( self, score ):
-        score = int( score )
-
-        if 1 <= score and score <= 4:
-            return 5
 
         return 0
 

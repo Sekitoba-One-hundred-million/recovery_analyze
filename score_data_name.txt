@@ -10,7 +10,6 @@ weight
 before_id_weight
 omega
 before_speed
-popular
 trainer_rank
 jockey_rank
 before_diff
@@ -36,6 +35,6 @@ train_score
 race_deployment
 up3_standard_value
 my_limb_count
-true_skill
-true_skill_index
+horce_true_skill
 father_blood_type
+jockey_true_skill

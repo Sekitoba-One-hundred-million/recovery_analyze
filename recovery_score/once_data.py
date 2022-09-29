@@ -29,8 +29,11 @@ dm.dl.file_set( "omega_index_data.pickle" )
 dm.dl.file_set( "race_day.pickle" )
 dm.dl.file_set( "parent_id_data.pickle" )
 dm.dl.file_set( "horce_sex_data.pickle" )
-dm.dl.file_set( "true_skill_data.pickle" )
+#dm.dl.file_set( "true_skill_data.pickle" )
 dm.dl.file_set( "horce_blood_type_data.pickle" )
+#dm.dl.file_set( "jockey_true_skill_data.pickle" )
+dm.dl.file_set( "race_jockey_id_data.pickle" )
+dm.dl.file_set( "horce_jockey_true_skill_data.pickle" )
 
 class OnceData:
     def __init__( self ):
@@ -43,8 +46,11 @@ class OnceData:
         self.race_day = dm.dl.data_get( "race_day.pickle" )
         self.parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
         self.horce_sex_data = dm.dl.data_get( "horce_sex_data.pickle" )
-        self.true_skill_data = dm.dl.data_get( "true_skill_data.pickle" )
+        #self.true_skill_data = dm.dl.data_get( "true_skill_data.pickle" )
+        #self.jockey_true_skill_data = dm.dl.data_get( "jockey_true_skill_data.pickle" )
         self.horce_blood_type_data = dm.dl.data_get( "horce_blood_type_data.pickle" )
+        self.race_jockey_id_data = dm.dl.data_get( "race_jockey_id_data.pickle" )
+        self.horce_jockey_true_skill_data = dm.dl.data_get( "horce_jockey_true_skill_data.pickle" )
         
         self.ds = DataSet()
         self.race_high_level = RaceHighLevel()
@@ -122,6 +128,7 @@ class OnceData:
         current_race_data = {}
         current_race_data[data_name.speed_index] = []
         current_race_data[data_name.true_skill_index] = []
+        current_race_data[data_name.jockey_true_skill_index] = []
         current_race_data[data_name.my_limb_count] = {}
         
         for kk in self.race_data[k].keys():
@@ -143,8 +150,18 @@ class OnceData:
             current_time_index = self.time_index.main( kk, pd.past_day_list() )
             speed, up_speed, pace_speed = pd.speed_index( self.baba_index_data[horce_id] )
             current_race_data[data_name.speed_index].append( lib.max_check( speed ) + current_time_index["max"] )
-            current_race_data[data_name.true_skill_index].append( self.true_skill_data[race_id][horce_id] )
 
+            try:
+                current_race_data[data_name.true_skill_index].append( self.true_skill_data[pd.before_cd().race_id()][horce_id] )
+            except:
+                current_race_data[data_name.true_skill_index].append( 25 )
+
+            try:
+                jockey_id = self.race_jockey_id_data[race_id][horce_id]
+                current_race_data[data_name.jockey_true_skill_index].append( self.jockey_true_skill_data[race_id][jockey_id] )
+            except:
+                current_race_data[data_name.jockey_true_skill_index].append( 25 )
+                
         sort_speed_index = sorted( current_race_data[data_name.speed_index], reverse = True )
 
         for kk in self.race_data[k].keys():
@@ -203,8 +220,20 @@ class OnceData:
             except:
                 omega_index_score = -1
 
-            true_skill = int( self.true_skill_data[race_id][horce_id] )
-            true_skill_index = current_race_data[data_name.true_skill_index].index( self.true_skill_data[race_id][horce_id] )      
+            try:
+                horce_true_skill = int( self.horce_jockey_true_skill_data["horce"][race_id][horce_id] )
+                #true_skill_index = current_race_data[data_name.true_skill_index].index( self.true_skill_data[before_cd.race_id()][horce_id] )
+            except:
+                horce_true_skill = 25
+                #true_skill_index = -1
+
+            try:
+                jockey_id = self.race_jockey_id_data[race_id][horce_id]
+                jockey_true_skill = self.horce_jockey_true_skill_data["jockey"][race_id][jockey_id]
+                #jockey_true_skill_index = current_race_data[data_name.jockey_true_skill_index].index( jockey_true_skill )
+            except:
+                jockey_true_skill = 25
+                #jockey_true_skill_index = -1
 
             try:
                 father_blood_type = self.horce_blood_type_data[race_id][key_horce_num]["father"]
@@ -271,7 +300,6 @@ class OnceData:
             self.ds.set_users_data( data_name.before_id_weight, before_id_weight_score )
             self.ds.set_users_data( data_name.omega, omega_index_score )
             self.ds.set_users_data( data_name.before_speed, before_speed_score )
-            self.ds.set_users_data( data_name.popular, cd.popular() )
             self.ds.set_users_data( data_name.trainer_rank, trainer_rank_score )
             self.ds.set_users_data( data_name.jockey_rank, jockey_rank_score )
             self.ds.set_users_data( data_name.before_diff, before_diff_score )
@@ -297,6 +325,6 @@ class OnceData:
             self.ds.set_users_data( data_name.race_deployment, deployment_score )
             self.ds.set_users_data( data_name.up3_standard_value, up3_standard_value )
             self.ds.set_users_data( data_name.my_limb_count, my_limb_count_score )
-            self.ds.set_users_data( data_name.true_skill, true_skill )
-            self.ds.set_users_data( data_name.true_skill_index, true_skill_index )
+            self.ds.set_users_data( data_name.horce_true_skill, horce_true_skill )
+            self.ds.set_users_data( data_name.jockey_true_skill, jockey_true_skill )
             self.ds.set_users_data( data_name.father_blood_type, father_blood_type_score )
