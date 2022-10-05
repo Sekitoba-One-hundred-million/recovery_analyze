@@ -68,13 +68,12 @@ class UsersScoreFunction:
         self.function[data_name.up3_standard_value_minus] = self.up3_standard_value_minus
         self.function[data_name.my_limb_count] = self.my_limb_count
         self.function[data_name.my_limb_count_minus] = self.my_limb_count_minus
-        self.function[data_name.horce_true_skill] = self.horce_true_skill
-        #self.function[data_name.horce_true_skill_minus] = self.horce_true_skill_minus
-        #self.function[data_name.true_skill_index] = self.true_skill_index
+        self.function[data_name.horce_true_skill] = self.horce_true_skill        
         self.function[data_name.father_blood_type] = self.father_blood_type
         self.function[data_name.father_blood_type_minus] = self.father_blood_type_minus
         self.function[data_name.jockey_true_skill] = self.jockey_true_skill
         self.function[data_name.jockey_true_skill_minus] = self.jockey_true_skill_minus
+        self.function[data_name.horce_jockey_true_skill_index] = self.horce_jockey_true_skill_index
         
         use_data_write( list( self.function.keys() ) )
         print( "data count: {}".format( len( self.function ) ) )
@@ -499,5 +498,13 @@ class UsersScoreFunction:
 
         if score == 12 or score == 23:
             return -5
+
+        return 0
+
+    def horce_jockey_true_skill_index( self, score ):
+        score = int( score )
+
+        if score == 3:
+            return 5
 
         return 0

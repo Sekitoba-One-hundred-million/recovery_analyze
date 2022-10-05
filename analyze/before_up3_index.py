@@ -11,7 +11,7 @@ dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 dm.dl.file_set( "baba_index_data.pickle" )
 
-name = "beofre_up3_rank"
+name = "beofre_up3_index"
 
 def main():
     result = {}
@@ -41,6 +41,8 @@ def main():
         if key_kind == "0" or key_kind == "3":
             continue
 
+        up3_list = []
+
         for kk in race_data[k].keys():
             horce_id = kk
             current_data, past_data = lib.race_check( horce_data[horce_id],
@@ -56,7 +58,25 @@ def main():
             if before_cd == None:
                 continue
 
-            score = before_data.up3_rank( before_cd )
+            up3_list.append( before_cd.up_time() )
+
+        for kk in race_data[k].keys():
+            horce_id = kk
+            current_data, past_data = lib.race_check( horce_data[horce_id],
+                                                     year, day, num, race_place_num )#今回と過去のデータに分ける
+            cd = lib.current_data( current_data )
+            pd = lib.past_data( past_data, current_data )
+
+            if not cd.race_check():
+                continue
+
+            before_cd = pd.before_cd()
+
+            if before_cd == None:
+                score = -1
+            else:
+                score = up3_list.index( before_cd.up_time() )
+                
             key = str( int( score ) )
             lib.dic_append( result, year, {} )
             lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )

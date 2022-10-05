@@ -38,3 +38,5 @@ my_limb_count
 horce_true_skill
 father_blood_type
 jockey_true_skill
+horce_jockey_true_skill_index
+before_up3_index

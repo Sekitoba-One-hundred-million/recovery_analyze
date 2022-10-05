@@ -127,8 +127,7 @@ class OnceData:
         race_limb = {}
         current_race_data = {}
         current_race_data[data_name.speed_index] = []
-        current_race_data[data_name.true_skill_index] = []
-        current_race_data[data_name.jockey_true_skill_index] = []
+        current_race_data[data_name.horce_jockey_true_skill_index] = []
         current_race_data[data_name.my_limb_count] = {}
         
         for kk in self.race_data[k].keys():
@@ -152,16 +151,19 @@ class OnceData:
             current_race_data[data_name.speed_index].append( lib.max_check( speed ) + current_time_index["max"] )
 
             try:
-                current_race_data[data_name.true_skill_index].append( self.true_skill_data[pd.before_cd().race_id()][horce_id] )
+                horce_true_skill = int( self.horce_jockey_true_skill_data["horce"][race_id][horce_id] )
             except:
-                current_race_data[data_name.true_skill_index].append( 25 )
+                horce_true_skill = 25
 
             try:
                 jockey_id = self.race_jockey_id_data[race_id][horce_id]
-                current_race_data[data_name.jockey_true_skill_index].append( self.jockey_true_skill_data[race_id][jockey_id] )
+                jockey_true_skill = self.horce_jockey_true_skill_data["jockey"][race_id][jockey_id]
             except:
-                current_race_data[data_name.jockey_true_skill_index].append( 25 )
-                
+                jockey_true_skill = 25
+
+            current_race_data[data_name.horce_jockey_true_skill_index].append( horce_true_skill + jockey_true_skill )
+
+
         sort_speed_index = sorted( current_race_data[data_name.speed_index], reverse = True )
 
         for kk in self.race_data[k].keys():
@@ -214,7 +216,8 @@ class OnceData:
                 up3_standard_value = max( min( ( up3 - p2 ) * 5, 15 ), -10 )
                 popular_rank_score = before_cd.rank() - before_cd.popular()
                 before_rank = before_cd.rank()
-            
+
+                
             try:
                 omega_index_score = self.omega_index_data[race_id][horce_num-1]
             except:
@@ -222,18 +225,14 @@ class OnceData:
 
             try:
                 horce_true_skill = int( self.horce_jockey_true_skill_data["horce"][race_id][horce_id] )
-                #true_skill_index = current_race_data[data_name.true_skill_index].index( self.true_skill_data[before_cd.race_id()][horce_id] )
             except:
                 horce_true_skill = 25
-                #true_skill_index = -1
 
             try:
                 jockey_id = self.race_jockey_id_data[race_id][horce_id]
                 jockey_true_skill = self.horce_jockey_true_skill_data["jockey"][race_id][jockey_id]
-                #jockey_true_skill_index = current_race_data[data_name.jockey_true_skill_index].index( jockey_true_skill )
             except:
                 jockey_true_skill = 25
-                #jockey_true_skill_index = -1
 
             try:
                 father_blood_type = self.horce_blood_type_data[race_id][key_horce_num]["father"]
@@ -279,6 +278,8 @@ class OnceData:
             train_score = self.train_index.score_get( race_id, horce_num )
             deployment_score = self.race_type.deploypent( pd )
             father_blood_type_score = int( cd.dist_kind() * 10 + father_blood_type )
+            horce_jockey_true_skill_index = current_race_data[data_name.horce_jockey_true_skill_index].index( horce_true_skill + jockey_true_skill )
+            foot_used_count = -1
 
             count += 1
             odds = cd.odds() if cd.rank() == 1 else 0
@@ -327,4 +328,5 @@ class OnceData:
             self.ds.set_users_data( data_name.my_limb_count, my_limb_count_score )
             self.ds.set_users_data( data_name.horce_true_skill, horce_true_skill )
             self.ds.set_users_data( data_name.jockey_true_skill, jockey_true_skill )
+            self.ds.set_users_data( data_name.horce_jockey_true_skill_index, horce_jockey_true_skill_index )
             self.ds.set_users_data( data_name.father_blood_type, father_blood_type_score )

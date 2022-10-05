@@ -26,8 +26,8 @@ before_speed
 before_speed_minus
 before_up3
 before_up3_minus
-before_up3_rank
-before_up3_rank_minus
+before_up3_index
+before_up3_index_minus
 best_weight
 best_weight_minus
 burden_weight
@@ -40,6 +40,8 @@ father_rank
 father_rank_minus
 foot_used
 foot_used_minus
+foot_used_count
+foot_used_count_minus
 horce_age
 horce_age_minus
 horce_jockey_true_skill_index
