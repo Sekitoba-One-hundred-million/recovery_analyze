@@ -21,6 +21,7 @@ from common.name import Name
 data_name = Name()
 
 dm.dl.file_set( "race_data.pickle" )
+dm.dl.file_set( "odds_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 dm.dl.file_set( "baba_index_data.pickle" )
@@ -29,15 +30,14 @@ dm.dl.file_set( "omega_index_data.pickle" )
 dm.dl.file_set( "race_day.pickle" )
 dm.dl.file_set( "parent_id_data.pickle" )
 dm.dl.file_set( "horce_sex_data.pickle" )
-#dm.dl.file_set( "true_skill_data.pickle" )
 dm.dl.file_set( "horce_blood_type_data.pickle" )
-#dm.dl.file_set( "jockey_true_skill_data.pickle" )
 dm.dl.file_set( "race_jockey_id_data.pickle" )
 dm.dl.file_set( "horce_jockey_true_skill_data.pickle" )
 
 class OnceData:
     def __init__( self ):
         self.race_data = dm.dl.data_get( "race_data.pickle" )
+        self.odds_data = dm.dl.data_get( "odds_data.pickle" )
         self.race_info = dm.dl.data_get( "race_info_data.pickle" )
         self.horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
         self.baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
@@ -46,8 +46,6 @@ class OnceData:
         self.race_day = dm.dl.data_get( "race_day.pickle" )
         self.parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
         self.horce_sex_data = dm.dl.data_get( "horce_sex_data.pickle" )
-        #self.true_skill_data = dm.dl.data_get( "true_skill_data.pickle" )
-        #self.jockey_true_skill_data = dm.dl.data_get( "jockey_true_skill_data.pickle" )
         self.horce_blood_type_data = dm.dl.data_get( "horce_blood_type_data.pickle" )
         self.race_jockey_id_data = dm.dl.data_get( "race_jockey_id_data.pickle" )
         self.horce_jockey_true_skill_data = dm.dl.data_get( "horce_jockey_true_skill_data.pickle" )

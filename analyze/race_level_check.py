@@ -6,17 +6,23 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 dm.dl.file_set( "race_data.pickle" )
+dm.dl.file_set( "odds_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "race_level_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 dm.dl.file_set( "race_level_split_data.pickle" )
 
 name = "race_level_check"
+ONE = "one"
+THREE = "three"
+DATA = "recovery"
+COUNT = "count"
 
 def main():
-    result = {}
+    result = { ONE: {}, THREE: {} }
     race_high_level = RaceHighLevel()
     race_data = dm.dl.data_get( "race_data.pickle" )
+    odds_data = dm.dl.data_get( "odds_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     race_day = dm.dl.data_get( "race_day.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
@@ -41,6 +47,11 @@ def main():
         if key_kind == "0" or key_kind == "3":
             continue
 
+        try:
+            three_odds = odds_data[race_id]["複勝"]
+        except:
+            continue
+
         for kk in race_data[k].keys():
             horce_id = kk
             current_data, past_data = lib.race_check( horce_data[horce_id],
@@ -56,25 +67,31 @@ def main():
             if score == 1000:
                 continue
             
-            score = int( score )
             key = str( int( score ) )
+            rank = cd.rank()
+            lib.dic_append( result[ONE], year, {} )
+            lib.dic_append( result[ONE][year], key, { DATA: 0, COUNT: 0 } )
+            lib.dic_append( result[THREE], year, {} )
+            lib.dic_append( result[THREE][year], key, { DATA: 0, COUNT: 0 } )
             
-            lib.dic_append( result, year, {} )
-            lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
-            
-            result[year][key]["count"] += 1
+            result[ONE][year][key][COUNT] += 1
+            result[THREE][year][key][COUNT] += 1
 
-            if cd.rank() == 1:
-                result[year][key]["recovery"] += cd.odds()
+            if rank == 1:
+                result[ONE][year][key][DATA] += cd.odds()
 
-    for year in result.keys():
-        for k in result[year].keys():
-            result[year][k]["recovery"] /= result[year][k]["count"]
-            result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
+            if rank <= len( three_odds ):
+                result[THREE][year][key][DATA] += three_odds[int(rank-1)] / 100
 
-    score = lib.recovery_score_check( result )
-    lib.write_recovery_csv( result, name + ".csv" )
-    #lib.recovery_data_upload( name, score, [] )
+    for year in result[ONE].keys():
+        for k in result[ONE][year].keys():
+            result[ONE][year][k][DATA] /= result[ONE][year][k][COUNT]
+            result[ONE][year][k][DATA] = round( result[ONE][year][k][DATA], 2 )
+            result[THREE][year][k][DATA] /= result[THREE][year][k][COUNT]
+            result[THREE][year][k][DATA] = round( result[THREE][year][k][DATA], 2 )
+
+    lib.write_recovery_csv( result[ONE], name + ".csv" )
+    lib.write_recovery_csv( result[THREE], THREE + "_" + name + ".csv" )
     
 if __name__ == "__main__":
     main()

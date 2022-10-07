@@ -6,18 +6,21 @@ import sekitoba_library as lib
 import sekitoba_data_manage as dm
 
 dm.dl.file_set( "race_data.pickle" )
+dm.dl.file_set( "odds_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 dm.dl.file_set( "true_skill_data.pickle" )
 
 name = "horce_true_skill"
+ONE = "one"
+THREE = "three"
 DATA = "recovery"
 COUNT = "count"
-    
+
 def main():
-    result = {}
-    data_storage = []
+    result = { ONE: {}, THREE: {} }
     race_data = dm.dl.data_get( "race_data.pickle" )
+    odds_data = dm.dl.data_get( "odds_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
     true_skill_data = dm.dl.data_get( "horce_jockey_true_skill_data.pickle" )
@@ -41,7 +44,10 @@ def main():
         if key_kind == "0" or key_kind == "3":
             continue
 
-        count = 0
+        try:
+            three_odds = odds_data[race_id]["複勝"]
+        except:
+            continue
         
         for kk in race_data[k].keys():
             horce_id = kk
@@ -59,22 +65,32 @@ def main():
                 score = 25
 
             key = str( int( score ) )
-            lib.dic_append( result, year, {} )
-            lib.dic_append( result[year], key, { DATA: 0, COUNT: 0 } )
             
-            result[year][key][COUNT] += 1
+            rank = cd.rank()
+            lib.dic_append( result[ONE], year, {} )
+            lib.dic_append( result[ONE][year], key, { DATA: 0, COUNT: 0 } )
+            lib.dic_append( result[THREE], year, {} )
+            lib.dic_append( result[THREE][year], key, { DATA: 0, COUNT: 0 } )
+            
+            result[ONE][year][key][COUNT] += 1
+            result[THREE][year][key][COUNT] += 1
 
-            if cd.rank() == 1:
-                result[year][key][DATA] += cd.odds()
+            if rank == 1:
+                result[ONE][year][key][DATA] += cd.odds()
 
-    for year in result.keys():
-        for k in result[year].keys():
-            result[year][k][DATA] /= result[year][k][COUNT]
-            result[year][k][DATA] = round( result[year][k][DATA], 2 )
+            if rank <= len( three_odds ):
+                result[THREE][year][key][DATA] += three_odds[int(rank-1)] / 100
 
-    lib.write_recovery_csv( result, name + ".csv" )
+    for year in result[ONE].keys():
+        for k in result[ONE][year].keys():
+            result[ONE][year][k][DATA] /= result[ONE][year][k][COUNT]
+            result[ONE][year][k][DATA] = round( result[ONE][year][k][DATA], 2 )
+            result[THREE][year][k][DATA] /= result[THREE][year][k][COUNT]
+            result[THREE][year][k][DATA] = round( result[THREE][year][k][DATA], 2 )
+
+    lib.write_recovery_csv( result[ONE], name + ".csv" )
+    lib.write_recovery_csv( result[THREE], THREE + "_" + name + ".csv" )
  
-
 if __name__ == "__main__":
     main()
         

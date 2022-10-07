@@ -5,17 +5,22 @@ import sekitoba_library as lib
 import sekitoba_data_manage as dm
 
 dm.dl.file_set( "race_data.pickle" )
+dm.dl.file_set( "odds_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 
 name = "before_rank"
+ONE = "one"
+THREE = "three"
+DATA = "recovery"
+COUNT = "count"
 
 def main():
-    result = {}
+    result = { ONE: {}, THREE: {} }
     race_data = dm.dl.data_get( "race_data.pickle" )
+    odds_data = dm.dl.data_get( "odds_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    key_dict = {}
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
@@ -36,6 +41,11 @@ def main():
         if key_kind == "0" or key_kind == "3":
             continue
 
+        try:
+            three_odds = odds_data[race_id]["複勝"]
+        except:
+            continue
+
         for kk in race_data[k].keys():
             horce_id = kk
             current_data, past_data = lib.race_check( horce_data[horce_id],
@@ -46,35 +56,38 @@ def main():
             if not cd.race_check():
                 continue
 
-            past_rank_list = pd.rank_list()
-            all_horce_num_list = pd.all_horce_num_list()
+            before_cd = pd.before_cd()
 
-            if len( past_rank_list ) == 0:
+            if before_cd == None:
                 continue
+            
+            score = before_cd.rank()
+            key = str( int( score ) )
 
-            before_rank = int( past_rank_list[0] ) 
-            before_str_rank = str( before_rank )
+            rank = cd.rank()
+            lib.dic_append( result[ONE], year, {} )
+            lib.dic_append( result[ONE][year], key, { DATA: 0, COUNT: 0 } )
+            lib.dic_append( result[THREE], year, {} )
+            lib.dic_append( result[THREE][year], key, { DATA: 0, COUNT: 0 } )
+            
+            result[ONE][year][key][COUNT] += 1
+            result[THREE][year][key][COUNT] += 1
 
-            if before_rank == 0:
-                continue
+            if rank == 1:
+                result[ONE][year][key][DATA] += cd.odds()
 
-            lib.dic_append( result, year, {} )
-            lib.dic_append( result[year], before_str_rank, { "recovery": 0, "count": 0 } )
+            if rank <= len( three_odds ):
+                result[THREE][year][key][DATA] += three_odds[int(rank-1)] / 100
 
-            result[year][before_str_rank]["count"] += 1
+    for year in result[ONE].keys():
+        for k in result[ONE][year].keys():
+            result[ONE][year][k][DATA] /= result[ONE][year][k][COUNT]
+            result[ONE][year][k][DATA] = round( result[ONE][year][k][DATA], 2 )
+            result[THREE][year][k][DATA] /= result[THREE][year][k][COUNT]
+            result[THREE][year][k][DATA] = round( result[THREE][year][k][DATA], 2 )
 
-            if cd.rank() == 1:
-                result[year][before_str_rank]["recovery"] += cd.odds()
-
-
-    for year in result.keys():
-        for k in result[year].keys():
-            result[year][k]["recovery"] /= result[year][k]["count"]
-            result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
-
-    lib.write_recovery_csv( result, name + ".csv" )
-    score = lib.recovery_score_check( result )
-    lib.recovery_data_upload( name, score, [] )
+    lib.write_recovery_csv( result[ONE], name + ".csv" )
+    lib.write_recovery_csv( result[THREE], THREE + "_" + name + ".csv" )
 
 if __name__ == "__main__":
     main()
