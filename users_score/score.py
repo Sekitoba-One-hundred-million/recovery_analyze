@@ -74,6 +74,10 @@ class UsersScoreFunction:
         self.function[data_name.jockey_true_skill] = self.jockey_true_skill
         self.function[data_name.jockey_true_skill_minus] = self.jockey_true_skill_minus
         self.function[data_name.horce_jockey_true_skill_index] = self.horce_jockey_true_skill_index
+        self.function[data_name.diff_load_weight] = self.diff_load_weight
+        self.function[data_name.straight_flame] = self.straight_flame
+        self.function[data_name.race_num] = self.race_num
+        self.function[data_name.race_money] = self.race_money
         
         use_data_write( list( self.function.keys() ) )
         print( "data count: {}".format( len( self.function ) ) )
@@ -505,6 +509,38 @@ class UsersScoreFunction:
         score = int( score )
 
         if score == 3:
+            return 5
+
+        return 0
+
+    def diff_load_weight( self, score ):
+        score = int( score )
+
+        if score == -2:
+            return 5
+
+        return 0
+
+    def straight_flame( self, score ):
+        score = int( score )
+        
+        if score == 101 or score == 103 or score == 202:
+            return 5
+
+        return 0
+
+    def race_num( self, score ):
+        score = int( score )
+
+        if score == 3 or score == 10:
+            return 5
+
+        return 0
+
+    def race_money( self, score ):
+        score = int( score )
+
+        if score == 4:
             return 5
 
         return 0

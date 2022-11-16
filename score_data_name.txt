@@ -39,3 +39,7 @@ horce_true_skill
 father_blood_type
 jockey_true_skill
 horce_jockey_true_skill_index
+diff_load_weight
+straight_flame
+race_num
+race_money

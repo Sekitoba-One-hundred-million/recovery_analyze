@@ -33,6 +33,8 @@ dm.dl.file_set( "horce_sex_data.pickle" )
 dm.dl.file_set( "horce_blood_type_data.pickle" )
 dm.dl.file_set( "race_jockey_id_data.pickle" )
 dm.dl.file_set( "horce_jockey_true_skill_data.pickle" )
+dm.dl.file_set( "race_cource_info.pickle" )
+dm.dl.file_set( "race_money_data.pickle" )
 
 class OnceData:
     def __init__( self ):
@@ -49,6 +51,8 @@ class OnceData:
         self.horce_blood_type_data = dm.dl.data_get( "horce_blood_type_data.pickle" )
         self.race_jockey_id_data = dm.dl.data_get( "race_jockey_id_data.pickle" )
         self.horce_jockey_true_skill_data = dm.dl.data_get( "horce_jockey_true_skill_data.pickle" )
+        self.race_cource_info = dm.dl.data_get( "race_cource_info.pickle" )
+        self.race_money_data = dm.dl.data_get( "race_money_data.pickle" )
         
         self.ds = DataSet()
         self.race_high_level = RaceHighLevel()
@@ -121,6 +125,14 @@ class OnceData:
         if key_kind == "0" or key_kind == "3":
             return
 
+        if self.race_info[race_id]["out_side"]:
+            key_dist += "外"
+        
+        try:
+            straight_dist = int( self.race_cource_info[key_place][key_kind][key_dist]["dist"][0] / 100 )
+        except:
+            straight_dist = -1
+
         count = 0
         race_limb = {}
         current_race_data = {}
@@ -183,38 +195,29 @@ class OnceData:
             before_cd = pd.before_cd()
 
             if before_cd == None:
-                before_id_weight_score = 100
-                before_speed_score = -1
-                before_diff_score = 100
-                before_popular = -1
-                before_last_passing_rank = 0
-                before_first_passing_rank = 0
-                up3_standard_value = 100
-                popular_rank_score = 100
-                before_rank = 0
-            else:
-                before_id_weight_score = self.division( min( max( before_cd.id_weight(), -10 ), 10 ), 2 )
-                before_speed_score = int( before_cd.speed() )
-                before_diff_score = int( max( before_cd.diff(), 0 ) * 10 )
-                before_popular = before_cd.popular()
-                before_passing_list = before_cd.passing_rank().split( "-" )
+                continue
+
+            before_id_weight_score = self.division( min( max( before_cd.id_weight(), -10 ), 10 ), 2 )
+            before_speed_score = int( before_cd.speed() )
+            before_diff_score = int( max( before_cd.diff(), 0 ) * 10 )
+            before_popular = before_cd.popular()
+            before_passing_list = before_cd.passing_rank().split( "-" )
             
-                try:
-                    before_last_passing_rank = int( before_passing_list[-1] )
-                except:
-                    before_last_passing_rank = 0
+            try:
+                before_last_passing_rank = int( before_passing_list[-1] )
+            except:
+                before_last_passing_rank = 0
 
-                try:
-                    before_first_passing_rank = int( before_passing_list[0] )
-                except:
-                    before_first_passing_rank = 0
+            try:
+                before_first_passing_rank = int( before_passing_list[0] )
+            except:
+                before_first_passing_rank = 0
 
-                p1, p2 = before_cd.pace()
-                up3 = before_cd.up_time()
-                up3_standard_value = max( min( ( up3 - p2 ) * 5, 15 ), -10 )
-                popular_rank_score = before_cd.rank() - before_cd.popular()
-                before_rank = before_cd.rank()
-
+            p1, p2 = before_cd.pace()
+            up3 = before_cd.up_time()
+            up3_standard_value = max( min( ( up3 - p2 ) * 5, 15 ), -10 )
+            popular_rank_score = before_cd.rank() - before_cd.popular()
+            before_rank = before_cd.rank()
                 
             try:
                 omega_index_score = self.omega_index_data[race_id][horce_num-1]
@@ -236,6 +239,13 @@ class OnceData:
                 father_blood_type = self.horce_blood_type_data[race_id][key_horce_num]["father"]
             except:
                 father_blood_type = 0
+
+            straight_flame_score = 0
+            
+            if cd.horce_number() < cd.all_horce_num() / 3:
+                straight_flame_score = int( 100 + straight_dist )
+            elif ( cd.all_horce_num() / 3 ) * 2 <= cd.horce_number():
+                straight_flame_score = int( 200 + straight_dist )
 
             before_year = int( year ) - 1
             key_before_year = str( int( before_year ) )
@@ -260,7 +270,7 @@ class OnceData:
             limb_horce_number = int( limb_math * 100 + int( cd.horce_number() / 2 ) )
             macth_rank_score = pd.match_rank()
             money_score = pd.get_money()
-            
+
             if not money_score == 0:
                 money_score += 100
                 
@@ -278,6 +288,13 @@ class OnceData:
             father_blood_type_score = int( cd.dist_kind() * 10 + father_blood_type )
             horce_jockey_true_skill_index = current_race_data[data_name.horce_jockey_true_skill_index].index( horce_true_skill + jockey_true_skill )
             foot_used_count = -1
+            diff_load_weight = int( cd.burden_weight() - before_cd.burden_weight() )
+            race_num = cd.race_num()
+
+            try:
+                race_money = lib.money_class_get( self.race_money_data[race_id] )
+            except:
+                race_money = -1
 
             count += 1
             odds = cd.odds() if cd.rank() == 1 else 0
@@ -328,3 +345,7 @@ class OnceData:
             self.ds.set_users_data( data_name.jockey_true_skill, jockey_true_skill )
             self.ds.set_users_data( data_name.horce_jockey_true_skill_index, horce_jockey_true_skill_index )
             self.ds.set_users_data( data_name.father_blood_type, father_blood_type_score )
+            self.ds.set_users_data( data_name.diff_load_weight, diff_load_weight )
+            self.ds.set_users_data( data_name.straight_flame, straight_flame_score )
+            self.ds.set_users_data( data_name.race_num, race_num )
+            self.ds.set_users_data( data_name.race_money, race_money )
