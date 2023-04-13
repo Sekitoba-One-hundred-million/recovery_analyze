@@ -108,7 +108,7 @@ class UsersScoreFunction:
     def race_level_check_minus( self, score ):
         score = int( score )
         
-        if 14 < score:
+        if 14 < score and score < 100:
             return -5
 
         return 0

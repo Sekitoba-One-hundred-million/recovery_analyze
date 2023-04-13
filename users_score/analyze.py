@@ -48,10 +48,30 @@ class UsersAnalyze:
         lib.dic_append( self.users_score_data[race_id], horce_id, {} )
         self.data = self.users_data[race_id][horce_id]
         
-        for k in self.users_score_function.function.keys():
+        for k in self.users_score_function.function.keys():                
             s = self.users_score_function.function[k]( self.data[k] )
             self.users_score_data[race_id][horce_id][k] = s
             score += s
+
+            if race_id == "202306030212" and horce_id == "2018103498":
+                print( k, self.users_score_function.function[k], self.data[k], s )
+
+        if race_id == "202306030212" and horce_id == "2018103498":
+            #print( k, self.data[k], s )
+            print( score )
+
+        year = race_id[0:4]
+
+        #if year == "2022":
+        #    start = 90
+        #    end = 100
+        #    text = ""
+        #    key_list = list( self.users_data[race_id][horce_id].keys() )
+
+        #    for i in range( start, min( end, len( key_list ) ) ):
+        #        text += key_list[i] + ":" + str( self.users_data[race_id][horce_id][key_list[i]] ) + " "
+
+        #    print( text )
 
         return score
 
