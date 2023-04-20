@@ -63,7 +63,7 @@ def main():
         instance = { "rank": od.ds.rank_data, "odds": od.ds.odds_data, "users": od.ds.users_data }
         file_name = str( rank ) + "-instance.pickle"
         dir_name = "./storage/"
-        dm.local_pickle_save( dir_name + file_name, instance )
+        dm.local_pickle_save( dir_name, file_name, instance )
         comm.send( dir_name + file_name, dest = 0, tag = 2 )
 
 if __name__ == "__main__":

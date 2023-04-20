@@ -53,12 +53,12 @@ class UsersAnalyze:
             self.users_score_data[race_id][horce_id][k] = s
             score += s
 
-            if race_id == "202306030212" and horce_id == "2018103498":
-                print( k, self.users_score_function.function[k], self.data[k], s )
+            #if race_id == "202306030812":
+            #    print( k, self.data[k], s )
 
-        if race_id == "202306030212" and horce_id == "2018103498":
-            #print( k, self.data[k], s )
-            print( score )
+        #if race_id == "202306030812":
+        #    print( horce_id, score )
+        #    print( score )
 
         year = race_id[0:4]
 
