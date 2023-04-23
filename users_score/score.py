@@ -2,24 +2,11 @@ from common.name import Name
 
 data_name = Name()
 
-def use_data_write( key_list ):
-    name_dict = {}
-    f = open( "score_data_name.txt", "w" )
-    
-    for name in key_list:
-        name = name.replace( "_minus", "" )
-        name_dict[name] = True
-
-    for name in name_dict.keys():
-        f.write( name + "\n" )
-
-    f.close()
-
 class UsersScoreFunction:
     def __init__( self ):
         self.function = {}
 
-    def set_function( self ):
+    def set_function( self, write = True ):
         self.function[data_name.before_rank] = self.before_rank
         self.function[data_name.before_rank_minus] = self.before_rank_minus
         self.function[data_name.race_level_check] = self.race_level_check
@@ -78,9 +65,23 @@ class UsersScoreFunction:
         self.function[data_name.straight_flame] = self.straight_flame
         self.function[data_name.race_num] = self.race_num
         self.function[data_name.race_money] = self.race_money
-        
-        use_data_write( list( self.function.keys() ) )
+
+        if write:
+            self.use_data_write( list( self.function.keys() ) )
+
+    def use_data_write( self, key_list ):
+        name_dict = {}
         print( "data count: {}".format( len( self.function ) ) )
+        f = open( "score_data_name.txt", "w" )
+    
+        for name in key_list:
+            name = name.replace( "_minus", "" )
+            name_dict[name] = True
+
+        for name in name_dict.keys():
+            f.write( name + "\n" )
+
+        f.close()
 
     def before_rank( self, score ):
         score = int( score )
