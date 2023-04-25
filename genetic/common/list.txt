@@ -130,6 +130,8 @@ train_score
 train_score_minus
 trainer_rank
 trainer_rank_minus
+trainer_true_skill
+trainer_true_skill_minus
 true_skill_index
 true_skill_index_minus
 two_rate

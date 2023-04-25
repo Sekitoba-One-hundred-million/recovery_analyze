@@ -23,7 +23,7 @@ def main():
     odds_data = dm.dl.data_get( "odds_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    true_skill_data = dm.dl.data_get( "horce_jockey_true_skill_data.pickle" )
+    true_skill_data = dm.dl.data_get( "true_skill_data.pickle" )
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )

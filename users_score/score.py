@@ -60,6 +60,8 @@ class UsersScoreFunction:
         self.function[data_name.father_blood_type_minus] = self.father_blood_type_minus
         self.function[data_name.jockey_true_skill] = self.jockey_true_skill
         self.function[data_name.jockey_true_skill_minus] = self.jockey_true_skill_minus
+        self.function[data_name.trainer_true_skill] = self.trainer_true_skill
+        self.function[data_name.trainer_true_skill_minus] = self.trainer_true_skill_minus
         self.function[data_name.horce_jockey_true_skill_index] = self.horce_jockey_true_skill_index
         self.function[data_name.diff_load_weight] = self.diff_load_weight
         self.function[data_name.straight_flame] = self.straight_flame
@@ -486,6 +488,22 @@ class UsersScoreFunction:
         score = int( score )
 
         if score < 20:
+            return -5
+
+        return 0
+
+    def trainer_true_skill( self, score ):
+        score = int( score )
+
+        if 34 <= score and score <= 36:
+            return 5
+
+        return 0
+
+    def trainer_true_skill_minus( self, score ):
+        score = int( score )
+
+        if score <= 17:
             return -5
 
         return 0

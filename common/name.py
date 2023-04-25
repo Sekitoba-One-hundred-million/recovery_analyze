@@ -132,6 +132,8 @@ class Name:
         self.train_score_minus = "train_score_minus"
         self.trainer_rank = "trainer_rank"
         self.trainer_rank_minus = "trainer_rank_minus"
+        self.trainer_true_skill = "trainer_true_skill"
+        self.trainer_true_skill_minus = "trainer_true_skill_minus"
         self.true_skill_index = "true_skill_index"
         self.true_skill_index_minus = "true_skill_index_minus"
         self.two_rate = "two_rate"

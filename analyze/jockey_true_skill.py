@@ -20,7 +20,7 @@ def main():
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    horce_jockey_true_skill_data = dm.dl.data_get( "horce_jockey_true_skill_data.pickle" )
+    true_skill_data = dm.dl.data_get( "true_skill_data.pickle" )
     race_jockey_id_data = dm.pickle_load( "race_jockey_id_data.pickle" )
     
     for k in tqdm( race_data.keys() ):
@@ -61,7 +61,7 @@ def main():
 
             try:
                 jockey_id = jockey_id_list[horce_id]
-                score = horce_jockey_true_skill_data["jockey"][race_id][jockey_id]
+                score = true_skill_data["jockey"][race_id][jockey_id]
             except:
                 score = 25
 
