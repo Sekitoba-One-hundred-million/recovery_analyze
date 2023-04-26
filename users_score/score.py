@@ -103,7 +103,7 @@ class UsersScoreFunction:
     def race_level_check( self, score ):
         score = int( score )
 
-        if score == 3 or score == 4 or score == 6 or score == 8:
+        if score == 4:
             return 5
 
         return 0
@@ -119,7 +119,7 @@ class UsersScoreFunction:
     def straight_slope( self, score ):
         score = int( score )
 
-        if score == 2:
+        if score == 2 or score == 3:
             return 5
 
         return 0
