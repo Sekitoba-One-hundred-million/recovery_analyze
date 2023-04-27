@@ -92,7 +92,7 @@ class OnceData:
             
         for target_cd in target_pd.past_cd_list():
             c = 0
-                
+            
             if target_cd.place() == cd.place():
                 c += 1
                 
@@ -107,7 +107,7 @@ class OnceData:
 
         if not count == 0:
             score /= count
-                
+            
         return int( score )
 
     def create( self, k ):
@@ -120,8 +120,11 @@ class OnceData:
         key_place = str( self.race_info[race_id]["place"] )
         key_dist = str( self.race_info[race_id]["dist"] )
         key_kind = str( self.race_info[race_id]["kind"] )
-        key_baba = str( self.race_info[race_id]["baba"] )        
+        key_baba = str( self.race_info[race_id]["baba"] )
         ymd = { "y": int( year ), "m": self.race_day[race_id]["month"], "d": self.race_day[race_id]["day"] }
+
+        if int( key_place ) == 8:
+            return
 
         #芝かダートのみ
         if key_kind == "0" or key_kind == "3":
@@ -184,9 +187,6 @@ class OnceData:
                                                      year, day, num, race_place_num )#今回と過去のデータに分ける
             cd = lib.current_data( current_data )
             pd = lib.past_data( past_data, current_data )
-
-            if race_id == "202305020212" and horce_id == "2018105217":
-                print( cd.race_check(), pd.before_cd() )
 
             if not cd.race_check():
                 continue                
