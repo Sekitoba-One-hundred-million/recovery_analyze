@@ -361,3 +361,4 @@ class OnceData:
             self.ds.set_users_data( data_name.straight_flame, straight_flame_score )
             self.ds.set_users_data( data_name.race_num, race_num )
             self.ds.set_users_data( data_name.race_money, race_money )
+            self.ds.set_users_data( data_name.level_score, pd.level_score() * 10 )

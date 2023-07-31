@@ -13,10 +13,8 @@ before_speed
 trainer_rank
 jockey_rank
 before_diff
-limb_horce_number
 mother_rank
 match_rank
-weather
 burden_weight
 before_continue_not_three_rank
 horce_sex
@@ -28,8 +26,6 @@ before_first_passing_rank
 jockey_year_rank
 money
 horce_num
-baba
-place
 popular_rank
 train_score
 race_deployment
@@ -44,3 +40,4 @@ diff_load_weight
 straight_flame
 race_num
 race_money
+level_score

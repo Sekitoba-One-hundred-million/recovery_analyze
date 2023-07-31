@@ -94,9 +94,9 @@ def write( recovery_data, score_key, test = False ):
         key_list = sorted( key_list )
 
         if test:
-            file_name = "/Users/kansei/Desktop/recovery_data/test_users_score_" + kind + ".csv"
+            file_name = "/Volumes/Gilgamesh/sekitoba-recovery/test_users_score_" + kind + ".csv"
         else:
-            file_name = "/Users/kansei/Desktop/recovery_data/users_score_" + kind + ".csv"
+            file_name = "/Volumes/Gilgamesh/sekitoba-recovery/users_score_" + kind + ".csv"
             
         f = open( file_name, "w" )
         

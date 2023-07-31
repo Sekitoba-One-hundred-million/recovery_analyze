@@ -1,7 +1,7 @@
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
 from score import UsersScoreFunction
-from three_score import UsersThreeScoreFunction
+#from three_score import UsersThreeScoreFunction
 from common.name import Name
 
 data_name = Name()
@@ -29,7 +29,7 @@ class UsersAnalyze:
         self.user_rank_data = dm.dl.data_get( "users_rank_data.pickle" )
         #self.users_score_rate = dm.dl.data_get( "users_score_rate.pickle" )
         self.users_score_function = UsersScoreFunction()
-        self.users_three_score_function = UsersThreeScoreFunction()
+        #self.users_three_score_function = UsersThreeScoreFunction()
         self.set_function()
 
     def set_function( self ):
@@ -40,8 +40,8 @@ class UsersAnalyze:
         #self.buy_function["triple"] = self.triple
 
         self.users_score_function.set_function()
-        self.users_three_score_function.set_function()
-
+        #self.users_three_score_function.set_function()
+        
     def get_one_score( self, race_id, horce_id ):
         score = 0
         lib.dic_append( self.users_score_data, race_id, {} )
@@ -61,8 +61,8 @@ class UsersAnalyze:
         lib.dic_append( self.users_score_data[race_id], horce_id, {} )
         self.data = self.users_data[race_id][horce_id]
 
-        for k in self.users_three_score_function.function.keys():
-            s = self.users_three_score_function.function[k]( self.data[k] )
+        for k in self.users_score_function.function.keys():
+            s = self.users_score_function.function[k]( self.data[k] )
             self.users_score_data[race_id][horce_id][k] = s
             score += s
 

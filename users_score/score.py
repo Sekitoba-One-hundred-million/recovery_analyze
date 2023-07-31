@@ -8,9 +8,7 @@ class UsersScoreFunction:
 
     def set_function( self, write = True ):
         self.function[data_name.before_rank] = self.before_rank
-        self.function[data_name.before_rank_minus] = self.before_rank_minus
         self.function[data_name.race_level_check] = self.race_level_check
-        self.function[data_name.race_level_check_minus] = self.race_level_check_minus
         self.function[data_name.straight_slope] = self.straight_slope
         self.function[data_name.foot_used] = self.foot_used
         self.function[data_name.limb] = self.limb
@@ -18,55 +16,44 @@ class UsersScoreFunction:
         self.function[data_name.speed_index] = self.speed_index
         self.function[data_name.race_interval] = self.race_interval
         self.function[data_name.weight] = self.weight
-        self.function[data_name.weight_minus] = self.weight_minus
         self.function[data_name.before_id_weight] = self.before_id_weight
         self.function[data_name.omega] = self.omega
-        self.function[data_name.before_speed_minus] = self.before_speed_minus
+        self.function[data_name.before_speed] = self.before_speed
         self.function[data_name.trainer_rank] = self.trainer_rank
-        self.function[data_name.trainer_rank_minus] = self.trainer_rank_minus
         self.function[data_name.jockey_rank] = self.jockey_rank
-        self.function[data_name.jockey_rank_minus] = self.jockey_rank_minus
         self.function[data_name.before_diff] = self.before_diff
-        self.function[data_name.limb_horce_number] = self.limb_horce_number
-        self.function[data_name.limb_horce_number_minus] = self.limb_horce_number_minus
+        #self.function[data_name.limb_horce_number] = self.limb_horce_number
         self.function[data_name.mother_rank] = self.mother_rank
         self.function[data_name.match_rank] = self.match_rank
-        self.function[data_name.match_rank_minus] = self.match_rank_minus
-        self.function[data_name.weather] = self.weather
+        #self.function[data_name.weather] = self.weather
         self.function[data_name.burden_weight] = self.burden_weight
         self.function[data_name.before_continue_not_three_rank] = self.before_continue_not_three_rank
-        self.function[data_name.before_continue_not_three_rank_minus] = self.before_continue_not_three_rank_minus
         self.function[data_name.horce_sex] = self.horce_sex
         self.function[data_name.horce_sex_month] = self.horce_sex_month
-        self.function[data_name.dist_kind_count_minus] = self.dist_kind_count_minus
+        self.function[data_name.dist_kind_count] = self.dist_kind_count
         self.function[data_name.before_popular] = self.before_popular
         self.function[data_name.before_last_passing_rank] = self.before_last_passing_rank
-        self.function[data_name.before_last_passing_rank_minus] = self.before_last_passing_rank_minus
         self.function[data_name.before_first_passing_rank] = self.before_first_passing_rank
         self.function[data_name.jockey_year_rank] = self.jockey_year_rank
         self.function[data_name.money] = self.money
         self.function[data_name.horce_num] = self.horce_num
-        self.function[data_name.baba] = self.baba
-        self.function[data_name.place] = self.place
+        #self.function[data_name.baba] = self.baba
+        #self.function[data_name.place] = self.place
         self.function[data_name.popular_rank] = self.popular_rank
         self.function[data_name.train_score] = self.train_score
         self.function[data_name.race_deployment] = self.race_deployment
         self.function[data_name.up3_standard_value] = self.up3_standard_value
-        self.function[data_name.up3_standard_value_minus] = self.up3_standard_value_minus
         self.function[data_name.my_limb_count] = self.my_limb_count
-        self.function[data_name.my_limb_count_minus] = self.my_limb_count_minus
         self.function[data_name.horce_true_skill] = self.horce_true_skill        
         self.function[data_name.father_blood_type] = self.father_blood_type
-        self.function[data_name.father_blood_type_minus] = self.father_blood_type_minus
         self.function[data_name.jockey_true_skill] = self.jockey_true_skill
-        self.function[data_name.jockey_true_skill_minus] = self.jockey_true_skill_minus
         self.function[data_name.trainer_true_skill] = self.trainer_true_skill
-        self.function[data_name.trainer_true_skill_minus] = self.trainer_true_skill_minus
         self.function[data_name.horce_jockey_true_skill_index] = self.horce_jockey_true_skill_index
         self.function[data_name.diff_load_weight] = self.diff_load_weight
         self.function[data_name.straight_flame] = self.straight_flame
         self.function[data_name.race_num] = self.race_num
         self.function[data_name.race_money] = self.race_money
+        self.function[data_name.level_score] = self.level_score
 
         if write:
             self.use_data_write( list( self.function.keys() ) )
@@ -91,13 +78,9 @@ class UsersScoreFunction:
         if score == 4 or score == 7 or score == 8:
             return 5
 
-        return 0
-
-    def before_rank_minus( self, score ):
-        score = int( score )
-        
-        if 14 < score:
+        if 13 <= score:
             return -5
+
         return 0
 
     def race_level_check( self, score ):
@@ -106,16 +89,11 @@ class UsersScoreFunction:
         if score == 4:
             return 5
 
-        return 0
-    
-    def race_level_check_minus( self, score ):
-        score = int( score )
-        
-        if 14 < score and score < 100:
+        if 13 <= score and score < 100:
             return -5
 
         return 0
-
+    
     def straight_slope( self, score ):
         score = int( score )
 
@@ -127,16 +105,22 @@ class UsersScoreFunction:
     def foot_used( self, score ):
         score = int( score )
 
-        if score == 4:
-            return 10
+        if score == 4 or score == 8:
+            return 5
+
+        if score <= 18 and 14 <= score:
+            return -5
 
         return 0
 
     def limb( self, score ):
         score = int( score )
 
-        if score == 3:
+        if score == 2 or score == 3:
             return 5
+
+        if score == 6 or score == 7 or score == 8:
+            return -5
 
         return 0
 
@@ -146,57 +130,67 @@ class UsersScoreFunction:
         if score == 5:
             return 5
 
+        if 7 <= score:
+            return -5
+
         return 0
 
     def speed_index( self, score ):
         score = int( score )
 
-        if score == 1 or score == 2 or score == 3 or score == 4:
+        if score == 1:
             return 5
+
+        if 11 <= score:
+            return -5
 
         return 0
 
     def race_interval( self, score ):
         score = int( score )
 
-        if score == 10:
+        if score == 10 or score == 11:
             return 5
+
+        if 0 <= score and score <= 3:
+            return -5
 
         return 0
     
     def weight( self, score ):
         score = int( score )
 
-        if score == 50:
+        if score == 50 or score == 51:
             return 5
-
-        return 0
-
-    def weight_minus( self, score ):
-        score = int( score )
 
         if score < 45:
             return -5
 
         return 0
-    
+
     def before_id_weight( self, score ):
         score = int( score )
 
         if score == -2:
             return 5
 
+        if score == -5:
+            return -5
+
         return 0
 
     def omega( self, score ):
         score = int( score )
 
-        if score == 17:
+        if 17 <= score and score <= 19:
             return 5
+
+        if score <= 11:
+            return -5
 
         return 0
 
-    def before_speed_minus( self, score ):
+    def before_speed( self, score ):
         score = int( score )
 
         if 65 < score:
@@ -207,15 +201,10 @@ class UsersScoreFunction:
     def trainer_rank( self, score ):
         score = int( score )
 
-        if score == 5 or score == 6:
+        if score == 6:
             return 5
 
-        return 0
-
-    def trainer_rank_minus( self, score ):
-        score = int( score )
-
-        if 8 < score:
+        if 8 <= score and score <= 10:
             return -5
 
         return 0
@@ -223,15 +212,10 @@ class UsersScoreFunction:
     def jockey_rank( self, score ):
         score = int( score )
 
-        if score == 7:
+        if score == 5:
             return 5
 
-        return 0
-
-    def jockey_rank_minus( self, score ):
-        score = int( score )
-
-        if 9 < score:
+        if 8 <= score and score <= 13:
             return -5
 
         return 0
@@ -241,22 +225,6 @@ class UsersScoreFunction:
 
         if score == 7 or score == 8:
             return 5
-
-        return 0
-
-    def limb_horce_number( self, score ):
-        score = int( score )
-        
-        if score == 304 or score == 305 or score == 306:
-            return 5
-
-        return 0
-
-    def limb_horce_number_minus( self, score ):
-        score = int( score )
-
-        if score == 300 or score == 600:
-            return -5
 
         return 0
 
@@ -274,11 +242,6 @@ class UsersScoreFunction:
         if score == 6:
             return 5
 
-        return 0
-
-    def match_rank_minus( self, score ):
-        score = int( score )
-        
         if 10 < score:
             return -5
 
@@ -306,15 +269,10 @@ class UsersScoreFunction:
         if score == 6:
             return 5
 
-        return 5
-
-    def before_continue_not_three_rank_minus( self, score ):
-        score = int( score )
-
         if score == 10:
             return -5
 
-        return 0
+        return 5
 
     def horce_sex( self, score ):
         score = int( score )
@@ -332,7 +290,7 @@ class UsersScoreFunction:
 
         return 0
 
-    def dist_kind_count_minus( self, score ):
+    def dist_kind_count( self, score ):
         score = int( score )
 
         if score == 20:
@@ -353,11 +311,6 @@ class UsersScoreFunction:
 
         if score == 2 or score == 3:
             return 5
-
-        return 0
-
-    def before_last_passing_rank_minus( self, score ):
-        score = int( score )
 
         if score == 17 or score == 18:
             return -5
@@ -442,11 +395,6 @@ class UsersScoreFunction:
         if score == 4 or score == 7:
             return 5
 
-        return 0
-
-    def up3_standard_value_minus( self, score ):
-        score = int( score )
-
         if 10 <= score:
             return -5
 
@@ -457,11 +405,6 @@ class UsersScoreFunction:
 
         if score == 2 or score == 3 or score == 4:
             return 5        
-
-        return 0
-
-    def my_limb_count_minus( self, score ):
-        score = int( score )
 
         if score == 7 or score == 8:
             return -5
@@ -482,11 +425,6 @@ class UsersScoreFunction:
         if score <= 34 and 31 <= score:
             return 5
 
-        return 0
-
-    def jockey_true_skill_minus( self, score ):
-        score = int( score )
-
         if score < 20:
             return -5
 
@@ -498,11 +436,6 @@ class UsersScoreFunction:
         if 34 <= score and score <= 36:
             return 5
 
-        return 0
-
-    def trainer_true_skill_minus( self, score ):
-        score = int( score )
-
         if score <= 17:
             return -5
 
@@ -513,11 +446,6 @@ class UsersScoreFunction:
 
         if score == 15 or score == 22:
             return 5
-
-        return 0
-
-    def father_blood_type_minus( self, score ):
-        score = int( score )
 
         if score == 12 or score == 23:
             return -5
@@ -561,5 +489,13 @@ class UsersScoreFunction:
 
         if score == 4:
             return 5
+
+        return 0
+
+    def level_score( self, score ):
+        score = int( score )
+
+        if score == 0:
+            return -5
 
         return 0

@@ -32,6 +32,8 @@ best_weight
 best_weight_minus
 burden_weight
 burden_weight_minus
+corner_diff_rank_ave
+corner_diff_rank_ave_minus
 diff_load_weight
 diff_load_weight_minus
 dist_kind_count
@@ -70,6 +72,8 @@ jockey_two_rate
 jockey_two_rate_minus
 jockey_year_rank
 jockey_year_rank_minus
+level_score
+level_score_minus
 limb
 limb_minus
 limb1_count

@@ -1,24 +1,20 @@
-import os
-import numpy as np
-from tqdm import tqdm
-
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
+
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
-dm.dl.file_set( "race_money_data.pickle" )
 
-name = "race_money"
+name = "corner_diff_rank_ave"
 
 def main():
     result = {}
-    data_storage = []
     race_data = dm.dl.data_get( "race_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
-    race_money_data = dm.dl.data_get( "race_money_data.pickle" )
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
@@ -29,7 +25,7 @@ def main():
 
         key_place = str( race_info[race_id]["place"] )
         key_dist = str( race_info[race_id]["dist"] )
-        key_kind = str( race_info[race_id]["kind"] )      
+        key_kind = str( race_info[race_id]["kind"] )        
         key_baba = str( race_info[race_id]["baba"] )
 
         #if year in lib.test_years:
@@ -49,29 +45,26 @@ def main():
             if not cd.race_check():
                 continue
 
-            try:
-                race_money = race_money_data[race_id]
-            except:
-                continue
-
-            score = lib.money_class_get( int( race_money ) )
+            score = pd.corner_diff_rank()
             key = str( int( score ) )
+            
             lib.dic_append( result, year, {} )
             lib.dic_append( result[year], key, { "recovery": 0, "count": 0 } )
+            
             result[year][key]["count"] += 1
 
             if cd.rank() == 1:
                 result[year][key]["recovery"] += cd.odds()
 
     for year in result.keys():
-        print( result[year].keys() )
         for k in result[year].keys():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
     score = lib.recovery_score_check( result )
     lib.write_recovery_csv( result, name + ".csv" )
-
+    #lib.recovery_data_upload( name, score, [] )
+    
 if __name__ == "__main__":
     main()
         
