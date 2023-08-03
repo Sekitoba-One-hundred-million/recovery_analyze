@@ -36,101 +36,80 @@ def recovery_check( data ):
     
     for year in data.keys():
         result[year] = {}
-        
-        for kind in data[year].keys():
-            lib.dic_append( score_key, kind, {} )
-            result[year][kind] = {}
-            lib.dic_append( result["all"], kind, {} )
-            current_data = sorted( data[year][kind], key = lambda x:x["score"], reverse = True )
+        current_data = sorted( data[year], key = lambda x:x["score"], reverse = True )
 
-            if len( current_data ) == 0:
-                continue
+        if len( current_data ) == 0:
+            continue
 
-            count = 0
-            recovery = 0
-            current_score = current_data[0]["score"]            
+        current_score = current_data[0]["score"]            
             
-            for i in range( 0, len( current_data ) ):
-                score = current_data[i]["score"]
-                
-                if not score == current_score or i == len( current_data ) - 1:
-                    key_score = str( int( current_score ) )
-                    lib.dic_append( result["all"][kind], key_score, { "recovery": 0, "count": 0 } )
-                    score_key[kind][key_score] = current_score
-                    result[year][kind][key_score] = {}
-                    result[year][kind][key_score]["count"] = count
-                    result[year][kind][key_score]["recovery"] = round( recovery / count, 2 )
-                        
-                    result["all"][kind][key_score]["recovery"] += recovery
-                    result["all"][kind][key_score]["count"] += count
-                    
-                    count = 0
-                    recovery = 0
-                    current_score = score
+        for i in range( 0, len( current_data ) ):
+            score = current_data[i]["score"]
+            key_score = str( int( score ) )
+            lib.dic_append( result["all"], key_score, { "recovery": 0, "count": 0 } )
+            lib.dic_append( result[year], key_score, { "recovery": 0, "count": 0 } )
+            
+            score_key[key_score] = score
+            result[year][key_score]["count"] += 1
+            result[year][key_score]["recovery"] += current_data[i]["odds"]
+            result["all"][key_score]["recovery"] += current_data[i]["odds"]
+            result["all"][key_score]["count"] += 1                    
 
-                if kind == "wide":
-                    count += 3
-                else:
-                    count += 1
-                    
-                recovery += current_data[i]["odds"]
-
-    for kind in result["all"].keys():
-        for key_score in result["all"][kind].keys():
-            result["all"][kind][key_score]["recovery"] /= result["all"][kind][key_score]["count"]
-            result["all"][kind][key_score]["recovery"] = round( result["all"][kind][key_score]["recovery"], 2 )
+    for k in result.keys():
+        for key_score in result[k].keys():
+            result[k][key_score]["recovery"] /= result[k][key_score]["count"]
+            result[k][key_score]["recovery"] = round( result[k][key_score]["recovery"], 2 )
 
     return result, score_key
 
 def write( recovery_data, score_key, test = False ):
-    for kind in score_key.keys():
-        first = True
-        write_score = "year/score\t"
-        key_list = []
+    first = True
+    write_score = "year/score\t"
+    key_list = []
         
-        for sk in score_key[kind].keys():
-            key_list.append( int( sk ) )
+    for sk in score_key.keys():
+        key_list.append( int( sk ) )
 
-        key_list = sorted( key_list )
+    key_list = sorted( key_list )
 
-        if test:
-            file_name = "/Volumes/Gilgamesh/sekitoba-recovery/test_users_score_" + kind + ".csv"
-        else:
-            file_name = "/Volumes/Gilgamesh/sekitoba-recovery/users_score_" + kind + ".csv"
+    if test:
+        file_name = "/Volumes/Gilgamesh/sekitoba-recovery/test_users_score_one.csv"
+    else:
+        file_name = "/Volumes/Gilgamesh/sekitoba-recovery/users_score_one.csv"
             
-        f = open( file_name, "w" )
+    f = open( file_name, "w" )
         
-        for year in recovery_data.keys():
-            write_recovery = year + "\t"
-            write_count = year + "\t"
+    for year in recovery_data.keys():
+        write_recovery = year + "\t"
+        write_count = year + "\t"
 
-            for key in key_list:
-                score = str( key )
+        for key in key_list:
+            score = str( key )
                 
-                if first:
-                    write_score += score + "\t"
-
-                try:
-                    write_recovery += str( recovery_data[year][kind][score]["recovery"] ) + "\t"
-                    write_count += str( recovery_data[year][kind][score]["count"] ) + "\t"
-                except:
-                    write_recovery += "0\t"
-                    write_count += "0\t"
-
             if first:
-                #print( write_score )
-                write_score += "\n"
-                f.write( write_score )
+                write_score += score + "\t"
 
-            #print( write_recovery )
-            #print( write_count + "\n" )
-            write_recovery += "\n"
-            write_count += "\n\n"
-            f.write( write_recovery )
-            f.write( write_count )            
-            first = False
-            
-        f.close()            
+            try:
+                write_recovery += str( recovery_data[year][score]["recovery"] ) + "\t"
+                write_count += str( recovery_data[year][score]["count"] ) + "\t"
+            except:
+                write_recovery += "0\t"
+                write_count += "0\t"
+
+        if first:
+            #print( write_score )
+            write_score += "\n"
+            f.write( write_score )
+
+        #print( write_recovery )
+        #print( write_count + "\n" )
+        write_recovery += "\n"
+        write_count += "\n\n"
+        f.write( write_recovery )
+        f.write( write_count )            
+        first = False
+        
+    f.close()            
 
 def main():
     ua = UsersAnalyze()

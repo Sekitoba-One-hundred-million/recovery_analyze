@@ -53,7 +53,7 @@ def main():
             if before_cd == None:
                 continue
             
-            score = max( before_cd.diff() * 10, 0 )
+            score = min( max( before_cd.diff() * 10, 0 ), 20 )
             key_score = str( int( score ) )
             lib.dic_append( result, year, {} )
             lib.dic_append( result[year], key_score, { "recovery": 0, "count": 0 } )
@@ -70,7 +70,7 @@ def main():
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
     lib.write_recovery_csv( result, name + ".csv" )
-    score = lib.recovery_score_check( result )
+    lib.recovery_best_select( result )
 
 if __name__ == "__main__":
     main()

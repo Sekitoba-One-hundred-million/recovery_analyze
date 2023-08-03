@@ -1,4 +1,6 @@
 import os
+import math
+import copy
 from tqdm import tqdm
 
 import sekitoba_library as lib
@@ -86,9 +88,9 @@ def main():
             result[THREE][year][k][DATA] /= result[THREE][year][k][COUNT]
             result[THREE][year][k][DATA] = round( result[THREE][year][k][DATA], 2 )
 
+    lib.recovery_best_select( result[ONE] )
     lib.write_recovery_csv( result[ONE], name + ".csv" )
     lib.write_recovery_csv( result[THREE], THREE + "_" + name + ".csv" )
 
 if __name__ == "__main__":
     main()
-        

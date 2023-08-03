@@ -83,6 +83,7 @@ def main():
             result[THREE][year][k][DATA] /= result[THREE][year][k][COUNT]
             result[THREE][year][k][DATA] = round( result[THREE][year][k][DATA], 2 )
 
+    lib.recovery_best_select( result[ONE] )
     lib.write_recovery_csv( result[ONE], name + ".csv" )
     lib.write_recovery_csv( result[THREE], THREE + "_" + name + ".csv" )
     

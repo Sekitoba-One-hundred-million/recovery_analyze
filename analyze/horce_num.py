@@ -61,7 +61,8 @@ def main():
             result[year][k]["recovery"] /= result[year][k]["count"]
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
-    score = lib.recovery_score_check( result )
+    #score = lib.recovery_score_check( result )
+    lib.recovery_best_select( result )
     lib.write_recovery_csv( result, name + ".csv" )
 
 if __name__ == "__main__":

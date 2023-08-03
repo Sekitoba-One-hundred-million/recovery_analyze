@@ -39,7 +39,7 @@ def main():
         if key_kind == "0" or key_kind == "3":
             continue
 
-        if race_info[race_id]["out_side"]:
+        if "out_side" in race_info[race_id] and race_info[race_id]["out_side"]:
             key_dist += "外"
 
         try:
@@ -85,7 +85,7 @@ def main():
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
     lib.write_recovery_csv( result, name + ".csv" )
-    score = lib.recovery_score_check( result )
+    lib.recovery_best_select( result )
 
 if __name__ == "__main__":
     main()
