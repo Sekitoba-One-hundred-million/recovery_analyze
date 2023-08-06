@@ -9,13 +9,11 @@ class GA:
         self.key_list = key_list
         self.parent = []
         self.scores = []
-        self.ones = []
         self.best_population = None
         self.best_score = -1
         self.best_one = 0
         self.mutation_rate = 0.05
         self.next_individual_rate = 0.5
-        self.ticket_kind = ""
 
         for i in range( 0, self.population ):
             t = {}
@@ -31,19 +29,14 @@ class GA:
     def get_parent( self ):
         return self.parent
 
-    def set_ticket_kind( self, kind ):
-        self.ticket_kind = kind
-
-    def scores_set( self, score_list, one_list ):
+    def scores_set( self, score_list ):
         self.scores = copy.deepcopy( score_list )
-        self.ones = copy.deepcopy( one_list )
 
     def score_create( self ):
-        score = random.random()
-        score += 0.05
-        score *= 10
-        score = int( score )
-        score /= 10
+        score = True
+        if random.random() < 0.5:
+            score = False
+            
         return score
 
     def softmax( self, score_list ):
@@ -134,7 +127,6 @@ class GA:
             next_check.append( { "score": self.scores[i], "parent": self.parent[i] } )
             
             if self.best_score < self.scores[i]:
-                self.best_one = self.ones[i]
                 self.best_score = self.scores[i]
                 self.best_population = self.parent[i]
 

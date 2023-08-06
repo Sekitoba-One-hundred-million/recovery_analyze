@@ -23,21 +23,22 @@ class DataSet:
     def set_id( self, race_id, horce_id ):
         self.race_id = race_id
         self.horce_id = horce_id
-
-    def set_users_data( self, name, data ):
         lib.dic_append( self.users_data, self.race_id, {} )
         lib.dic_append( self.users_data[self.race_id], self.horce_id, {} )
+        lib.dic_append( self.rank_data, self.race_id, {} )
+        lib.dic_append( self.odds_data, self.race_id, {} )
+
+    def set_users_data( self, name, data ):
         self.users_data[self.race_id][self.horce_id][name] = data
-        self.users_data[self.race_id][self.horce_id][name+"_minus"] = data 
+        #self.users_data[self.race_id][self.horce_id][name+"_minus"] = data 
 
     def set_rank_data( self, rank ):
-        lib.dic_append( self.rank_data, self.race_id, {} )
         self.rank_data[self.race_id][self.horce_id] = rank
 
     def set_odds_data( self, odds ):
-        lib.dic_append( self.odds_data, self.race_id, {} )
         self.odds_data[self.race_id][self.horce_id] = odds
 
     def data_upload( self ):
+        dm.pickle_upload( "users_odds_data.pickle", self.odds_data )
         dm.pickle_upload( "users_rank_data.pickle", self.rank_data )
         dm.pickle_upload( "users_data.pickle", self.users_data )

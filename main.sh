@@ -54,7 +54,7 @@ if [ $tag = "3" ]; then
 fi
 
 if [ $tag = "4" ]; then
-    mpiexec -n 6 python $genetic_dir/main.py
+    python $genetic_dir/main.py
 fi
 
 if [ $tag = "5" ]; then

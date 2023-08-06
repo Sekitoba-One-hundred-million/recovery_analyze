@@ -1,3 +1,4 @@
+import json
 from common.name import Name
 
 data_name = Name()
@@ -6,58 +7,23 @@ class UsersScoreFunction:
     def __init__( self ):
         self.function = {}
         self.plus_score = {}
+        self.plus_score_set()
 
-        self.plus_score[data_name.age] = [2, 4, 5]
-        self.plus_score[data_name.all_horce_num] = [8, 9, 10, 11]
-        self.plus_score[data_name.baba] = [1]
-        self.plus_score[data_name.before_rank] = [4, 6, 7]
-        self.plus_score[data_name.before_continue_not_three_rank] = [5, 6, 7]
-        self.plus_score[data_name.before_diff] = [2, 3, 7]
-        self.plus_score[data_name.before_first_passing_rank] = [2, 3, 4, 5, 6]
-        self.plus_score[data_name.before_id_weight] = [-2, -1]
-        self.plus_score[data_name.before_last_passing_rank] = [1, 2, 3, 4, 6]
-        self.plus_score[data_name.before_pace] = [0, 2]
-        self.plus_score[data_name.before_popular] = [3, 6]
-        self.plus_score[data_name.before_speed] = [58, 59, 61, 63]
-        self.plus_score[data_name.best_weight] = [1, 3, 4, 5, 6, 11, 15, 16, 17, 18]
-        self.plus_score[data_name.burden_weight] = [5, 6]
-        self.plus_score[data_name.diff_load_weight] = [-2, 1, 2, 4]
-        self.plus_score[data_name.dist_kind_count] = [2, 3, 6, 10, 14, 16]
-        self.plus_score[data_name.father_blood_type] = [15, 18, 22, 34, 38, 42]
-        self.plus_score[data_name.foot_used] = [1, 3, 4, 5, 6, 9]
-        self.plus_score[data_name.horce_jockey_true_skill_index] = [1, 3, 5, 7, 9, 10, 13, 15]
-        self.plus_score[data_name.horce_num] = [2, 4, 6, 8, 10, 14]
-        self.plus_score[data_name.horce_sex] = [1]
-        self.plus_score[data_name.horce_sex_month] = [11, 21, 31, 62, 72]
-        self.plus_score[data_name.horce_true_skill] = [23, 26, 28, 30, 31, 32, 33]
-        self.plus_score[data_name.jockey_true_skill] = [26, 33, 34, 35, 36]
-        self.plus_score[data_name.jockey_rank] = [5, 6, 7]
-        self.plus_score[data_name.jockey_year_rank] = [1, 2, 3]
-        self.plus_score[data_name.level_score] = [3, 4]
-        self.plus_score[data_name.limb] = [1, 3]
-        self.plus_score[data_name.limb_horce_number] = [401, 402, 403, 404, 405, 602]
-        self.plus_score[data_name.match_rank] = [1, 2, 3, 4, 6]
-        self.plus_score[data_name.money] = [5, 7, 10, 11, 14, 16]
-        self.plus_score[data_name.mother_rank] = [0, 4, 11]
-        self.plus_score[data_name.my_limb_count] = [1, 3, 4, 5, 10]
-        self.plus_score[data_name.omega] = [17, 18, 19]
-        self.plus_score[data_name.place] = [3]
-        self.plus_score[data_name.popular_rank] = [-11, -6, 3, 5, 6, 7, 8, 10, 11]
-        self.plus_score[data_name.race_deployment] = [4, 7]
-        self.plus_score[data_name.race_num] = [3, 11, 12]
-        self.plus_score[data_name.race_money] = [3, 4]
-        self.plus_score[data_name.race_interval] = [10, 11, 13, 14]
-        self.plus_score[data_name.race_level_check] = [3, 4]
-        self.plus_score[data_name.speed_index] = [0, 1, 4, 5, 9, 11, 12]
-        self.plus_score[data_name.straight_flame] = [103, 202, 203]
-        self.plus_score[data_name.straight_slope] = [1, 2]
-        self.plus_score[data_name.three_average] = [7, 8, 11, 14, 15]
-        self.plus_score[data_name.train_score] = [-4, -3, -2]
-        self.plus_score[data_name.trainer_rank] = [5, 6]
-        self.plus_score[data_name.trainer_true_skill] = [24, 29, 30, 31, 32, 33, 34]
-        self.plus_score[data_name.up3_standard_value] = [-3, -2, -1, 1, 2, 3, 7]
-        self.plus_score[data_name.weather] = [1]
-        self.plus_score[data_name.weight] = [50, 51, 53]
+    def plus_score_set( self ):
+        f = open( "plus_score.json", "r" )
+        plus_score_instance = json.load( f )
+        f.close()
+
+        f = open( "plus_ga_use.json", "r" )
+        plus_ga_use = json.load( f )
+        f.close()
+
+        for k in plus_ga_use.keys():
+            if not plus_ga_use[k]:
+                continue
+
+            self.plus_score[k] = plus_score_instance[k]
+            
         self.use_data_write( list( self.plus_score.keys() ) )
 
     def use_data_write( self, key_list ):

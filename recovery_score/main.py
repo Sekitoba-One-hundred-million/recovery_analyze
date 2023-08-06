@@ -4,8 +4,10 @@ from mpi4py import MPI
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
 
+from plus_score_create import PlusScoreCreate
 from once_data import OnceData
 from data_set import DataSet
+
 import recovery_check
 
 def key_list_search( rank, size, key_list ):
@@ -46,6 +48,18 @@ def main():
 
         ds.set_all_data( users_data, rank_data, odds_data )
         recovery_check.main( ds )
+        
+        race_id = list( ds.users_data.keys() )[0]
+        horce_id = list( ds.users_data[race_id].keys() )[0]
+        score_key_list = list( ds.users_data[race_id][horce_id].keys() )
+        l = len( score_key_list )
+        plus_score_create = PlusScoreCreate( ds )
+
+        for i, score_key in enumerate( score_key_list ):
+            print( l - i, score_key )
+            plus_score_create.target_plus( score_key )
+
+        plus_score_create.plus_json_create()
         ds.data_upload()
     else:
         ok = comm.recv( source = 0, tag = 1 )        
@@ -65,6 +79,7 @@ def main():
         dir_name = "./storage/"
         dm.local_pickle_save( dir_name, file_name, instance )
         comm.send( dir_name + file_name, dest = 0, tag = 2 )
+        return
 
 if __name__ == "__main__":
     main()
