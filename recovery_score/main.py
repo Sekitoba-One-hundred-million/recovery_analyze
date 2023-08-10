@@ -4,7 +4,7 @@ from mpi4py import MPI
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
 
-from plus_score_create import PlusScoreCreate
+from score_create import ScoreCreate
 from once_data import OnceData
 from data_set import DataSet
 
@@ -53,13 +53,13 @@ def main():
         horce_id = list( ds.users_data[race_id].keys() )[0]
         score_key_list = list( ds.users_data[race_id][horce_id].keys() )
         l = len( score_key_list )
-        plus_score_create = PlusScoreCreate( ds )
+        score_create = ScoreCreate( ds )
 
         for i, score_key in enumerate( score_key_list ):
             print( l - i, score_key )
-            plus_score_create.target_plus( score_key )
+            score_create.create( score_key )
 
-        plus_score_create.plus_json_create()
+        score_create.json_create()
         ds.data_upload()
     else:
         ok = comm.recv( source = 0, tag = 1 )        

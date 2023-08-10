@@ -6,12 +6,13 @@ from data_set import DataSet
 DATA = "recovery"
 COUNT = "count"
 
-class PlusScoreCreate:
+class ScoreCreate:
     def __init__( self, ds :DataSet ):
         self.ds = ds
         self.plus_score = {}
+        self.minus_score = {}
 
-    def target_plus( self, key ):
+    def create( self, key ):
         check_data = {}
         
         for race_id in self.ds.users_data.keys():
@@ -37,12 +38,18 @@ class PlusScoreCreate:
                 check_data[year][score_key][DATA] /= check_data[year][score_key][COUNT]
                 check_data[year][score_key][DATA] = round( check_data[year][score_key][DATA], 2 )
 
-        self.plus_score[key] = lib.recovery_best_select( check_data, show = False )
+        self.plus_score[key], self.minus_score[key] = lib.recovery_best_select( check_data, show = False )
 
-    def plus_json_create( self ):
-        if len( self.plus_score ) == 0:
-            print( "not found plus_score" )
+    def json_create( self ):
+        if len( self.plus_score ) == 0 or len( self.minus_score ) == 0:
+            print( "not found score" )
             return False
 
         f = open( "plus_score.json", "w" )
         json.dump( self.plus_score, f, indent = 4 )
+        f.close()
+
+        f = open( "minus_score.json", "w" )
+        json.dump( self.minus_score, f, indent = 4 )
+        f.close()
+

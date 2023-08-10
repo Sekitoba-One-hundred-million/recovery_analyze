@@ -7,14 +7,19 @@ class UsersScoreFunction:
     def __init__( self ):
         self.function = {}
         self.plus_score = {}
-        self.plus_score_set()
+        self.minus_score = {}
+        self.score_set()
 
-    def plus_score_set( self ):
+    def score_set( self ):
         f = open( "plus_score.json", "r" )
         plus_score_instance = json.load( f )
         f.close()
 
-        f = open( "plus_ga_use.json", "r" )
+        f = open( "minus_score.json", "r" )
+        minus_score_instance = json.load( f )
+        f.close()
+
+        f = open( "use_score_data.json", "r" )
         plus_ga_use = json.load( f )
         f.close()
 
@@ -23,6 +28,7 @@ class UsersScoreFunction:
                 continue
 
             self.plus_score[k] = plus_score_instance[k]
+            self.minus_score[k] = minus_score_instance[k]
             
         self.use_data_write( list( self.plus_score.keys() ) )
 

@@ -134,6 +134,8 @@ true_skill_index
 true_skill_index_minus
 two_rate
 two_rate_minus
+up3_horce_true_skill
+up3_horce_true_skill_minus
 up3_standard_value
 up3_standard_value_minus
 up_score

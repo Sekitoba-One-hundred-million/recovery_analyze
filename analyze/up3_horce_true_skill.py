@@ -1,16 +1,17 @@
+import os
+import numpy as np
+from tqdm import tqdm
+
 import sekitoba_library as lib
 import sekitoba_data_manage as dm
-
-import copy
-from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 dm.dl.file_set( "race_data.pickle" )
 dm.dl.file_set( "odds_data.pickle" )
 dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
+dm.dl.file_set( "true_skill_data.pickle" )
 
-name = "age"
+name = "up3_horce_true_skill"
 ONE = "one"
 THREE = "three"
 DATA = "recovery"
@@ -22,6 +23,7 @@ def main():
     odds_data = dm.dl.data_get( "odds_data.pickle" )
     race_info = dm.dl.data_get( "race_info_data.pickle" )
     horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
+    true_skill_data = dm.dl.data_get( "up3_true_skill_data.pickle" )
     
     for k in tqdm( race_data.keys() ):
         race_id = lib.id_get( k )
@@ -46,7 +48,7 @@ def main():
             three_odds = odds_data[race_id]["複勝"]
         except:
             continue
-
+        
         for kk in race_data[k].keys():
             horce_id = kk
             current_data, past_data = lib.race_check( horce_data[horce_id],
@@ -57,9 +59,11 @@ def main():
             if not cd.race_check():
                 continue
 
-            current_year = cd.year()
-            horce_birth_day = int( horce_id[0:4] )
-            score = current_year - horce_birth_day
+            try:
+                score = true_skill_data["horce"][race_id][horce_id]
+            except:
+                score = 25
+
             key = str( int( score ) )
             
             rank = cd.rank()
@@ -86,8 +90,8 @@ def main():
 
     lib.write_recovery_csv( result[ONE], name + ".csv" )
     lib.write_recovery_csv( result[THREE], THREE + "_" + name + ".csv" )
-    plus_best_select, minus_best_select = lib.recovery_best_select( result[ONE] )
-
+    lib.recovery_best_select( result[ONE] )
+ 
 if __name__ == "__main__":
     main()
         

@@ -71,6 +71,7 @@ def main():
             result[year][k]["recovery"] = round( result[year][k]["recovery"], 2 )
 
     lib.write_recovery_csv( result, name + ".csv" )
+    print( result[year].keys() )
     lib.recovery_best_select( result )
 
 if __name__ == "__main__":

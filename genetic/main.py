@@ -59,7 +59,8 @@ def genetic_score_create( learn_data, users_rank_data, users_odds_data, check_da
     best_score = -100
     best_recovery = -100
     best_score_key = ""
-
+    print( score_values )
+    
     for score in score_values:
         score_key = str( int( score ) )
         current_recovery_list = []        
@@ -100,26 +101,31 @@ def genetic_score_create( learn_data, users_rank_data, users_odds_data, check_da
     
     return best_score, best_score_key, best_recovery
 
-def plus_score_get( users_score_data ):
-    users_score_plus_data = {}
+def pm_score_get( users_score_data ):
+    users_score_pm_data = {}
     f = open( "plus_score.json", "r" )
     plus_score = json.load( f )
     f.close()
 
-    for race_id in users_score_data.keys():
-        users_score_plus_data[race_id] = {}
-        for horce_id in users_score_data[race_id].keys():
-            users_score_plus_data[race_id][horce_id] = {}
+    f = open( "minus_score.json", "r" )
+    minus_score = json.load( f )
+    f.close()
 
-            #print( len( users_score_data[race_id][horce_id] ), users_score_data[race_id][horce_id] )
+    for race_id in users_score_data.keys():
+        users_score_pm_data[race_id] = {}
+        for horce_id in users_score_data[race_id].keys():
+            users_score_pm_data[race_id][horce_id] = {}
+
             for score_key in users_score_data[race_id][horce_id].keys():
-                users_score_plus_data[race_id][horce_id][score_key] = 0
+                users_score_pm_data[race_id][horce_id][score_key] = 0
 
                 if users_score_data[race_id][horce_id][score_key] in plus_score[score_key]:
-                    users_score_plus_data[race_id][horce_id][score_key] = 1
+                    users_score_pm_data[race_id][horce_id][score_key] = 1
 
+                if users_score_data[race_id][horce_id][score_key] in minus_score[score_key]:
+                    users_score_pm_data[race_id][horce_id][score_key] = -1
 
-    return users_score_plus_data
+    return users_score_pm_data
 
 def main():
     N = 100
@@ -133,7 +139,7 @@ def main():
     learn_data = {}
     test_data = {}
 
-    users_score_plus_data = plus_score_get( users_data )
+    users_score_plus_data = pm_score_get( users_data )
     
     for race_id in users_score_plus_data.keys():
         year = race_id[0:4]
@@ -170,11 +176,15 @@ def main():
     print( ga.best_score )
     print( len( ga.best_population ) )
     print( ga.best_population )
-    f = open( "plus_ga_use.json", "w" )
+    f = open( "use_score_data.json", "w" )
     json.dump( ga.best_population, f, indent = 4 )
     f.close()
 
     print( genetic_score_create( learn_data, \
+                                users_rank_data, \
+                                users_odds_data, \
+                                ga.best_population ) )
+    print( genetic_score_create( test_data, \
                                 users_rank_data, \
                                 users_odds_data, \
                                 ga.best_population ) )

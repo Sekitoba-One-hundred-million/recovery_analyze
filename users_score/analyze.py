@@ -36,22 +36,15 @@ class UsersAnalyze:
         self.data = self.users_data[race_id][horce_id]
         
         for k in self.users_score_function.plus_score.keys():
-            if int( self.data[k] ) in self.users_score_function.plus_score[k]:
+            math_data = int( self.data[k] )
+            
+            if math_data in self.users_score_function.plus_score[k]:
                 self.users_score_data[race_id][horce_id][k] = 1
                 score += 1
 
-        return score
-
-    def get_three_score( self, race_id, horce_id ):
-        score = 0
-        lib.dic_append( self.users_score_data, race_id, {} )
-        lib.dic_append( self.users_score_data[race_id], horce_id, {} )
-        self.data = self.users_data[race_id][horce_id]
-
-        for k in self.users_score_function.function.keys():
-            s = self.users_score_function.function[k]( self.data[k] )
-            self.users_score_data[race_id][horce_id][k] = s
-            score += s
+            if math_data in self.users_score_function.minus_score[k]:
+                self.users_score_data[race_id][horce_id][k] = -1
+                score -= 1
 
         return score
 

@@ -136,6 +136,8 @@ class Name:
         self.true_skill_index_minus = "true_skill_index_minus"
         self.two_rate = "two_rate"
         self.two_rate_minus = "two_rate_minus"
+        self.up3_horce_true_skill = "up3_horce_true_skill"
+        self.up3_horce_true_skill_minus = "up3_horce_true_skill_minus"
         self.up3_standard_value = "up3_standard_value"
         self.up3_standard_value_minus = "up3_standard_value_minus"
         self.up_score = "up_score"
