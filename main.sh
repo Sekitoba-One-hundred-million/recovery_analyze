@@ -8,14 +8,25 @@ learn_dir="learn"
 genetic_dir="genetic"
 money_test_dir="money_test"
 
-echo "1: name update"
-echo "2: recovery_score update"
-echo "3: users_score update"
-echo "4: GA start"
-echo "5: money test start"
-
 tag=""
-read -p "Enter 1,2,3,4,5 > " tag
+
+if [ $# -eq 1 ]; then
+    tag=$1
+fi
+
+if [ !$tag = "1" ] && [ !$tag = "2" ] && [ !$tag = "3" ] && [ !$tag = "4" ]; then
+    tag=""
+fi
+
+if [ -z $tag ]; then
+    echo "1: name update"
+    echo "2: recovery_score update"
+    echo "3: users_score update"
+    echo "4: GA start"
+    echo "5: recovery and users start"
+
+    read -p "Enter 1,2,3,4,5 > " tag
+fi
 
 if [ !$tag = "1" ] && [ !$tag = "2" ] && [ !$tag = "3" ] && [ !$tag = "4" ] && [ !$tag = "5" ]; then
     echo "Wrong number"
@@ -58,7 +69,9 @@ if [ $tag = "4" ]; then
 fi
 
 if [ $tag = "5" ]; then
-    python $money_test_dir/main.py
+    cd /Users/kansei/ghq/github.com/Sekitoba-One-hundred-million/sekitoba_library; pip install .; cd /Users/kansei/ghq/github.com/Sekitoba-One-hundred-million/recovery_analyze
+    mpiexec -n 6 python $re_dir/main.py
+    python $us_dir/main.py
 fi
 
 rm -rf storage
