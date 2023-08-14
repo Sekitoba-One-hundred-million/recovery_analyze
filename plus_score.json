@@ -110,14 +110,7 @@
         6
     ],
     "horce_jockey_true_skill_index": [
-        1,
-        3,
-        5,
-        7,
-        9,
-        10,
-        13,
-        15
+        7
     ],
     "horce_num": [
         4,
@@ -284,6 +277,12 @@
         1,
         3,
         5
+    ],
+    "up3_horce_true_skill": [
+        29,
+        30,
+        33,
+        35
     ],
     "weather": [
         1,

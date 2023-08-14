@@ -36,6 +36,7 @@ dm.dl.file_set( "race_trainer_id_data.pickle" )
 dm.dl.file_set( "true_skill_data.pickle" )
 dm.dl.file_set( "race_cource_info.pickle" )
 dm.dl.file_set( "race_money_data.pickle" )
+dm.dl.file_set( "up3_true_skill_data.pickle" )
 
 class OnceData:
     def __init__( self ):
@@ -55,6 +56,7 @@ class OnceData:
         self.true_skill_data = dm.dl.data_get( "true_skill_data.pickle" )
         self.race_cource_info = dm.dl.data_get( "race_cource_info.pickle" )
         self.race_money_data = dm.dl.data_get( "race_money_data.pickle" )
+        self.up3_true_skill_data = dm.dl.data_get( "up3_true_skill_data.pickle" )
         
         self.ds = DataSet()
         self.race_high_level = RaceHighLevel()
@@ -172,7 +174,7 @@ class OnceData:
 
             try:
                 jockey_id = self.race_jockey_id_data[race_id][horce_id]
-                jockey_true_skill = self.true_skill_data["jockey"][race_id][jockey_id]
+                jockey_true_skill = int( self.true_skill_data["jockey"][race_id][jockey_id] )
             except:
                 jockey_true_skill = 25
 
@@ -223,28 +225,42 @@ class OnceData:
             up3_standard_value = max( min( ( up3 - p2 ) * 5, 15 ), -10 )
             popular_rank_score = before_cd.rank() - before_cd.popular()
             before_rank = before_cd.rank()
-                
+            horce_true_skill = 25
+            jockey_true_skill = 25
+            trainer_true_skill = 25
+            up3_horce_true_skill = 25
+
+            jockey_id = ""
+            trainer_id = ""
+
+            if race_id in self.race_jockey_id_data and \
+              horce_id in self.race_jockey_id_data[race_id]:
+                jockey_id = self.race_jockey_id_data[race_id][horce_id]
+
+            if race_id in self.race_trainer_id_data and \
+              horce_id in self.race_trainer_id_data[race_id]:
+                trainer_id = self.race_trainer_id_data[race_id][horce_id]
+            
+            if race_id in self.true_skill_data["horce"] and \
+              horce_id in self.true_skill_data["horce"][race_id]:
+                horce_true_skill = int( self.true_skill_data["horce"][race_id][horce_id] )
+
+            if race_id in self.true_skill_data["jockey"] and \
+              jockey_id in self.true_skill_data["jockey"][race_id]:
+                jockey_true_skill = int( self.true_skill_data["jockey"][race_id][jockey_id] )
+
+            if race_id in self.true_skill_data["trainer"] and \
+              trainer_id in self.true_skill_data["trainer"][race_id]:
+                trainer_true_skill = int( self.true_skill_data["trainer"][race_id][trainer_id] )
+
+            if race_id in self.up3_true_skill_data["horce"] and \
+              horce_id in self.up3_true_skill_data["horce"][race_id]:
+                up3_horce_true_skill = int( self.up3_true_skill_data["horce"][race_id][horce_id] )
+
             try:
                 omega_index_score = self.omega_index_data[race_id][horce_num-1]
             except:
                 omega_index_score = -1
-
-            try:
-                horce_true_skill = int( self.true_skill_data["horce"][race_id][horce_id] )
-            except:
-                horce_true_skill = 25
-
-            try:
-                jockey_id = self.race_jockey_id_data[race_id][horce_id]
-                jockey_true_skill = self.true_skill_data["jockey"][race_id][jockey_id]
-            except:
-                jockey_true_skill = 25
-
-            try:
-                trainer_id = self.race_trainer_id_data[race_id][horce_id]
-                trainer_true_skill = self.true_skill_data["trainer"][race_id][trainer_id]
-            except:
-                trainer_true_skill = 25
 
             try:
                 father_blood_type = self.horce_blood_type_data[race_id][key_horce_num]["father"]
@@ -364,5 +380,6 @@ class OnceData:
             self.ds.set_users_data( data_name.trainer_rank, trainer_rank_score )
             self.ds.set_users_data( data_name.trainer_true_skill, trainer_true_skill )
             self.ds.set_users_data( data_name.up3_standard_value, up3_standard_value )
+            self.ds.set_users_data( data_name.up3_horce_true_skill, up3_horce_true_skill )
             self.ds.set_users_data( data_name.weather, cd.weather() )
             self.ds.set_users_data( data_name.weight, weight_score )
