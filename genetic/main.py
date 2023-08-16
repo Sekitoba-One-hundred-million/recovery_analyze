@@ -59,7 +59,6 @@ def genetic_score_create( learn_data, users_rank_data, users_odds_data, check_da
     best_score = -100
     best_recovery = -100
     best_score_key = ""
-    print( score_values )
     
     for score in score_values:
         score_key = str( int( score ) )
