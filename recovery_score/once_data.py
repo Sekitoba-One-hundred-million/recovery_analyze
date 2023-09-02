@@ -26,7 +26,6 @@ dm.dl.file_set( "race_info_data.pickle" )
 dm.dl.file_set( "horce_data_storage.pickle" )
 dm.dl.file_set( "baba_index_data.pickle" )
 dm.dl.file_set( "parent_id_data.pickle" )
-dm.dl.file_set( "omega_index_data.pickle" )
 dm.dl.file_set( "race_day.pickle" )
 dm.dl.file_set( "parent_id_data.pickle" )
 dm.dl.file_set( "horce_sex_data.pickle" )
@@ -46,7 +45,6 @@ class OnceData:
         self.horce_data = dm.dl.data_get( "horce_data_storage.pickle" )
         self.baba_index_data = dm.dl.data_get( "baba_index_data.pickle" )
         self.parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
-        self.omega_index_data = dm.dl.data_get( "omega_index_data.pickle" )
         self.race_day = dm.dl.data_get( "race_day.pickle" )
         self.parent_id_data = dm.dl.data_get( "parent_id_data.pickle" )
         self.horce_sex_data = dm.dl.data_get( "horce_sex_data.pickle" )
@@ -258,11 +256,6 @@ class OnceData:
                 up3_horce_true_skill = int( self.up3_true_skill_data["horce"][race_id][horce_id] )
 
             try:
-                omega_index_score = self.omega_index_data[race_id][horce_num-1]
-            except:
-                omega_index_score = -1
-
-            try:
                 father_blood_type = self.horce_blood_type_data[race_id][key_horce_num]["father"]
             except:
                 father_blood_type = 0
@@ -291,7 +284,6 @@ class OnceData:
             speed_index_score = sort_speed_index.index( current_race_data[data_name.speed_index][count] )
             race_interval_score = min( max( pd.race_interval(), 0 ), 20 )
             weight_score = int( cd.weight() / 10 )
-            omega_index_score = int( omega_index_score / 5 )
             trainer_rank_score = self.trainer_data.rank( race_id, horce_id )
             jockey_rank_score = self.jockey_data.rank( race_id, horce_id )
             limb_horce_number = int( limb_math * 100 + int( cd.horce_number() / 2 ) )
@@ -364,7 +356,6 @@ class OnceData:
             self.ds.set_users_data( data_name.money, money_score )
             self.ds.set_users_data( data_name.mother_rank, mother_score )
             self.ds.set_users_data( data_name.my_limb_count, my_limb_count_score )
-            self.ds.set_users_data( data_name.omega, omega_index_score )
             self.ds.set_users_data( data_name.place, cd.place() )
             self.ds.set_users_data( data_name.popular_rank, popular_rank_score )
             self.ds.set_users_data( data_name.race_deployment, deployment_score )
