@@ -46,6 +46,8 @@ foot_used
 foot_used_minus
 foot_used_count
 foot_used_count_minus
+high_level_score
+high_level_score_minus
 horce_age
 horce_age_minus
 horce_jockey_true_skill_index
@@ -76,8 +78,8 @@ limb_horce_number
 limb_horce_number_minus
 match_rank
 match_rank_minus
-money
-money_minus
+money_score
+money_score_minus
 mother_rank
 mother_rank_minus
 my_deployment_count
@@ -104,10 +106,6 @@ race_dist_kind
 race_dist_kind_minus
 race_interval
 race_interval_minus
-race_level_check
-race_level_check_minus
-race_money
-race_money_minus
 race_num
 race_num_minus
 rank_score_odds

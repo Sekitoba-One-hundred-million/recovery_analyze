@@ -20,8 +20,8 @@ mother_rank
 my_limb_count
 place
 race_num
-race_money
-race_level_check
+money
+high_level_score
 speed_index
 straight_flame
 straight_slope
