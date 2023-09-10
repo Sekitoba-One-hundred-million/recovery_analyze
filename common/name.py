@@ -80,6 +80,8 @@ class Name:
         self.limb_horce_number_minus = "limb_horce_number_minus"
         self.match_rank = "match_rank"
         self.match_rank_minus = "match_rank_minus"
+        self.money = "money"
+        self.money_minus = "money_minus"
         self.money_score = "money_score"
         self.money_score_minus = "money_score_minus"
         self.mother_rank = "mother_rank"

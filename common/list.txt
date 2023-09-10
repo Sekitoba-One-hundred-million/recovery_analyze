@@ -78,6 +78,8 @@ limb_horce_number
 limb_horce_number_minus
 match_rank
 match_rank_minus
+money
+money_minus
 money_score
 money_score_minus
 mother_rank
