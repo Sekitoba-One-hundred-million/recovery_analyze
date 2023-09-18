@@ -141,7 +141,7 @@ class OnceData:
         count = 0
         race_limb = {}
         current_race_data = {}
-        current_race_data[data_name.speed_index] = []
+        current_race_data[data_name.speed_index_index] = []
         current_race_data[data_name.horce_jockey_true_skill_index] = []
         current_race_data[data_name.my_limb_count] = {}
         
@@ -163,7 +163,7 @@ class OnceData:
             
             current_time_index = self.time_index.main( kk, pd.past_day_list() )
             speed, up_speed, pace_speed = pd.speed_index( self.baba_index_data[horce_id] )
-            current_race_data[data_name.speed_index].append( lib.max_check( speed ) + current_time_index["max"] )
+            current_race_data[data_name.speed_index_index].append( lib.max_check( speed ) + current_time_index["max"] )
 
             try:
                 horce_true_skill = int( self.true_skill_data["horce"][race_id][horce_id] )
@@ -179,7 +179,7 @@ class OnceData:
             current_race_data[data_name.horce_jockey_true_skill_index].append( horce_true_skill + jockey_true_skill )
 
 
-        sort_speed_index = sorted( current_race_data[data_name.speed_index], reverse = True )
+        sort_speed_index = sorted( current_race_data[data_name.speed_index_index], reverse = True )
 
         for kk in self.race_data[k].keys():
             horce_id = kk
@@ -281,7 +281,7 @@ class OnceData:
             key_limb = str( int( limb_math ) )
             my_limb_count_score = current_race_data[data_name.my_limb_count][key_limb]
             age = current_year - horce_birth_day
-            speed_index_score = sort_speed_index.index( current_race_data[data_name.speed_index][count] )
+            speed_index_score = sort_speed_index.index( current_race_data[data_name.speed_index_index][count] )
             race_interval_score = min( max( pd.race_interval(), 0 ), 20 )
             weight_score = int( cd.weight() / 10 )
             trainer_rank_score = self.trainer_data.rank( race_id, horce_id )
