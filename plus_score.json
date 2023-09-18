@@ -205,7 +205,7 @@
         11,
         12
     ],
-    "money": [
+    "money_class": [
         2,
         3,
         4
@@ -223,7 +223,7 @@
         6,
         8
     ],
-    "speed_index": [
+    "speed_index_index": [
         1,
         2,
         4,

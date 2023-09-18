@@ -78,8 +78,8 @@ limb_horce_number
 limb_horce_number_minus
 match_rank
 match_rank_minus
-money
-money_minus
+money_class
+money_class_minus
 money_score
 money_score_minus
 mother_rank
@@ -112,8 +112,8 @@ race_num
 race_num_minus
 rank_score_odds
 rank_score_odds_minus
-speed_index
-speed_index_minus
+speed_index_index
+speed_index_index_minus
 straight_flame
 straight_flame_minus
 straight_slope
