@@ -138,15 +138,14 @@ class OnceData:
         except:
             straight_dist = -1
 
-        count = 0
         race_limb = {}
         current_race_data = {}
         current_race_data[data_name.speed_index_index] = []
         current_race_data[data_name.horce_jockey_true_skill_index] = []
         current_race_data[data_name.my_limb_count] = {}
+        horce_id_list = []
         
-        for kk in self.race_data[k].keys():
-            horce_id = kk
+        for horce_id in self.race_data[k].keys():
             current_data, past_data = lib.race_check( self.horce_data[horce_id],
                                                      year, day, num, race_place_num )#今回と過去のデータに分ける
             cd = lib.current_data( current_data )
@@ -159,11 +158,10 @@ class OnceData:
             key_limb = str( int( limb_math ) )
             lib.dic_append( current_race_data[data_name.my_limb_count], key_limb, 0 )
             current_race_data[data_name.my_limb_count][key_limb] += 1
-            race_limb[kk] = limb_math
+            race_limb[horce_id] = limb_math
             
-            current_time_index = self.time_index.main( kk, pd.past_day_list() )
+            current_time_index = self.time_index.main( horce_id, pd.past_day_list() )
             speed, up_speed, pace_speed = pd.speed_index( self.baba_index_data[horce_id] )
-            current_race_data[data_name.speed_index_index].append( lib.max_check( speed ) + current_time_index["max"] )
 
             try:
                 horce_true_skill = int( self.true_skill_data["horce"][race_id][horce_id] )
@@ -177,12 +175,12 @@ class OnceData:
                 jockey_true_skill = 25
 
             current_race_data[data_name.horce_jockey_true_skill_index].append( horce_true_skill + jockey_true_skill )
-
+            current_race_data[data_name.speed_index_index].append( lib.max_check( speed ) + current_time_index["max"] )
+            horce_id_list.append( horce_id )
 
         sort_speed_index = sorted( current_race_data[data_name.speed_index_index], reverse = True )
 
-        for kk in self.race_data[k].keys():
-            horce_id = kk
+        for count, horce_id in enumerate( horce_id_list ):
             current_data, past_data = lib.race_check( self.horce_data[horce_id],
                                                      year, day, num, race_place_num )#今回と過去のデータに分ける
             cd = lib.current_data( current_data )
@@ -277,7 +275,7 @@ class OnceData:
             stright_slope_score = self.race_type.stright_slope( cd, pd )
             foot_used_score = self.race_type.foot_used_score_get( cd, pd )
             high_level_score = self.race_high_level.data_get( cd, pd, ymd )
-            limb_math = race_limb[kk]#lib.limb_search( pd )
+            limb_math = race_limb[horce_id]#lib.limb_search( pd )
             key_limb = str( int( limb_math ) )
             my_limb_count_score = current_race_data[data_name.my_limb_count][key_limb]
             age = current_year - horce_birth_day
@@ -315,7 +313,6 @@ class OnceData:
             except:
                 race_money = -1
 
-            count += 1
             odds = cd.odds() if cd.rank() == 1 else 0
             
             self.ds.set_yo( year, odds )
@@ -363,6 +360,10 @@ class OnceData:
             self.ds.set_users_data( data_name.money_class, race_money )
             self.ds.set_users_data( data_name.race_interval, race_interval_score )
             self.ds.set_users_data( data_name.high_level_score, high_level_score )
+
+            if race_id == "202304030308":
+                print( horce_id, cd.horce_number(), sort_speed_index, current_race_data[data_name.speed_index_index][count] )
+            
             self.ds.set_users_data( data_name.speed_index_index, speed_index_score )
             self.ds.set_users_data( data_name.straight_flame, straight_flame_score )
             self.ds.set_users_data( data_name.straight_slope, stright_slope_score )
