@@ -32,10 +32,11 @@ dm.dl.file_set( "horce_sex_data.pickle" )
 dm.dl.file_set( "horce_blood_type_data.pickle" )
 dm.dl.file_set( "race_jockey_id_data.pickle" )
 dm.dl.file_set( "race_trainer_id_data.pickle" )
-dm.dl.file_set( "true_skill_data.pickle" )
 dm.dl.file_set( "race_cource_info.pickle" )
 dm.dl.file_set( "race_money_data.pickle" )
+dm.dl.file_set( "true_skill_data.pickle" )
 dm.dl.file_set( "up3_true_skill_data.pickle" )
+dm.dl.file_set( "first_passing_true_skill_data.pickle" )
 
 class OnceData:
     def __init__( self ):
@@ -51,10 +52,11 @@ class OnceData:
         self.horce_blood_type_data = dm.dl.data_get( "horce_blood_type_data.pickle" )
         self.race_jockey_id_data = dm.dl.data_get( "race_jockey_id_data.pickle" )
         self.race_trainer_id_data = dm.dl.data_get( "race_trainer_id_data.pickle" )
-        self.true_skill_data = dm.dl.data_get( "true_skill_data.pickle" )
         self.race_cource_info = dm.dl.data_get( "race_cource_info.pickle" )
         self.race_money_data = dm.dl.data_get( "race_money_data.pickle" )
+        self.true_skill_data = dm.dl.data_get( "true_skill_data.pickle" )
         self.up3_true_skill_data = dm.dl.data_get( "up3_true_skill_data.pickle" )
+        self.first_passing_true_skill_data = dm.dl.data_get( "first_passing_true_skill_data.pickle" )
         
         self.ds = DataSet()
         self.race_high_level = RaceHighLevel()
@@ -138,11 +140,27 @@ class OnceData:
         except:
             straight_dist = -1
 
+        key_race_money_class = str( int( lib.money_class_get( self.race_money_data[race_id] ) ) )
         race_limb = {}
         current_race_data = {}
-        current_race_data[data_name.speed_index_index] = []
-        current_race_data[data_name.horce_jockey_true_skill_index] = []
         current_race_data[data_name.my_limb_count] = {}
+        current_race_data[data_name.horce_true_skill] = []
+        current_race_data[data_name.jockey_true_skill] = []
+        current_race_data[data_name.trainer_true_skill] = []
+        current_race_data[data_name.horce_first_passing_true_skill] = []
+        current_race_data[data_name.jockey_first_passing_true_skill] = []
+        current_race_data[data_name.trainer_first_passing_true_skill] = []
+        current_race_data[data_name.up3_horce_true_skill] = []
+        current_race_data[data_name.up3_jockey_true_skill] = []
+        current_race_data[data_name.up3_trainer_true_skill] = []
+        current_race_data[data_name.max_time_point] = []
+        current_race_data[data_name.up_rate] = []
+        current_race_data[data_name.one_rate] = []
+        current_race_data[data_name.two_rate] = []
+        current_race_data[data_name.three_rate] = []
+        current_race_data[data_name.speed_index] = []
+        current_race_data[data_name.time_index] = []
+        current_race_data[data_name.level_score] = []
         horce_id_list = []
         
         for horce_id in self.race_data[k].keys():
@@ -163,22 +181,88 @@ class OnceData:
             current_time_index = self.time_index.main( horce_id, pd.past_day_list() )
             speed, up_speed, pace_speed = pd.speed_index( self.baba_index_data[horce_id] )
 
-            try:
-                horce_true_skill = int( self.true_skill_data["horce"][race_id][horce_id] )
-            except:
-                horce_true_skill = 25
+            horce_true_skill = -1000
+            jockey_true_skill = -1000
+            trainer_true_skill = -1000
+            horce_first_true_skill = -1000
+            jockey_first_true_skill = -1000
+            trainer_first_true_skill = -1000
+            up3_horce_true_skill = -1000
+            up3_jockey_true_skill = -1000
+            up3_trainer_true_skill = -1000
 
-            try:
+            jockey_id = ""
+            trainer_id = ""
+
+            if race_id in self.race_jockey_id_data and \
+              horce_id in self.race_jockey_id_data[race_id]:
                 jockey_id = self.race_jockey_id_data[race_id][horce_id]
-                jockey_true_skill = int( self.true_skill_data["jockey"][race_id][jockey_id] )
-            except:
-                jockey_true_skill = 25
 
-            current_race_data[data_name.horce_jockey_true_skill_index].append( horce_true_skill + jockey_true_skill )
-            current_race_data[data_name.speed_index_index].append( lib.max_check( speed ) + current_time_index["max"] )
+            if race_id in self.race_trainer_id_data and \
+              horce_id in self.race_trainer_id_data[race_id]:
+                trainer_id = self.race_trainer_id_data[race_id][horce_id]
+            
+            if race_id in self.true_skill_data["horce"] and \
+              horce_id in self.true_skill_data["horce"][race_id]:
+                horce_true_skill = int( self.true_skill_data["horce"][race_id][horce_id] )
+
+            if race_id in self.true_skill_data["jockey"] and \
+              jockey_id in self.true_skill_data["jockey"][race_id]:
+                jockey_true_skill = int( self.true_skill_data["jockey"][race_id][jockey_id] )
+
+            if race_id in self.true_skill_data["trainer"] and \
+              trainer_id in self.true_skill_data["trainer"][race_id]:
+                trainer_true_skill = int( self.true_skill_data["trainer"][race_id][trainer_id] )
+
+            if race_id in self.up3_true_skill_data["horce"] and \
+              horce_id in self.up3_true_skill_data["horce"][race_id]:
+                up3_horce_true_skill = int( self.up3_true_skill_data["horce"][race_id][horce_id] )
+
+            if race_id in self.up3_true_skill_data["jockey"] and \
+              jockey_id in self.up3_true_skill_data["jockey"][race_id]:
+                up3_jockey_true_skill = int( self.up3_true_skill_data["jockey"][race_id][jockey_id] )
+                
+            if race_id in self.up3_true_skill_data["trainer"] and \
+              trainer_id in self.up3_true_skill_data["trainer"][race_id]:
+                up3_trainer_true_skill = int( self.up3_true_skill_data["trainer"][race_id][trainer_id] )
+
+            if race_id in self.first_passing_true_skill_data["horce"] and \
+              horce_id in self.first_passing_true_skill_data["horce"][race_id]:
+                horce_first_true_skill = int( self.first_passing_true_skill_data["horce"][race_id][horce_id] )
+
+            if race_id in self.first_passing_true_skill_data["jockey"] and \
+              jockey_id in self.first_passing_true_skill_data["jockey"][race_id]:
+                jockey_first_true_skill = int( self.first_passing_true_skill_data["jockey"][race_id][jockey_id] )
+
+            if race_id in self.first_passing_true_skill_data["trainer"] and \
+              trainer_id in self.first_passing_true_skill_data["trainer"][race_id]:
+                trainer_first_true_skill = int( self.first_passing_true_skill_data["trainer"][race_id][trainer_id] )
+
+            current_race_data[data_name.horce_true_skill].append( horce_true_skill )
+            current_race_data[data_name.jockey_true_skill].append( jockey_true_skill )
+            current_race_data[data_name.trainer_true_skill].append( trainer_true_skill )
+            current_race_data[data_name.horce_first_passing_true_skill].append( horce_first_true_skill )
+            current_race_data[data_name.jockey_first_passing_true_skill].append( jockey_first_true_skill )
+            current_race_data[data_name.trainer_first_passing_true_skill].append( trainer_first_true_skill )
+            current_race_data[data_name.up3_horce_true_skill].append( up3_horce_true_skill )
+            current_race_data[data_name.up3_jockey_true_skill].append( up3_jockey_true_skill )
+            current_race_data[data_name.up3_trainer_true_skill].append( up3_trainer_true_skill )
+            current_race_data[data_name.max_time_point].append( pd.max_time_point() )
+            current_race_data[data_name.up_rate].append( pd.up_rate( key_race_money_class ) )
+            current_race_data[data_name.speed_index].append( lib.max_check( speed ) )
+            current_race_data[data_name.time_index].append( current_time_index["max"] )
+            current_race_data[data_name.one_rate].append( pd.one_rate() )
+            current_race_data[data_name.two_rate].append( pd.two_rate() )
+            current_race_data[data_name.three_rate].append( pd.three_rate() )
+            current_race_data[data_name.level_score].append( pd.level_score() )
             horce_id_list.append( horce_id )
 
-        sort_speed_index = sorted( current_race_data[data_name.speed_index_index], reverse = True )
+        data_key_list = list( current_race_data.keys() )
+        for data_key in data_key_list:
+            if not type( current_race_data[data_key] ) is list:
+                continue
+
+            current_race_data[data_key+"_devi"] = lib.deviation_value( current_race_data[data_key] )
 
         for count, horce_id in enumerate( horce_id_list ):
             current_data, past_data = lib.race_check( self.horce_data[horce_id],
@@ -209,12 +293,12 @@ class OnceData:
             try:
                 before_last_passing_rank = int( before_passing_list[-1] )
             except:
-                before_last_passing_rank = 0
+                before_last_passing_rank = -1000
 
             try:
                 before_first_passing_rank = int( before_passing_list[0] )
             except:
-                before_first_passing_rank = 0
+                before_first_passing_rank = -1000
 
             p1, p2 = before_cd.pace()
             up3 = before_cd.up_time()
@@ -237,22 +321,6 @@ class OnceData:
               horce_id in self.race_trainer_id_data[race_id]:
                 trainer_id = self.race_trainer_id_data[race_id][horce_id]
             
-            if race_id in self.true_skill_data["horce"] and \
-              horce_id in self.true_skill_data["horce"][race_id]:
-                horce_true_skill = int( self.true_skill_data["horce"][race_id][horce_id] )
-
-            if race_id in self.true_skill_data["jockey"] and \
-              jockey_id in self.true_skill_data["jockey"][race_id]:
-                jockey_true_skill = int( self.true_skill_data["jockey"][race_id][jockey_id] )
-
-            if race_id in self.true_skill_data["trainer"] and \
-              trainer_id in self.true_skill_data["trainer"][race_id]:
-                trainer_true_skill = int( self.true_skill_data["trainer"][race_id][trainer_id] )
-
-            if race_id in self.up3_true_skill_data["horce"] and \
-              horce_id in self.up3_true_skill_data["horce"][race_id]:
-                up3_horce_true_skill = int( self.up3_true_skill_data["horce"][race_id][horce_id] )
-
             try:
                 father_blood_type = self.horce_blood_type_data[race_id][key_horce_num]["father"]
             except:
@@ -279,7 +347,6 @@ class OnceData:
             key_limb = str( int( limb_math ) )
             my_limb_count_score = current_race_data[data_name.my_limb_count][key_limb]
             age = current_year - horce_birth_day
-            speed_index_score = sort_speed_index.index( current_race_data[data_name.speed_index_index][count] )
             race_interval_score = min( max( pd.race_interval(), 0 ), 20 )
             weight_score = int( cd.weight() / 10 )
             trainer_rank_score = self.trainer_data.rank( race_id, horce_id )
@@ -303,8 +370,6 @@ class OnceData:
             train_score = self.train_index.score_get( race_id, horce_num )
             deployment_score = self.race_type.deploypent( pd )
             father_blood_type_score = int( cd.dist_kind() * 10 + father_blood_type )
-            horce_jockey_true_skill_index = current_race_data[data_name.horce_jockey_true_skill_index].index( horce_true_skill + jockey_true_skill )
-            foot_used_count = -1
             diff_load_weight = int( cd.burden_weight() - before_cd.burden_weight() )
             race_num = cd.race_num()
 
@@ -338,15 +403,11 @@ class OnceData:
             self.ds.set_users_data( data_name.dist_kind_count, dist_kind_count )
             self.ds.set_users_data( data_name.father_blood_type, father_blood_type_score )
             self.ds.set_users_data( data_name.foot_used, foot_used_score )
-            self.ds.set_users_data( data_name.horce_jockey_true_skill_index, horce_jockey_true_skill_index )
             self.ds.set_users_data( data_name.horce_num, horce_num )
-            self.ds.set_users_data( data_name.horce_true_skill, horce_true_skill )
             self.ds.set_users_data( data_name.horce_sex, horce_sex )
             self.ds.set_users_data( data_name.horce_sex_month, horce_sex_month )
-            self.ds.set_users_data( data_name.jockey_true_skill, jockey_true_skill )
             self.ds.set_users_data( data_name.jockey_rank, jockey_rank_score )
             self.ds.set_users_data( data_name.jockey_year_rank, jockey_year_rank_score )
-            self.ds.set_users_data( data_name.level_score, pd.level_score() * 10 )
             self.ds.set_users_data( data_name.limb, limb_math )
             self.ds.set_users_data( data_name.limb_horce_number, limb_horce_number )
             self.ds.set_users_data( data_name.match_rank, macth_rank_score )
@@ -360,18 +421,39 @@ class OnceData:
             self.ds.set_users_data( data_name.money_class, race_money )
             self.ds.set_users_data( data_name.race_interval, race_interval_score )
             self.ds.set_users_data( data_name.high_level_score, high_level_score )
-
-            if race_id == "202304030308":
-                print( horce_id, cd.horce_number(), sort_speed_index, current_race_data[data_name.speed_index_index][count] )
-            
-            self.ds.set_users_data( data_name.speed_index_index, speed_index_score )
             self.ds.set_users_data( data_name.straight_flame, straight_flame_score )
             self.ds.set_users_data( data_name.straight_slope, stright_slope_score )
             self.ds.set_users_data( data_name.three_average, pd.three_average() )
             self.ds.set_users_data( data_name.train_score, train_score )
             self.ds.set_users_data( data_name.trainer_rank, trainer_rank_score )
-            self.ds.set_users_data( data_name.trainer_true_skill, trainer_true_skill )
             self.ds.set_users_data( data_name.up3_standard_value, up3_standard_value )
-            self.ds.set_users_data( data_name.up3_horce_true_skill, up3_horce_true_skill )
             self.ds.set_users_data( data_name.weather, cd.weather() )
             self.ds.set_users_data( data_name.weight, weight_score )
+            self.ds.set_users_data( data_name.horce_true_skill, current_race_data[data_name.horce_true_skill][count] )
+            self.ds.set_users_data( data_name.jockey_true_skill, current_race_data[data_name.jockey_true_skill][count] )
+            self.ds.set_users_data( data_name.trainer_true_skill, current_race_data[data_name.trainer_true_skill][count] )
+            self.ds.set_users_data( data_name.horce_first_passing_true_skill, current_race_data[data_name.horce_first_passing_true_skill][count] )
+            self.ds.set_users_data( data_name.jockey_true_skill, current_race_data[data_name.jockey_first_passing_true_skill][count] )
+            self.ds.set_users_data( data_name.trainer_true_skill, current_race_data[data_name.trainer_first_passing_true_skill][count] )
+            self.ds.set_users_data( data_name.up3_horce_true_skill, current_race_data[data_name.up3_horce_true_skill][count] )
+            self.ds.set_users_data( data_name.up3_jockey_true_skill, current_race_data[data_name.up3_jockey_true_skill][count] )
+            self.ds.set_users_data( data_name.up3_trainer_true_skill, current_race_data[data_name.up3_trainer_true_skill][count] )
+            self.ds.set_users_data( data_name.max_time_point, current_race_data[data_name.max_time_point][count] )
+            self.ds.set_users_data( data_name.level_score, current_race_data[data_name.level_score][count] * 10 )
+            self.ds.set_users_data( data_name.horce_true_skill_devi, current_race_data[data_name.horce_true_skill_devi][count] )
+            self.ds.set_users_data( data_name.jockey_true_skill_devi, current_race_data[data_name.jockey_true_skill_devi][count] )
+            self.ds.set_users_data( data_name.trainer_true_skill_devi, current_race_data[data_name.trainer_true_skill_devi][count] )
+            self.ds.set_users_data( data_name.horce_first_passing_true_skill_devi, current_race_data[data_name.horce_first_passing_true_skill_devi][count] )
+            self.ds.set_users_data( data_name.jockey_true_skill_devi, current_race_data[data_name.jockey_first_passing_true_skill_devi][count] )
+            self.ds.set_users_data( data_name.trainer_true_skill_devi, current_race_data[data_name.trainer_first_passing_true_skill_devi][count] )
+            self.ds.set_users_data( data_name.up3_horce_true_skill_devi, current_race_data[data_name.up3_horce_true_skill_devi][count] )
+            self.ds.set_users_data( data_name.up3_jockey_true_skill_devi, current_race_data[data_name.up3_jockey_true_skill_devi][count] )
+            self.ds.set_users_data( data_name.up3_trainer_true_skill_devi, current_race_data[data_name.up3_trainer_true_skill_devi][count] )
+            self.ds.set_users_data( data_name.speed_index_devi, current_race_data[data_name.speed_index_devi][count] )
+            self.ds.set_users_data( data_name.time_index_devi, current_race_data[data_name.time_index_devi][count] )
+            self.ds.set_users_data( data_name.one_rate_devi, current_race_data[data_name.one_rate_devi][count] )
+            self.ds.set_users_data( data_name.two_rate_devi, current_race_data[data_name.two_rate_devi][count] )
+            self.ds.set_users_data( data_name.three_rate_devi, current_race_data[data_name.three_rate_devi][count] )
+            self.ds.set_users_data( data_name.max_time_point_devi, current_race_data[data_name.max_time_point_devi][count] )
+            self.ds.set_users_data( data_name.up_rate_devi, current_race_data[data_name.up_rate_devi][count] )
+            self.ds.set_users_data( data_name.level_score_devi, current_race_data[data_name.level_score_devi][count] )

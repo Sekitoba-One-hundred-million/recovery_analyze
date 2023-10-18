@@ -81,5 +81,49 @@ def main():
         comm.send( dir_name + file_name, dest = 0, tag = 2 )
         return
 
+def test():
+    comm = MPI.COMM_WORLD   #COMM_WORLDは全体
+    size = comm.Get_size()  #サイズ（指定されたプロセス（全体）数）
+    rank = comm.Get_rank()  #ランク（何番目のプロセスか。プロセスID）
+    name = MPI.Get_processor_name() #プロセスが動いているノードのホスト名
+
+    if rank == 0:
+        plus_score_data = {}
+        minus_score_data = {}
+
+        for i in range( 1, size ):
+            plus_instance = comm.recv( source = i, tag = 0 )
+            minus_instance = comm.recv( source = i, tag = 1 )
+            plus_score_data.update( plus_instance )
+            minus_score_data.update( minus_instance )
+            print( i )
+
+        score_create = ScoreCreate( None )
+        score_create.plus_score = plus_score_data
+        score_create.minus_score = minus_score_data
+        score_create.json_create()
+    else:
+        ds = DataSet()
+        ds.odds_data = dm.pickle_load( "users_odds_data.pickle" )
+        ds.rank_data = dm.pickle_load( "users_rank_data.pickle" )
+        ds.users_data = dm.pickle_load( "users_data.pickle" )
+
+        race_id = list( ds.users_data.keys() )[0]
+        horce_id = list( ds.users_data[race_id].keys() )[0]
+        score_key_list = list( ds.users_data[race_id][horce_id].keys() )
+        score_create = ScoreCreate( ds )
+        #print( score_key_list[-1] )
+        #score_create.create( score_key_list[-1] )
+    
+        for i, score_key in enumerate( score_key_list ):
+            if i % int( size - 1 ) == int( rank - 1 ):
+                print( rank, len( score_key_list ) - i, score_key )
+                score_create.create( score_key )
+                break
+
+        comm.send( score_create.plus_score, dest = 0, tag = 0 )
+        comm.send( score_create.minus_score, dest = 0, tag = 1 )
+    
 if __name__ == "__main__":
-    main()
+    #main()
+    test()
