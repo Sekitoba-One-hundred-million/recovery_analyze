@@ -24,8 +24,8 @@ class UsersScoreFunction:
         f.close()
 
         for k in plus_ga_use.keys():
-            if not plus_ga_use[k]:
-                continue
+            #if not plus_ga_use[k]:
+            #    continue
 
             self.plus_score[k] = plus_score_instance[k]
             self.minus_score[k] = minus_score_instance[k]

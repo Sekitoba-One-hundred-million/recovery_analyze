@@ -32,8 +32,10 @@ class ScoreCreate:
     
             return int( l - len( str_data ) ) * '0' + str_data
 
-        best_select = []
-        best_score = -100
+        best_plus_select = []
+        best_minus_select = []
+        best_plus_score = -100
+        best_minus_score = 100
         best_recovery = 0
 
         if users_score_list == None:
@@ -74,11 +76,11 @@ class ScoreCreate:
             if len( use_users_score_data ) == 0:
                 continue
 
-            search_length = 10
-            score_list = []
+            search_length = 15
+            recovery_list = []
+            bet_count_list = []
             
             for _ in range( 5 ):
-                recovery_list = []
                 random_race_id_list = random.sample( race_id_list, len( race_id_list ) )
                 recovery = 0
                 bet_count = 0
@@ -91,6 +93,7 @@ class ScoreCreate:
                     if count == length:
                         if not bet_count == 0:
                             recovery_list.append( recovery / bet_count )
+                            #print( recovery / bet_count, bet_count )
                             
                         count = 0
                         bet_count = 0
@@ -107,57 +110,59 @@ class ScoreCreate:
                 if bet_count > 20:
                     recovery_list.append( recovery / bet_count )
 
-                recovery_list = sorted( recovery_list )
-                ave_recovery = sum( recovery_list ) / len( recovery_list )
-                median_recovery = recovery_list[int(len(recovery_list)/2)]
-                conv = 0
-                median_conv = 0
-                min_recovery = 10
-                max_recovery = -10
+            recovery_list = sorted( recovery_list )
+            ave_recovery = sum( recovery_list ) / len( recovery_list )
+            median_recovery = recovery_list[int(len(recovery_list)/2)]
+            conv = 0
+            median_conv = 0
+            recovery_list.pop()
+            recovery_list.pop(-1)
 
-                for recovery in recovery_list:
-                    conv += math.pow( recovery - ave_recovery, 2 )
+            for recovery in recovery_list:
+                conv += math.pow( recovery - ave_recovery, 2 )
+
+                if recovery < median_recovery:
                     median_conv += math.pow( recovery - median_recovery, 2 )
-                    min_recovery = min( min_recovery, recovery )
-                    max_recovery = max( max_recovery, recovery )
 
-                conv = math.sqrt( conv / len( recovery_list ) )
-                recovery_score = ( ( median_recovery + ave_recovery ) / 2 )# - ( 1 - min_recovery ) - ( 1 - max_recovery )
-                conv_score = ( conv + median_conv ) / 2
-                #print( recovery_score, conv_score, use_users_score_data )
+            conv = math.sqrt( conv / len( recovery_list ) )
+            recovery_score = median_recovery + ( ave_recovery / 3 )
 
-                if recovery_score - conv_score < 0.65:
-                    score_list = []
-                    break
-                
-                score_list.append( recovery_score - conv_score )
-
-            if len( score_list ) == 0:
-                continue
-
-            score = ( sum( score_list ) / len( score_list ) ) + score_list[int(len(score_list)/2)]
+            if recovery_score < 0.75:
+                recovery_score -= 1
             
-            if best_score < score:
-                best_score = score
-                best_select = copy.deepcopy( use_users_score_data )
+            conv_score = ( median_conv ) / 5
+            score = recovery_score - conv_score
+            
+            if best_plus_score < score:
+                best_plus_score = score
+                best_plus_select = copy.deepcopy( use_users_score_data )
+                best_recovery = median_recovery
 
-        return best_select, users_score_list
+            if best_minus_score > score:
+                best_minus_score = score
+                best_minus_select = copy.deepcopy( use_users_score_data )
+
+            #print( i, best_plus_select, best_minus_select, best_recovery )
+
+        #print( best_plus_select, best_minus_select )
+        return best_plus_select, best_minus_select
 
     def recovery_best_select( self, data ):
-        plus_best_select, users_score_list = self.plus_recovery_select( data )
+        return self.plus_recovery_select( data )
+        #plus_best_select, users_score_list = self.plus_recovery_select( data )
         #print( plus_best_select )
 
-        for plus_score in plus_best_select:
-            users_score_list.remove( plus_score )
+        #for plus_score in plus_best_select:
+        #    users_score_list.remove( plus_score )
         
-        middle_best_select, users_score_list = self.plus_recovery_select( data, users_score_list = users_score_list )
+        #middle_best_select, users_score_list = self.plus_recovery_select( data, users_score_list = users_score_list )
         #print( middle_best_select )
 
-        for middle_score in middle_best_select:
-            users_score_list.remove( middle_score )
+        #for middle_score in middle_best_select:
+        #    users_score_list.remove( middle_score )
 
         #print( users_score_list )
-        return plus_best_select, users_score_list
+        #return plus_best_select, users_score_list
 
     def create( self, key ):
         check_data = {}

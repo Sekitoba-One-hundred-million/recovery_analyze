@@ -48,19 +48,19 @@ def main():
 
         ds.set_all_data( users_data, rank_data, odds_data )
         recovery_check.main( ds )
-        
-        race_id = list( ds.users_data.keys() )[0]
-        horce_id = list( ds.users_data[race_id].keys() )[0]
-        score_key_list = list( ds.users_data[race_id][horce_id].keys() )
-        l = len( score_key_list )
-        score_create = ScoreCreate( ds )
-
-        for i, score_key in enumerate( score_key_list ):
-            print( l - i, score_key )
-            score_create.create( score_key )
-
-        score_create.json_create()
         ds.data_upload()
+        
+        #race_id = list( ds.users_data.keys() )[0]
+        #horce_id = list( ds.users_data[race_id].keys() )[0]
+        #score_key_list = list( ds.users_data[race_id][horce_id].keys() )
+        #l = len( score_key_list )
+        #score_create = ScoreCreate( ds )
+
+        #for i, score_key in enumerate( score_key_list ):
+        #    print( l - i, score_key )
+        #    score_create.create( score_key )
+
+        #score_create.json_create()
     else:
         ok = comm.recv( source = 0, tag = 1 )        
         od = OnceData()
@@ -113,7 +113,7 @@ def test():
         score_key_list = list( ds.users_data[race_id][horce_id].keys() )
         score_create = ScoreCreate( ds )
         #print( score_key_list[-1] )
-        #score_create.create( score_key_list[-1] )
+        score_create.create( score_key_list[-1] )
     
         for i, score_key in enumerate( score_key_list ):
             if i % int( size - 1 ) == int( rank - 1 ):

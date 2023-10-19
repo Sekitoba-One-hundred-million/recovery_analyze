@@ -1,4 +1,5 @@
 from tqdm import tqdm
+import copy
 import numpy as np
 
 import sekitoba_library as lib
@@ -262,7 +263,12 @@ class OnceData:
             if not type( current_race_data[data_key] ) is list:
                 continue
 
-            current_race_data[data_key+"_devi"] = lib.deviation_value( current_race_data[data_key] )
+            devi_data = lib.deviation_value( current_race_data[data_key] )
+
+            for i in range( 0, len( devi_data ) ):
+                devi_data[i] = int( devi_data[i] / 2 )
+            
+            current_race_data[data_key+"_devi"] = copy.deepcopy( devi_data )
 
         for count, horce_id in enumerate( horce_id_list ):
             current_data, past_data = lib.race_check( self.horce_data[horce_id],
