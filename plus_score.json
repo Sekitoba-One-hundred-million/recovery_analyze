@@ -1,24 +1,349 @@
 {
     "age": [
+        5,
+        7
+    ],
+    "before_id_weight": [
+        -2,
+        3
+    ],
+    "diff_load_weight": [
+        1,
+        -2,
+        -3,
+        4
+    ],
+    "jockey_rank": [
+        6,
         5
     ],
-    "all_horce_num": [
-        14,
-        10,
-        17,
-        9
-    ],
-    "baba": [
+    "my_limb_count": [
         2,
+        3,
+        11
+    ],
+    "high_level_score": [
+        4,
+        5,
+        6
+    ],
+    "weather": [
+        3
+    ],
+    "up3_jockey_true_skill": [
+        27,
+        31,
+        32,
+        33
+    ],
+    "horce_first_passing_true_skill_devi": [
+        50,
+        46,
+        52,
+        55,
+        56
+    ],
+    "two_rate_devi": [
+        50,
+        49,
+        51,
+        52,
+        53
+    ],
+    "all_horce_num": [
+        10,
+        9,
+        8
+    ],
+    "before_last_passing_rank": [
+        3,
         4
     ],
-    "before_rank": [
-        4
+    "dist_kind_count": [
+        3,
+        4,
+        10,
+        11,
+        12
     ],
-    "before_continue_not_three_rank": [
+    "jockey_year_rank": [
+        2,
+        12
+    ],
+    "place": [
+        10,
+        1,
+        2
+    ],
+    "straight_flame": [
+        103,
+        202,
+        206,
+        201,
+        207
+    ],
+    "weight": [
+        50,
+        51,
+        52,
+        53
+    ],
+    "up3_trainer_true_skill": [
+        28,
+        29,
+        30,
+        31
+    ],
+    "up3_horce_true_skill_devi": [
+        51,
+        46,
+        53,
+        54,
+        55
+    ],
+    "three_rate_devi": [
+        50,
+        52,
+        54
+    ],
+    "baba": [],
+    "before_pace": [],
+    "father_blood_type": [
+        31,
+        32,
+        22,
+        15,
+        13
+    ],
+    "limb": [
+        3
+    ],
+    "popular_rank": [
+        3,
         5,
         6,
-        8,
+        7
+    ],
+    "straight_slope": [
+        2,
+        3
+    ],
+    "horce_true_skill": [
+        31,
+        32,
+        33,
+        34
+    ],
+    "max_time_point": [
+        65,
+        64,
+        66,
+        68
+    ],
+    "up3_jockey_true_skill_devi": [
+        50,
+        51,
+        47,
+        55
+    ],
+    "max_time_point_devi": [
+        47,
+        55,
+        57
+    ],
+    "before_rank": [
+        4,
+        7
+    ],
+    "before_popular": [
+        4,
+        6
+    ],
+    "foot_used": [
+        3,
+        4
+    ],
+    "limb_horce_number": [
+        402,
+        401,
+        404,
+        405,
+        406
+    ],
+    "race_deployment": [
+        4,
+        2,
+        7,
+        8
+    ],
+    "three_average": [
+        4
+    ],
+    "jockey_true_skill": [
+        30,
+        32,
+        33
+    ],
+    "level_score": [
+        4,
+        5,
         9
+    ],
+    "up3_trainer_true_skill_devi": [
+        50,
+        51,
+        54,
+        41
+    ],
+    "up_rate_devi": [
+        53,
+        55,
+        44
+    ],
+    "before_continue_not_three_rank": [
+        6,
+        8,
+        10,
+        11
+    ],
+    "before_speed": [
+        60,
+        61,
+        59,
+        58,
+        64,
+        57,
+        65
+    ],
+    "horce_num": [
+        4,
+        10,
+        14
+    ],
+    "match_rank": [
+        4
+    ],
+    "race_num": [
+        10,
+        3
+    ],
+    "train_score": [
+        -2,
+        -4,
+        -5
+    ],
+    "trainer_true_skill": [
+        26,
+        31,
+        32,
+        33
+    ],
+    "horce_true_skill_devi": [
+        51,
+        48,
+        53,
+        54,
+        57
+    ],
+    "speed_index_devi": [
+        54,
+        47,
+        45,
+        55,
+        42
+    ],
+    "level_score_devi": [
+        54,
+        55,
+        48
+    ],
+    "before_diff": [
+        7,
+        8,
+        2,
+        11,
+        12
+    ],
+    "best_weight": [
+        1,
+        5,
+        11
+    ],
+    "horce_sex": [
+        0
+    ],
+    "money_score": [
+        2,
+        6,
+        8,
+        11,
+        13
+    ],
+    "money_class": [],
+    "trainer_rank": [
+        5
+    ],
+    "horce_first_passing_true_skill": [
+        27,
+        30,
+        32
+    ],
+    "jockey_true_skill_devi": [
+        48,
+        58
+    ],
+    "time_index_devi": [
+        55,
+        56,
+        57,
+        58
+    ],
+    "before_first_passing_rank": [
+        3
+    ],
+    "burden_weight": [
+        6,
+        5,
+        1
+    ],
+    "horce_sex_month": [
+        31,
+        41,
+        61,
+        72,
+        21
+    ],
+    "mother_rank": [
+        6,
+        5,
+        4
+    ],
+    "race_interval": [
+        10,
+        11
+    ],
+    "up3_standard_value": [
+        1,
+        4
+    ],
+    "up3_horce_true_skill": [
+        30,
+        32,
+        33,
+        34
+    ],
+    "trainer_true_skill_devi": [
+        54,
+        55,
+        49,
+        45
+    ],
+    "one_rate_devi": [
+        47,
+        41,
+        48,
+        51,
+        52,
+        53
     ]
 }

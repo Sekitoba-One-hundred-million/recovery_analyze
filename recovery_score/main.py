@@ -119,7 +119,6 @@ def test():
             if i % int( size - 1 ) == int( rank - 1 ):
                 print( rank, len( score_key_list ) - i, score_key )
                 score_create.create( score_key )
-                break
 
         comm.send( score_create.plus_score, dest = 0, tag = 0 )
         comm.send( score_create.minus_score, dest = 0, tag = 1 )
