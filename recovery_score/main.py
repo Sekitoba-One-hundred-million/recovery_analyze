@@ -88,6 +88,37 @@ def test():
     name = MPI.Get_processor_name() #プロセスが動いているノードのホスト名
 
     if rank == 0:
+        score_key_kind = {}
+        users_data = dm.pickle_load( "users_data.pickle" )
+
+        for race_id in users_data.keys():
+            for horce_id in users_data[race_id].keys():
+                for score_key in users_data[race_id][horce_id].keys():
+                    lib.dic_append( score_key_kind, score_key, {} )
+                    score_key_kind[score_key][int( users_data[race_id][horce_id][score_key] )] = True
+
+        score_key_list = list( score_key_kind.keys() )
+        index_list = []
+
+        for i in range( 0, size - 1 ):
+            index_list.append( { "score_key": [], "sum": 0 } )
+
+        for i in range( 0, len( score_key_list ) ):
+            N = min( len( score_key_kind[score_key_list[i]] ), 15 )
+            min_index = 0
+            min_sum = 100000
+
+            for r in range( 0, len( index_list ) ):
+                if index_list[r]["sum"] + N < min_sum:
+                    min_index = r
+                    min_sum = index_list[r]["sum"] + N
+
+            index_list[min_index]["score_key"].append( score_key_list[i] )
+            index_list[min_index]["sum"] += N
+
+        for i in range( 1, size ):
+            comm.send( index_list[int(i-1)]["score_key"], dest = i, tag = 0 )
+
         plus_score_data = {}
         minus_score_data = {}
 
@@ -108,17 +139,12 @@ def test():
         ds.rank_data = dm.pickle_load( "users_rank_data.pickle" )
         ds.users_data = dm.pickle_load( "users_data.pickle" )
 
-        race_id = list( ds.users_data.keys() )[0]
-        horce_id = list( ds.users_data[race_id].keys() )[0]
-        score_key_list = list( ds.users_data[race_id][horce_id].keys() )
+        score_key_list = comm.recv( source = 0, tag = 0)
         score_create = ScoreCreate( ds )
-        #print( score_key_list[-1] )
-        #score_create.create( score_key_list[-1] )
     
         for i, score_key in enumerate( score_key_list ):
-            if i % int( size - 1 ) == int( rank - 1 ):
-                print( rank, len( score_key_list ) - i, score_key )
-                score_create.create( score_key )
+            print( rank, len( score_key_list ) - i, score_key )
+            score_create.create( score_key )
 
         comm.send( score_create.plus_score, dest = 0, tag = 0 )
         comm.send( score_create.minus_score, dest = 0, tag = 1 )

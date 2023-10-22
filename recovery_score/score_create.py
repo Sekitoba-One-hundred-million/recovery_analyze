@@ -76,7 +76,7 @@ class ScoreCreate:
             if len( use_users_score_data ) == 0:
                 continue
 
-            search_length = 15
+            search_length = 20
             recovery_list = []
             bet_count_list = []
             
@@ -115,21 +115,26 @@ class ScoreCreate:
             median_recovery = recovery_list[int(len(recovery_list)/2)]
             conv = 0
             median_conv = 0
+            min_recovery = 100
             recovery_list.pop()
             recovery_list.pop(-1)
 
             for recovery in recovery_list:
                 conv += math.pow( recovery - ave_recovery, 2 )
+                min_recovery = min( recovery, min_recovery )
 
                 if recovery < median_recovery:
                     median_conv += math.pow( recovery - median_recovery, 2 )
 
             conv = math.sqrt( conv / len( recovery_list ) )
-            recovery_score = median_recovery + ( ave_recovery / 3 )
+            recovery_score = median_recovery + ( ave_recovery / 4 )
 
             if recovery_score < 0.75:
                 recovery_score -= 1
-            
+
+            if min_recovery < 0.5:
+                recovery_score -= 1
+                
             conv_score = ( median_conv ) / 5
             score = recovery_score - conv_score
             
