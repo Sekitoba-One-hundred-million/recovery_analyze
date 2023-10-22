@@ -113,7 +113,7 @@ def test():
         score_key_list = list( ds.users_data[race_id][horce_id].keys() )
         score_create = ScoreCreate( ds )
         #print( score_key_list[-1] )
-        score_create.create( score_key_list[-1] )
+        #score_create.create( score_key_list[-1] )
     
         for i, score_key in enumerate( score_key_list ):
             if i % int( size - 1 ) == int( rank - 1 ):

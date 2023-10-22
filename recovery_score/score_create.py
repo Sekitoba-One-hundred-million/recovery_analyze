@@ -50,7 +50,7 @@ class ScoreCreate:
             key_data = sorted( key_data.items(), key = lambda x:x[1] ,reverse = True )
     
             for i in range( 0, len( key_data ) ):
-                if key_data[i][1] < 3000 or len( users_score_list ) == 15:
+                if key_data[i][1] < 3000 or len( users_score_list ) == 16:
                     break
         
                 users_score_list.append( key_data[i][0] )
