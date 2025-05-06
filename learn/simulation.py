@@ -1,9 +1,9 @@
 import random
 
-from learn import ManageScore
 import SekitobaLibrary as lib
+from SekitobaLibrary import ManageRecoveryScore
 
-def main( learn_data, manage_score: ManageScore, recovery_len = 30, escape_year_list = lib.test_years ):
+def main( learn_data, manage_recovery_score: ManageRecoveryScore, recovery_len = 30, escape_year_list = lib.test_years ):
     N = 3
     win_count = 0
     recovery_data = []
@@ -21,14 +21,14 @@ def main( learn_data, manage_score: ManageScore, recovery_len = 30, escape_year_
         current_odds = learn_data["odds"][i]
         current_score_list = [ 0 for _ in range( len( current_standardization ) ) ]
 
-        for name in manage_score.data_name_list:
-            data_index = manage_score.data_name_list.index( name )
+        for name in manage_recovery_score.data_name_list:
+            data_index = manage_recovery_score.data_name_list.index( name )
             
             for r in range( 0, len( current_standardization ) ):
                 if data_type[name] == float:
-                    current_score_list[r] += manage_score.check_score( current_standardization[r][data_index], name )
+                    current_score_list[r] += manage_recovery_score.check_score( current_standardization[r][data_index], name )
                 elif data_type[name] == int:
-                    current_score_list[r] += manage_score.check_score( current_teacher[r][data_index], name )
+                    current_score_list[r] += manage_recovery_score.check_score( current_teacher[r][data_index], name )
 
         check_data = []
 
@@ -77,7 +77,7 @@ def main( learn_data, manage_score: ManageScore, recovery_len = 30, escape_year_
 
     return score
 
-def test_simu( simu_data, manage_score_list: list[ ManageScore ], test_years = lib.simu_years ):
+def test_simu( simu_data, manage_recovery_score_list: list[ ManageRecoveryScore ], test_years = lib.simu_years ):
     recovery = 0
     win_count = 0
     count = 0
@@ -90,16 +90,16 @@ def test_simu( simu_data, manage_score_list: list[ ManageScore ], test_years = l
             continue
 
         predict_data = {}
-        instance_manage_score = manage_score_list[0]
+        instance_manage_recovery_score = manage_recovery_score_list[0]
         
         for horce_id in simu_data[race_id].keys():
-            for name in instance_manage_score.data_name_list:
+            for name in instance_manage_recovery_score.data_name_list:
                 lib.dic_append( predict_data, name, [] )
-                data_index = instance_manage_score.data_name_list.index( name )
+                data_index = instance_manage_recovery_score.data_name_list.index( name )
                 predict_data[name].append( simu_data[race_id][horce_id]["data"][data_index] )
 
-        for name in instance_manage_score.data_name_list:
-            if instance_manage_score.data_type[name] == float:
+        for name in instance_manage_recovery_score.data_name_list:
+            if instance_manage_recovery_score.data_type[name] == float:
                 predict_data[name] = lib.standardization( predict_data[name], abort = [ lib.escapeValue ] )
 
         c = 0
@@ -108,9 +108,9 @@ def test_simu( simu_data, manage_score_list: list[ ManageScore ], test_years = l
         for horce_id in simu_data[race_id].keys():
             score = 0
 
-            for manage_score in manage_score_list:
-                for name in manage_score.data_name_list:
-                    score += manage_score.check_score( predict_data[name][c], name )
+            for manage_recovery_score in manage_recovery_score_list:
+                for name in manage_recovery_score.data_name_list:
+                    score += manage_recovery_score.check_score( predict_data[name][c], name )
 
             c += 1
             score_list.append( { "rank": simu_data[race_id][horce_id]["answer"]["rank"],

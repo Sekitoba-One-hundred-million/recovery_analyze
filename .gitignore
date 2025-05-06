@@ -1,4 +1,5 @@
 /learn/__pycache__/
 /learn/common
 /data_analyze/common
-//data_analyze/common/__pycache__
+/data_analyze/__pycache__
+/common/__pycache__

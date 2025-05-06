@@ -72,8 +72,8 @@ def create_next_cut_data( parent_data: list, sort_data: dict ):
     next_cut_index_data = {}
 
     for parent in parent_data:
-        current_cluster: dict = parent["manage_score"].cluster_data
-        current_data_tyoe: dict = parent["manage_score"].data_type
+        current_cluster: dict = parent["manage_recovery_score"].cluster_data
+        current_data_tyoe: dict = parent["manage_recovery_score"].data_type
         
         for name in current_cluster.keys():
             if current_data_tyoe[name] == int:
@@ -157,7 +157,7 @@ def create_next_cut_data( parent_data: list, sort_data: dict ):
             next_cut_index_data[name][i] = next_cut_data
 
     next_cut_data = {}
-    use_cluster: dict = parent["manage_score"].cluster_data
+    use_cluster: dict = parent["manage_recovery_score"].cluster_data
 
     for name in next_cut_index_data.keys():
         next_cut_data[name] = {}
@@ -175,7 +175,7 @@ def create_next_cut_data( parent_data: list, sort_data: dict ):
 def create_child( parent_data: list, sort_data: dict ):
     next_cluster_data = {}
     next_score_data = {}
-    data_type: dict = parent_data[0]["manage_score"].data_type
+    data_type: dict = parent_data[0]["manage_recovery_score"].data_type
     name_list = list( data_type.keys() )
     next_cluster_data.update( create_next_cut_data( parent_data, sort_data ) )
 
@@ -184,7 +184,7 @@ def create_child( parent_data: list, sort_data: dict ):
 
         if data_type[name] == int:
             next_cluster_data[name] = {}
-            next_cluster_data[name]["cut"] = copy.deepcopy( parent_data[0]["manage_score"].cluster_data[name]["cut"] )
+            next_cluster_data[name]["cut"] = copy.deepcopy( parent_data[0]["manage_recovery_score"].cluster_data[name]["cut"] )
             score_len = len( next_cluster_data[name]["cut"] )
         elif data_type[name] == float:
             score_len = int( len( next_cluster_data[name]["cut"] ) + 1 )
@@ -193,7 +193,7 @@ def create_child( parent_data: list, sort_data: dict ):
         next_cluster_data[name]["score_rate"] = [ 0 ] * score_len
             
         for parent in parent_data:
-            parent_cluster: dict = parent["manage_score"].cluster_data
+            parent_cluster: dict = parent["manage_recovery_score"].cluster_data
 
             for i in range( 0, len( next_cluster_data[name]["score"] ) ):
                 if data_type[name] == int:
@@ -264,28 +264,28 @@ def create_child( parent_data: list, sort_data: dict ):
             
     return next_cluster_data
 
-def main( manage_score_list, score_list, sort_data ):
+def main( manage_recovery_score_list, score_list, sort_data ):
     genetic_data = []
     rate_list = rate_softmax( score_list )
 
     for i in range( 0, len( rate_list ) ):
-        genetic_data.append( { "rate": rate_list[i], "manage_score": manage_score_list[i] } )
+        genetic_data.append( { "rate": rate_list[i], "manage_recovery_score": manage_recovery_score_list[i] } )
 
     genetic_data.sort( key = lambda x:x["rate"], reverse = True )
     children_data = []
-    children_data.append( copy.deepcopy( genetic_data[0]["manage_score"].cluster_data ) )
+    children_data.append( copy.deepcopy( genetic_data[0]["manage_recovery_score"].cluster_data ) )
 
     while 1:
-        if len( children_data ) == len( manage_score_list ):
+        if len( children_data ) == len( manage_recovery_score_list ):
             break
 
         parent_data = select_parent( genetic_data )
         children_data.append( create_child( parent_data, sort_data ) )
 
-    for i in range( 0, len( manage_score_list ) ):
+    for i in range( 0, len( manage_recovery_score_list ) ):
         if i == 0:
-            manage_score_list[i].genelation += 1
+            manage_recovery_score_list[i].genelation += 1
         else:
-            manage_score_list[i].genelation = 0
+            manage_recovery_score_list[i].genelation = 0
 
-        manage_score_list[i].update_cluster( children_data[i] )
+        manage_recovery_score_list[i].update_cluster( children_data[i] )
