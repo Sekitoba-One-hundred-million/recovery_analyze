@@ -1,3 +1,7 @@
+import faulthandler
+
+faulthandler.enable()
+
 def data_score_read():
     result = []
     f = open( "./common/rank_score_data.txt", "r" )
@@ -28,9 +32,16 @@ def main():
 
     import SekitobaDataManage as dm
     import SekitobaLibrary as lib
+
+    from learn import recovery_main
     from data_analyze import data_create
 
     lib.name.set_name( "recovery" )
+
+    comm = MPI.COMM_WORLD   #COMM_WORLDは全体
+    size = comm.Get_size()  #サイズ（指定されたプロセス（全体）数）
+    rank = comm.Get_rank()  #ランク（何番目のプロセスか。プロセスID）
+    name = MPI.Get_processor_name() #プロセスが動いているノードのホスト名
 
     lib.log.set_write( False )
     parser = ArgumentParser()
@@ -51,31 +62,16 @@ def main():
 
     data = data_create.main( update = u_check )
 
-    if not data  == None:
-        simu_data = data["simu"]
-        learn_data = data["data"]
-        remove_list = data_score_read()
+    if u_check and rank == 0:
+        dm.pickle_upload( lib.name.data_name(), data["data"] )
+        dm.pickle_upload( lib.name.simu_name(), data["simu"] )
 
-        for k in simu_data.keys():
-            for kk in simu_data[k].keys():
-                simu_data[k][kk]["data"] = data_remove( simu_data[k][kk]["data"], remove_list )
+    if l_check:
+        if rank == 0:
+            recovery_main.main_core( data["data"], data["simu"] )
+        else:
+            recovery_main.sub_core()
 
-        for i in range( 0, len( learn_data["teacher"] ) ):
-            for r in range( 0, len( learn_data["teacher"][i] ) ):
-                learn_data["teacher"][i][r] = data_remove( learn_data["teacher"][i][r], remove_list )
-
-        #if o_check:
-        #    learn.optuna_main( learn_data, simu_data )
-        #else:
-        #    model_list = []
-            
-        #    if l_check:
-        #        model_list = learn.main( data["data"], state = s_check )
-        #    elif b_check:
-        #        model_list = dm.pickle_load( lib.name.model_name() )
-
-        #    buy_simulation.main( model_list, simu_data, test_years = lib.simu_years )
-            
     MPI.Finalize()        
     
 if __name__ == "__main__":

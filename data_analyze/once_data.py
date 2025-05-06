@@ -24,6 +24,10 @@ data_name = Name()
 
 class OnceData:
     def __init__( self ):
+        self.predict_first_passing_rank = dm.dl.data_get( "predict_first_passing_rank.pickle" )
+        self.predict_last_passing_rank = dm.dl.data_get( "predict_last_passing_rank.pickle" )
+        self.predict_up3 = dm.dl.data_get( "predict_up3.pickle" )
+
         self.race_data = ps.RaceData()
         self.race_horce_data = ps.RaceHorceData()
         self.horce_data = ps.HorceData()
@@ -45,7 +49,7 @@ class OnceData:
         self.kind_score_key_list = {}
         self.kind_score_key_list[data_name.waku_three_rate] = [ "place", "dist", "limb", "baba", "kind" ]
         self.kind_score_key_list[data_name.limb_score] = [ "place", "dist", "baba", "kind" ]
-        self.result = { "answer": [], "teacher": [], "query": [], "year": [], "diff": [], "popular": [] }
+        self.result = { "answer": [], "teacher": [], "query": [], "year": [], "diff": [], "popular": [], "odds": [] }
         self.data_name_read()
 
     def data_name_read( self ):
@@ -150,11 +154,12 @@ class OnceData:
 
         teacher_data = []
         answer_data = []
+        odds_data = []
         popular_data = []
         diff_data = []
         horce_id_list = []
-        race_limb = {}
         getHorceDataDict: dict[ str, GetHorceData ] = {}
+        key_race_money_class = str( int( lib.money_class_get( self.race_data.data["money"] ) ) )
         new_check = False
 
         for horce_id in self.race_horce_data.horce_id_list:
@@ -170,6 +175,19 @@ class OnceData:
             place_num = int( race_place_num )
             horce_num = int( cd.horce_number() )
 
+            predict_first_passing_rank = lib.escapeValue
+            predict_last_passing_rank = lib.escapeValue
+            predict_up3 = lib.escapeValue
+
+            if race_id in self.predict_first_passing_rank and horce_id in self.predict_first_passing_rank[race_id]:
+                predict_first_passing_rank = self.predict_first_passing_rank[race_id][horce_id]["score"]
+
+            if race_id in self.predict_last_passing_rank and horce_id in self.predict_last_passing_rank[race_id]:
+                predict_last_passing_rank = self.predict_last_passing_rank[race_id][horce_id]["score"]
+
+            if race_id in self.predict_up3 and horce_id in self.predict_up3[race_id]:
+                predict_up3 = self.predict_up3[race_id][horce_id]["score"]
+
             before_id_weight_score = getHorceData.getBeforeIdWeight()
             before_popular = getHorceData.getBeforePopular()
             before_first_passing_rank, before_last_passing_rank = getHorceData.getBeforePassingRank()
@@ -182,6 +200,9 @@ class OnceData:
             before_continue_not_three_rank = pd.before_continue_not_three_rank()
             horce_sex = self.horce_data.data[horce_id]["sex"]
             dist_kind_count = pd.dist_kind_count()
+            age = int( cd.year() - int( horce_id[0:4]) )
+            speed, up_speed, pace_speed = pd.speed_index( self.horce_data.data[horce_id]["baba_index"] )
+            current_time_index = self.time_index.main( horce_id, pd.past_day_list() )
 
             horce_true_skill = self.race_horce_data.data[horce_id]["horce_true_skill"]
             jockey_true_skill = self.race_horce_data.data[horce_id]["jockey_true_skill"]
@@ -212,22 +233,22 @@ class OnceData:
                     break
 
             t_instance = {}
+            t_instance[data_name.age] = age
+            t_instance[data_name.before_rank] = getHorceData.getBeforeRank()
+            t_instance[data_name.before_diff] = getHorceData.getBeforeDiff()
             t_instance[data_name.before_continue_not_three_rank] = before_continue_not_three_rank
             t_instance[data_name.before_first_passing_rank] = before_first_passing_rank
             t_instance[data_name.before_id_weight] = before_id_weight_score
             t_instance[data_name.before_last_passing_rank] = before_last_passing_rank
             t_instance[data_name.before_popular] = before_popular
             t_instance[data_name.burden_weight] = cd.burden_weight()
-            t_instance[data_name.dist_kind] = cd.dist_kind()
             t_instance[data_name.dist_kind_count] = dist_kind_count
             t_instance[data_name.flame_evaluation_one] = flame_evaluation_one
             t_instance[data_name.flame_evaluation_two] = flame_evaluation_two
             t_instance[data_name.flame_evaluation_three] = flame_evaluation_three
             t_instance[data_name.foot_used_best] = self.race_type.best_foot_used( cd, pd )
             t_instance[data_name.horce_num] = cd.horce_number()
-            t_instance[data_name.horce_sex] = horce_sex
             t_instance[data_name.jockey_rank] = jockey_rank_score
-            t_instance[data_name.limb] = getHorceData.limb_math
             t_instance[data_name.race_interval] = race_interval_score
             t_instance[data_name.high_level_score] = high_level_score
             t_instance[data_name.waku_three_rate] = waku_three_rate
@@ -237,6 +258,18 @@ class OnceData:
             t_instance[data_name.trainer_true_skill] = self.race_horce_data.data[horce_id]["trainer_true_skill"]
             t_instance[data_name.up3_horce_true_skill] = self.race_horce_data.data[horce_id]["horce_up3_true_skill"]
             t_instance[data_name.corner_true_skill] = self.race_horce_data.data[horce_id]["horce_corner_true_skill"]
+            t_instance[data_name.predict_first_passing_rank] = predict_first_passing_rank
+            t_instance[data_name.predict_last_passing_rank] = predict_last_passing_rank
+            t_instance[data_name.predict_up3] = predict_up3
+            t_instance[data_name.weight] = weight_score
+            t_instance[data_name.limb] = getHorceData.limb_math
+            t_instance[data_name.stamina] = pd.stamina_create( getHorceData.key_limb )
+            t_instance[data_name.speed_index] = lib.max_check( speed ) + current_time_index["max"]
+            t_instance[data_name.match_rank] = pd.match_rank()
+            t_instance[data_name.kinetic_energy] = self.kinetic_energy.create( cd, pd )
+            t_instance[data_name.run_circle_speed] = pd.run_circle_speed()
+            t_instance[data_name.best_dist] = pd.best_dist()
+            t_instance[data_name.up_rate] = pd.up_rate( key_race_money_class, self.race_data.data["up_kind_ave"] )
 
             t_list = self.data_list_create( t_instance )
 
@@ -244,7 +277,7 @@ class OnceData:
                 key_dist_kind = str( int( cd.dist_kind() ) )
                 key_popular = str( int( cd.popular() ) )
                 popular_win_rate = { "one": 0, "two": 0, "three": 0 }
-                
+
                 try:
                     popular_win_rate = copy.deepcopy( self.popular_kind_win_rate_data[key_place][key_dist_kind][key_kind][key_popular] )
                 except:
@@ -265,11 +298,60 @@ class OnceData:
             teacher_data.append( t_list )
             diff_data.append( cd.diff() )
             popular_data.append( cd.popular() )
+            odds_data.append( cd.odds() )
 
         if not len( answer_data ) == 0:
             self.result["answer"].append( answer_data )
             self.result["teacher"].append( teacher_data )
             self.result["year"].append( year )
+            self.result["odds"].append( odds_data )
             self.result["query"].append( { "q": len( answer_data ), "year": year } )
             self.result["diff"].append( diff_data )
             self.result["popular"].append( popular_data )
+
+        if not "type" in self.result:
+            data_type = {}
+            data_type[data_name.age] = int
+            data_type[data_name.before_rank] = int
+            data_type[data_name.before_diff] = float
+            data_type[data_name.before_continue_not_three_rank] = int
+            data_type[data_name.before_first_passing_rank] = float
+            data_type[data_name.before_id_weight] = float
+            data_type[data_name.before_last_passing_rank] = float
+            data_type[data_name.before_popular] = int
+            data_type[data_name.burden_weight] = int
+            data_type[data_name.dist_kind_count] = int
+            data_type[data_name.flame_evaluation_one] = float
+            data_type[data_name.flame_evaluation_two] = float
+            data_type[data_name.flame_evaluation_three] = float
+            data_type[data_name.foot_used_best] = float
+            data_type[data_name.horce_num] = int
+            data_type[data_name.jockey_rank] = float
+            data_type[data_name.race_interval] = float
+            data_type[data_name.high_level_score] = float
+            data_type[data_name.waku_three_rate] = float
+            data_type[data_name.diff_load_weight] = float
+            data_type[data_name.horce_true_skill] = float
+            data_type[data_name.jockey_true_skill] = float
+            data_type[data_name.trainer_true_skill] = float
+            data_type[data_name.up3_horce_true_skill] = float
+            data_type[data_name.corner_true_skill] = float
+            data_type[data_name.predict_first_passing_rank] = float
+            data_type[data_name.predict_last_passing_rank] = float
+            data_type[data_name.predict_up3] = float
+            data_type[data_name.weight] = float
+            data_type[data_name.limb] = int
+            data_type[data_name.stamina] = float
+            data_type[data_name.speed_index] = float
+            data_type[data_name.match_rank] = float
+            data_type[data_name.kinetic_energy] = float
+            data_type[data_name.run_circle_speed] = float
+            data_type[data_name.best_dist] = float
+            data_type[data_name.up_rate] = float
+
+            for k in t_instance.keys():
+                if not k in data_type:
+                    print( "not found {} data_type".format( k ) )
+                    exit( 1 )
+
+            self.result["type"] = copy.deepcopy( data_type )
