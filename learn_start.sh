@@ -3,7 +3,7 @@ FILE_LIST=`cat "${DIR}"/list.txt`
 WRITE_FILE_NAME="${DIR}/name.py"
 TAG=''
 PROD_CHECK='test'
-CORE='21'
+CORE='11'
 PIPSERVER='100.95.241.19'
 
 while getopts tsc-: opt; do
@@ -60,7 +60,7 @@ cp -r "${DIR}" learn/
 PYTHON_COMMAND='python main.py'
 
 if [ "${TAG}" = '2' ]; then
-  mpiexec -n "${CORE}" ${PYTHON_COMMAND} -u True
+  mpiexec -n 10 ${PYTHON_COMMAND} -u True
   mpiexec -n "${CORE}" ${PYTHON_COMMAND} -l True -s "${PROD_CHECK}"
 fi
 

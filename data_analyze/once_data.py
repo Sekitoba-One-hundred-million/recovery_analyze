@@ -46,6 +46,7 @@ class OnceData:
         self.data_name_list = []
         self.write_data_list = []
         self.simu_data = {}
+        self.jockey_judgement_param_list = [ "limb", "popular", "flame_num", "dist", "kind", "baba", "place" ]
         self.kind_score_key_list = {}
         self.kind_score_key_list[data_name.waku_three_rate] = [ "place", "dist", "limb", "baba", "kind" ]
         self.kind_score_key_list[data_name.limb_score] = [ "place", "dist", "baba", "kind" ]
@@ -209,7 +210,17 @@ class OnceData:
             trainer_true_skill = self.race_horce_data.data[horce_id]["trainer_true_skill"]
             up3_horce_true_skill = self.race_horce_data.data[horce_id]["horce_up3_true_skill"]
             corner_true_skill = self.race_horce_data.data[horce_id]["horce_corner_true_skill"]
+            horce_first_passing_true_skill = self.race_horce_data.data[horce_id]["horce_first_passing_true_skill"]
+            jockey_first_passing_true_skill = self.race_horce_data.data[horce_id]["jockey_first_passing_true_skill"]
+            trainer_first_passing_true_skill = self.race_horce_data.data[horce_id]["trainer_first_passing_true_skill"]
+            horce_last_passing_true_skill  =self.race_horce_data.data[horce_id]["horce_last_passing_true_skill"]
+            jockey_last_passing_true_skill = self.race_horce_data.data[horce_id]["jockey_last_passing_true_skill"]
+            trainer_last_passing_true_skill = self.race_horce_data.data[horce_id]["trainer_last_passing_true_skill"]
 
+            past_min_first_horce_body, past_max_first_horce_body, past_ave_first_horce_body, past_std_first_horce_body = \
+                getHorceData.getFirstHorceBody()
+
+            stride_ablity_data = self.stride_ablity.ablity_create( cd, pd )
             jockey_year_rank_score = self.jockey_analyze.year_rank( horce_id, getHorceData.key_before_year )
             flame_evaluation_one = lib.escapeValue
             flame_evaluation_two = lib.escapeValue
@@ -270,6 +281,40 @@ class OnceData:
             t_instance[data_name.run_circle_speed] = pd.run_circle_speed()
             t_instance[data_name.best_dist] = pd.best_dist()
             t_instance[data_name.up_rate] = pd.up_rate( key_race_money_class, self.race_data.data["up_kind_ave"] )
+            t_instance[data_name.horce_sex] = horce_sex
+            t_instance[data_name.predict_netkeiba_deployment] = predict_netkeiba_deployment
+            t_instance[data_name.corner_diff_rank_ave] = pd.corner_diff_rank()
+            t_instance[data_name.max_time_point] = pd.max_time_point( self.race_data.data["race_time_analyze"] )
+            t_instance[data_name.horce_first_passing_true_skill] = horce_first_passing_true_skill
+            t_instance[data_name.jockey_first_passing_true_skill] = jockey_first_passing_true_skill
+            t_instance[data_name.trainer_first_passing_true_skill] = trainer_first_passing_true_skill
+            t_instance[data_name.horce_last_passing_true_skill] = horce_last_passing_true_skill
+            t_instance[data_name.jockey_last_passing_true_skill] = jockey_last_passing_true_skill
+            t_instance[data_name.trainer_last_passing_true_skill] = trainer_last_passing_true_skill
+            t_instance[data_name.past_min_first_horce_body] = past_min_first_horce_body
+            t_instance[data_name.past_max_first_horce_body] = past_max_first_horce_body
+            t_instance[data_name.past_ave_first_horce_body] = past_ave_first_horce_body
+            t_instance[data_name.past_std_first_horce_body] = past_std_first_horce_body            
+            t_instance[data_name.first_result_rank_diff] = pd.first_result_rank_diff()
+            t_instance[data_name.last_result_rank_diff] = pd.last_result_rank_diff()
+            t_instance[data_name.best_first_passing_rank] = pd.best_first_passing_rank()
+            t_instance[data_name.best_second_passing_rank] = pd.best_second_passing_rank()
+            t_instance[data_name.passing_regression] = pd.passing_regression()
+            t_instance[data_name.diff_pace_first_passing] = pd.diff_pace_first_passing()
+            t_instance[data_name.diff_pace_time] = pd.diff_pace_time()
+            t_instance[data_name.one_rate] = pd.one_rate()
+            t_instance[data_name.two_rate] = pd.two_rate()
+            t_instance[data_name.three_rate] = pd.three_rate()
+            t_instance[data_name.up3_standard_value] = getHorceData.getUp3StandardValue()
+            t_instance[data_name.popular_rank] = getHorceData.getPopularRank()
+            t_instance[data_name.three_average] = pd.three_average()
+            t_instance[data_name.three_difference] = pd.three_difference()
+
+            for stride_data_key in stride_ablity_data.keys():
+                t_instance[stride_data_key] = stride_ablity_data[stride_data_key]
+
+            for param in self.jockey_judgement_param_list:
+                t_instance["jockey_judgment_{}".format( param )] = self.race_horce_data.data[horce_id]["jockey_judgment"][param]
 
             t_list = self.data_list_create( t_instance )
 
@@ -348,6 +393,40 @@ class OnceData:
             data_type[data_name.run_circle_speed] = float
             data_type[data_name.best_dist] = float
             data_type[data_name.up_rate] = float
+            data_type[data_name.horce_sex] = int
+            data_type[data_name.predict_netkeiba_deployment] = int
+            data_type[data_name.corner_diff_rank_ave] = float
+            data_type[data_name.max_time_point] = float
+            data_type[data_name.horce_first_passing_true_skill] = float
+            data_type[data_name.jockey_first_passing_true_skill] = float
+            data_type[data_name.trainer_first_passing_true_skill] = float
+            data_type[data_name.horce_last_passing_true_skill] = float
+            data_type[data_name.jockey_last_passing_true_skill] = float
+            data_type[data_name.trainer_last_passing_true_skill] = float
+            data_type[data_name.past_min_first_horce_body] = float
+            data_type[data_name.past_max_first_horce_body] = float
+            data_type[data_name.past_ave_first_horce_body] = float
+            data_type[data_name.past_std_first_horce_body] = float
+            data_type[data_name.first_result_rank_diff] = float
+            data_type[data_name.last_result_rank_diff] = float
+            data_type[data_name.best_first_passing_rank] = float
+            data_type[data_name.best_second_passing_rank] = float
+            data_type[data_name.passing_regression] = float
+            data_type[data_name.diff_pace_first_passing] = float
+            data_type[data_name.diff_pace_time] = float
+            data_type[data_name.one_rate] = float
+            data_type[data_name.two_rate] = float
+            data_type[data_name.three_rate] = float
+            data_type[data_name.up3_standard_value] = float
+            data_type[data_name.popular_rank] = float
+            data_type[data_name.three_average] = float
+            data_type[data_name.three_difference] = float
+            
+            for stride_data_key in stride_ablity_data.keys():
+                data_type[stride_data_key] = float
+
+            for param in self.jockey_judgement_param_list:
+                data_type["jockey_judgment_{}".format( param )] = float
 
             for k in t_instance.keys():
                 if not k in data_type:

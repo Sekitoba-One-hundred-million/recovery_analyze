@@ -67,10 +67,29 @@ def main():
         dm.pickle_upload( lib.name.simu_name(), data["simu"] )
 
     if l_check:
+        lib.race_money_data.clear()
+        lib.race_ave_true_skill_data.clear()
+        lib.corner_horce_body_data.clear()
+        lib.wrap_data.clear()
+        lib.run_circle_dist_data.clear()
+        
         if rank == 0:
             recovery_main.main_core( data["data"], data["simu"] )
         else:
             recovery_main.sub_core()
+    elif b_check:
+        from learn.simulation import test_simu
+        manage_recovery_score_list = []
+        simu_data = dm.pickle_load( lib.name.simu_name() )
+        cluster_data = dm.pickle_load( "recovery_cluster_data.pickle" )
+
+        for cluster in cluster_data["cluster"]:
+            manage_recovery_score_list.append( lib.ManageRecoveryScore( {},
+                                                                        data_name_list = cluster_data["name"],
+                                                                        data_type = cluster_data["type"],
+                                                                        cd = cluster ) )
+
+        print( test_simu( simu_data, manage_recovery_score_list ) )
 
     MPI.Finalize()        
     

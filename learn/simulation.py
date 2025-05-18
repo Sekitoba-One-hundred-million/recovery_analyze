@@ -82,7 +82,7 @@ def test_simu( simu_data, manage_recovery_score_list: list[ ManageRecoveryScore 
     win_count = 0
     count = 0
     N = 3
-
+    #print( len( simu_data.keys() ) )
     for race_id in simu_data.keys():
         year = race_id[0:4]
 
@@ -130,6 +130,7 @@ def test_simu( simu_data, manage_recovery_score_list: list[ ManageRecoveryScore 
                 break
 
     #win_rate = ( win_count / count ) * N
-    #print( "test win_rate: {}".format( win_rate ) )
+    #print( "count: {}".format( count ) )
+    #print( "win_rate: {}".format( win_rate ) )
 
     return recovery / count
