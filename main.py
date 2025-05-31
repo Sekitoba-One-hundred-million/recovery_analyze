@@ -67,12 +67,6 @@ def main():
         dm.pickle_upload( lib.name.simu_name(), data["simu"] )
 
     if l_check:
-        lib.race_money_data.clear()
-        lib.race_ave_true_skill_data.clear()
-        lib.corner_horce_body_data.clear()
-        lib.wrap_data.clear()
-        lib.run_circle_dist_data.clear()
-        
         if rank == 0:
             recovery_main.main_core( data["data"], data["simu"] )
         else:
