@@ -211,7 +211,7 @@ def sub_core():
                       "manage_recovery_score": manage_recovery_score_list }
         comm.send( send_data, dest = 0, tag = rank )
         finish = comm.recv( source = 0, tag = 1 )
-        
+
         if finish:
             print( "sub:{} finish".format( rank ) )
             break

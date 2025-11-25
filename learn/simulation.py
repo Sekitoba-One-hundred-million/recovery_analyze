@@ -129,8 +129,10 @@ def test_simu( simu_data, manage_recovery_score_list: list[ ManageRecoveryScore 
                 recovery += score_list[i]["odds"]
                 break
 
-    #win_rate = ( win_count / count ) * N
+    win_rate = ( win_count / count ) * N
+    recovery /= count
+    recovery *= win_rate
     #print( "count: {}".format( count ) )
     #print( "win_rate: {}".format( win_rate ) )
 
-    return recovery / count
+    return recovery
