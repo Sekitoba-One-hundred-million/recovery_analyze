@@ -135,14 +135,8 @@ def main_core( learn_data, simu_data ):
                     best_manage_recovery_score = copy.deepcopy( manage_recovery_score_list[r] )
 
             if best_manage_recovery_score.genelation == 0:
-                #check_score = simulation.main( learn_data,
-                #                               best_manage_recovery_score,
-                #                               recovery_len = 5,
-                #                               escape_year_list = test_remove_year_list )
                 best_manage_recovery_score_list.append( { "score": simulation.test_simu( simu_data, [ best_manage_recovery_score ], test_years = lib.recovery_test_years ),
                                                  "manage_recovery_score": best_manage_recovery_score } )
-                #best_manage_recovery_score_list.append( { "score": check_score,
-                #                                 "manage_recovery_score": best_manage_recovery_score } )
 
             print( c, i, len( best_manage_recovery_score_list ), min( recovery_list ), best_score,
                    best_manage_recovery_score_list[-1]["score"],

@@ -12,6 +12,8 @@ best_second_passing_rank
 burden_weight
 corner_diff_rank_ave
 corner_true_skill
+corner_true_skill_index
+corner_true_skill_stand
 diff_load_weight
 diff_pace_first_passing
 diff_pace_time
@@ -33,6 +35,8 @@ horce_last_passing_true_skill
 horce_num
 horce_sex
 horce_true_skill
+horce_true_skill_index
+horce_true_skill_stand
 jockey_first_passing_true_skill
 jockey_judgment_baba
 jockey_judgment_dist
@@ -44,6 +48,8 @@ jockey_judgment_popular
 jockey_last_passing_true_skill
 jockey_rank
 jockey_true_skill
+jockey_true_skill_index
+jockey_true_skill_stand
 kinetic_energy
 last_result_rank_diff
 leading_power_ave
@@ -82,8 +88,12 @@ three_rate
 trainer_first_passing_true_skill
 trainer_last_passing_true_skill
 trainer_true_skill
+trainer_true_skill_index
+trainer_true_skill_stand
 two_rate
 up3_horce_true_skill
+up3_horce_true_skill_index
+up3_horce_true_skill_stand
 up3_standard_value
 up_rate
 waku_three_rate

@@ -159,10 +159,55 @@ class OnceData:
         popular_data = []
         diff_data = []
         horce_id_list = []
+        current_race_data = {}
         getHorceDataDict: dict[ str, GetHorceData ] = {}
         key_race_money_class = str( int( lib.money_class_get( self.race_data.data["money"] ) ) )
         new_check = False
 
+        for name in self.data_name_list:
+            if name in current_race_data:
+                continue
+
+            current_race_data[name] = []
+
+        for horce_id in self.race_horce_data.horce_id_list:
+            current_data, past_data = lib.race_check( self.horce_data.data[horce_id]["past_data"], ymd )
+            cd = lib.CurrentData( current_data )
+            pd = lib.PastData( past_data, current_data, self.race_data )
+
+            if not cd.race_check():
+                continue
+
+            cd.setting_odds( self.race_data.data["dev_odds_popular"][horce_id]["odds"] )
+            cd.setting_popular( self.race_data.data["dev_odds_popular"][horce_id]["popular"] )
+            horce_true_skill = self.race_horce_data.data[horce_id]["horce_true_skill"]
+            jockey_true_skill = self.race_horce_data.data[horce_id]["jockey_true_skill"]
+            trainer_true_skill = self.race_horce_data.data[horce_id]["trainer_true_skill"]
+            up3_horce_true_skill = self.race_horce_data.data[horce_id]["horce_up3_true_skill"]
+            corner_true_skill = self.race_horce_data.data[horce_id]["horce_corner_true_skill"]
+            current_race_data[data_name.horce_true_skill].append( horce_true_skill )
+            current_race_data[data_name.jockey_true_skill].append( jockey_true_skill )
+            current_race_data[data_name.trainer_true_skill].append( trainer_true_skill )
+            current_race_data[data_name.corner_true_skill].append( corner_true_skill )
+            current_race_data[data_name.up3_horce_true_skill].append( up3_horce_true_skill )            
+            current_race_data[data_name.corner_true_skill].append( corner_true_skill )            
+
+        current_key_list = []
+
+        for data_key in current_race_data.keys():
+            if not type( current_race_data[data_key] ) is list or \
+              len( current_race_data[data_key] ) == 0:
+                continue
+
+            current_key_list.append( data_key )
+            
+        for data_key in current_key_list:
+            current_race_data[data_key+"_index"] = sorted( current_race_data[data_key], reverse = True )
+            current_race_data[data_key+"_stand"] = lib.standardization( current_race_data[data_key] )
+            current_race_data[data_key+"_devi"] = lib.deviation_value( current_race_data[data_key] )
+
+        rc = 0
+        
         for horce_id in self.race_horce_data.horce_id_list:
             current_data, past_data = lib.race_check( self.horce_data.data[horce_id]["past_data"], ymd )
             cd = lib.CurrentData( current_data )
@@ -207,11 +252,6 @@ class OnceData:
             speed, up_speed, pace_speed = pd.speed_index( self.horce_data.data[horce_id]["baba_index"] )
             current_time_index = self.time_index.main( horce_id, pd.past_day_list() )
 
-            horce_true_skill = self.race_horce_data.data[horce_id]["horce_true_skill"]
-            jockey_true_skill = self.race_horce_data.data[horce_id]["jockey_true_skill"]
-            trainer_true_skill = self.race_horce_data.data[horce_id]["trainer_true_skill"]
-            up3_horce_true_skill = self.race_horce_data.data[horce_id]["horce_up3_true_skill"]
-            corner_true_skill = self.race_horce_data.data[horce_id]["horce_corner_true_skill"]
             horce_first_passing_true_skill = self.race_horce_data.data[horce_id]["horce_first_passing_true_skill"]
             jockey_first_passing_true_skill = self.race_horce_data.data[horce_id]["jockey_first_passing_true_skill"]
             trainer_first_passing_true_skill = self.race_horce_data.data[horce_id]["trainer_first_passing_true_skill"]
@@ -266,11 +306,28 @@ class OnceData:
             t_instance[data_name.high_level_score] = high_level_score
             t_instance[data_name.waku_three_rate] = waku_three_rate
             t_instance[data_name.diff_load_weight] = diff_load_weight
-            t_instance[data_name.horce_true_skill] = self.race_horce_data.data[horce_id]["horce_true_skill"]
-            t_instance[data_name.jockey_true_skill] = self.race_horce_data.data[horce_id]["jockey_true_skill"]
-            t_instance[data_name.trainer_true_skill] = self.race_horce_data.data[horce_id]["trainer_true_skill"]
-            t_instance[data_name.up3_horce_true_skill] = self.race_horce_data.data[horce_id]["horce_up3_true_skill"]
-            t_instance[data_name.corner_true_skill] = self.race_horce_data.data[horce_id]["horce_corner_true_skill"]
+            
+            t_instance[data_name.horce_true_skill] = current_race_data[data_name.horce_true_skill][rc]
+            t_instance[data_name.horce_true_skill_index] = current_race_data[data_name.horce_true_skill_index][rc]
+            t_instance[data_name.horce_true_skill_stand] = current_race_data[data_name.horce_true_skill_stand][rc]
+                                    
+            t_instance[data_name.jockey_true_skill] = current_race_data[data_name.jockey_true_skill][rc]
+            t_instance[data_name.jockey_true_skill_index] = current_race_data[data_name.jockey_true_skill][rc]
+            t_instance[data_name.jockey_true_skill_stand] = current_race_data[data_name.jockey_true_skill][rc]
+                                    
+            t_instance[data_name.trainer_true_skill] = current_race_data[data_name.trainer_true_skill][rc]
+            t_instance[data_name.trainer_true_skill_index] = current_race_data[data_name.trainer_true_skill_index][rc]
+            t_instance[data_name.trainer_true_skill_stand] = current_race_data[data_name.trainer_true_skill_stand][rc]
+                                    
+            t_instance[data_name.up3_horce_true_skill] = current_race_data[data_name.up3_horce_true_skill][rc]
+            t_instance[data_name.up3_horce_true_skill_index] = current_race_data[data_name.up3_horce_true_skill_index][rc]
+            t_instance[data_name.up3_horce_true_skill_stand] = current_race_data[data_name.up3_horce_true_skill_stand][rc]
+            
+            t_instance[data_name.corner_true_skill] = current_race_data[data_name.corner_true_skill][rc]
+            t_instance[data_name.corner_true_skill_index] = current_race_data[data_name.corner_true_skill_index][rc]
+            t_instance[data_name.corner_true_skill_stand] = current_race_data[data_name.corner_true_skill_stand][rc]
+
+            rc += 1
             t_instance[data_name.predict_first_passing_rank] = predict_first_passing_rank
             t_instance[data_name.predict_last_passing_rank] = predict_last_passing_rank
             t_instance[data_name.predict_up3] = predict_up3
@@ -379,10 +436,20 @@ class OnceData:
             data_type[data_name.waku_three_rate] = float
             data_type[data_name.diff_load_weight] = float
             data_type[data_name.horce_true_skill] = float
+            data_type[data_name.horce_true_skill_index] = int
+            data_type[data_name.horce_true_skill_stand] = float
             data_type[data_name.jockey_true_skill] = float
+            data_type[data_name.jockey_true_skill_index] = int
+            data_type[data_name.jockey_true_skill_stand] = float
             data_type[data_name.trainer_true_skill] = float
+            data_type[data_name.trainer_true_skill_index] = int
+            data_type[data_name.trainer_true_skill_stand] = float
             data_type[data_name.up3_horce_true_skill] = float
+            data_type[data_name.up3_horce_true_skill_index] = int
+            data_type[data_name.up3_horce_true_skill_stand] = float
             data_type[data_name.corner_true_skill] = float
+            data_type[data_name.corner_true_skill_index] = int
+            data_type[data_name.corner_true_skill_stand] = float
             data_type[data_name.predict_first_passing_rank] = float
             data_type[data_name.predict_last_passing_rank] = float
             data_type[data_name.predict_up3] = float

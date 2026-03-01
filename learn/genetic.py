@@ -243,10 +243,10 @@ def create_child( parent_data: list, sort_data: dict ):
             score = next_cluster_data[name]["score"][i] / next_cluster_data[name]["score_rate"][i]
             next_score = lib.escapeValue
             normal_dis = np.random.normal( 
-            loc = score,
-            scale = 0.1,
-            size = 100 )
-
+                loc = score,
+                scale = 0.1,
+                size = 100 )
+            
             for sc in normal_dis:
                 if sc <= 0 or 1 <= sc:
                     continue

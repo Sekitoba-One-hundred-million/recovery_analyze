@@ -3,7 +3,7 @@ import random
 import SekitobaLibrary as lib
 from SekitobaLibrary import ManageRecoveryScore
 
-def main( learn_data, manage_recovery_score: ManageRecoveryScore, recovery_len = 30, escape_year_list = lib.test_years ):
+def main( learn_data, manage_recovery_score: ManageRecoveryScore, recovery_len = 10, escape_year_list = lib.test_years ):
     N = 3
     win_count = 0
     recovery_data = []
@@ -45,7 +45,6 @@ def main( learn_data, manage_recovery_score: ManageRecoveryScore, recovery_len =
 
         for r in range( 0, N ):
             if check_data[r]["rank"] == 1:
-                win_count += 1
                 recovery = check_data[r]["odds"]
                 break
 
@@ -53,6 +52,7 @@ def main( learn_data, manage_recovery_score: ManageRecoveryScore, recovery_len =
 
     score = 100
     recovery_list = []
+    bet_count = N
     
     for i in range( 0, 100 ):
         cut_count = int( len( recovery_data ) / recovery_len )
@@ -62,7 +62,7 @@ def main( learn_data, manage_recovery_score: ManageRecoveryScore, recovery_len =
             s1 = int( r * cut_count )
             s2 = int( s1 + cut_count )
             recovery_list.append(
-                sum( recovery_data[s1:s2] ) / ( len( recovery_data[s1:s2] ) * N ) )
+                sum( recovery_data[s1:s2] ) / ( len( recovery_data[s1:s2] ) * bet_count ) )
 
         current_recovery = 0
         c = int( recovery_len / 5 )
@@ -73,7 +73,7 @@ def main( learn_data, manage_recovery_score: ManageRecoveryScore, recovery_len =
         score = min( score, current_recovery / c )
         recovery_list.clear()
 
-    print( sum( recovery_data ) / ( len( recovery_data ) * N ) )
+    print( sum( recovery_data ) / ( len( recovery_data ) * bet_count ) )
 
     return score
 
@@ -129,9 +129,10 @@ def test_simu( simu_data, manage_recovery_score_list: list[ ManageRecoveryScore 
                 recovery += score_list[i]["odds"]
                 break
 
-    win_rate = ( win_count / count ) * N
+    #win_rate = ( win_count / count ) * N
     recovery /= count
-    recovery *= win_rate
+    #recovery *= N
+    #recovery *= win_rate
     #print( "count: {}".format( count ) )
     #print( "win_rate: {}".format( win_rate ) )
 
